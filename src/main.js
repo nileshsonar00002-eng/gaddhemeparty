@@ -1,0 +1,891 @@
+import './style.css';
+import { LeafletAdapter } from './map/LeafletAdapter';
+import { GoogleMapsAdapter } from './map/GoogleMapsAdapter';
+import { createNavbar } from './components/Navbar';
+import { renderStatsStrip } from './components/StatsStrip';
+import { checkAndShowOnboarding } from './components/OnboardingModal';
+import { BottomSheet } from './components/BottomSheet';
+import { LeaderboardSection } from './components/LeaderboardSheet';
+import { renderReportForm } from './components/ReportForm';
+import { openPinDetailModal } from './components/PinDetailModal';
+import { openChaiTipModal } from './components/ChaiTipModal';
+import { showToast } from './components/Toast';
+import { t, getLanguage, renderAllPageI18n } from './utils/i18n';
+import { modalManager } from './utils/modalManager';
+import { resolvePinCity, getNearestIndianCity } from './utils/cities';
+import { getActionQuota, hasUserReportedOrUpvoted, hasUserUpvoted, markPinAsUpvoted } from './utils/upvoteStorage';
+import {
+  initAnonymousAuth,
+  subscribeToActivePins,
+  subscribeToGlobalStats,
+  subscribeToLeaderboard,
+  uploadPotholePhoto,
+  callSubmitReport,
+  callUpvotePin,
+  callFlagPin
+} from './services/firebase';
+import {
+  saveReportOffline,
+  getOfflineReports,
+  removeOfflineReport
+} from './utils/offlineQueue';
+
+import { StarfieldCanvas } from './components/StarfieldCanvas';
+import { NightGlobe } from './components/NightGlobe';
+import { PanelManager } from './components/PanelManager';
+import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimation';
+import { router } from './utils/router';
+
+// Real Live Data Store
+class KhaddaApp {
+  constructor() {
+    this.mapAdapter = null;
+    this.bottomSheet = new BottomSheet();
+    this.panelManager = null;
+    this.leaderboardSection = new LeaderboardSection('leaderboard-mount');
+    this.currentPins = [];
+    this.userCoords = null;
+    this.mapTheme = 'dark';
+    this.activeNav = 'map';
+    this.starfield = null;
+    this.nightGlobe = null;
+    this.hasFlownIn = false;
+    this.knownPinIds = new Set();
+    this.statsData = {
+      totalReports: 0,
+      todayReports: 0,
+      topCity: '-'
+    };
+  }
+
+  async init() {
+    console.log('[KhaddaWaliParty] Initializing redesigned civic-tech app...');
+
+    // 0. Initialize theme from storage or system preference
+    this.initTheme();
+
+    // 0.2. Render saved language across static DOM
+    renderAllPageI18n();
+
+    // 0.5. Initialize Hero Cinematic Visuals (Starfield & 3D Night Globe)
+    this.initHeroVisuals();
+
+    // 1. Initialize Anonymous Auth
+    await initAnonymousAuth();
+
+    // 2. Initialize Map View centered on India (Google Maps or Leaflet)
+    const provider = import.meta.env.VITE_MAP_PROVIDER;
+    const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+    if (provider === 'google' && googleKey) {
+      try {
+        console.log('[Map] Initializing Google Maps JS API with region=IN...');
+        this.mapAdapter = new GoogleMapsAdapter();
+        await this.mapAdapter.init('map', { theme: this.mapTheme });
+      } catch (e) {
+        console.warn('[Map] Google Maps fallback to Leaflet:', e);
+        this.mapAdapter = new LeafletAdapter();
+        this.mapAdapter.init('map', { theme: this.mapTheme });
+      }
+    } else {
+      this.mapAdapter = new LeafletAdapter();
+      this.mapAdapter.init('map', { theme: this.mapTheme });
+    }
+
+    this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+
+    // Setup Map Cinematic Fly-in on first viewport intersection
+    this.setupMapFlyInObserver();
+
+    // 3. Initialize Slide-Over Panel Manager & Routing
+    this.initPanelsAndRouter();
+
+    // 4. Initialize Top Navbar & Real Stats Strip
+    this.renderHeaderAndStats();
+
+    // 5. Setup Global UI Event Handlers
+    this.setupEventListeners();
+
+    // 6. Connect Realtime Firestore Listeners
+    this.setupFirestoreSubscriptions();
+
+    // 7. Setup Offline Sync Manager
+    this.setupOfflineSync();
+
+    // 8. Auto-detect user geolocation on initial load if permitted
+    this.detectInitialLocation();
+
+    // 9. Sticky Mobile CTA & Scroll Reveal
+    this.setupStickyCtaObserver();
+    this.setupScrollReveal();
+
+    // 10. First-visit Onboarding Primer (stored in localStorage)
+    checkAndShowOnboarding();
+
+    // 10.5. Initialize Animated Pothole Cartoon Strip (Above Footer)
+    initPotholeCartoonAnimation('pothole-animation-mount');
+    window.addEventListener('languageChanged', () => {
+      initPotholeCartoonAnimation('pothole-animation-mount');
+      this.renderHeaderAndStats();
+    });
+
+    // 11. Window Resize Listener for full-width layout responsiveness
+    window.addEventListener('resize', () => {
+      if (this.mapAdapter && this.mapAdapter.resize) {
+        this.mapAdapter.resize();
+      }
+    });
+  }
+
+  initHeroVisuals() {
+    try {
+      this.starfield = new StarfieldCanvas('starfield-canvas');
+      this.nightGlobe = new NightGlobe('globe-canvas');
+    } catch (e) {
+      console.warn('[HeroVisuals] Initialization notice:', e);
+    }
+  }
+
+  setupMapFlyInObserver() {
+    const mapSection = document.getElementById('map-section');
+    if (!mapSection) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !this.hasFlownIn) {
+            this.hasFlownIn = true;
+            if (this.mapAdapter && this.mapAdapter.cinematicFlyIn) {
+              this.mapAdapter.cinematicFlyIn();
+            }
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(mapSection);
+  }
+
+  initPanelsAndRouter() {
+    this.panelManager = new PanelManager({
+      onSelectPin: (pin) => {
+        this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+        setTimeout(() => {
+          openPinDetailModal(pin);
+        }, 350);
+      },
+      onPanelStateChange: (panelId, isOpen) => {
+        this.activeNav = isOpen ? panelId : 'map';
+        this.renderHeaderAndStats();
+      }
+    });
+
+    // Wire Router with History API
+    router.init((route) => {
+      if (route.type === 'pin' && route.id) {
+        const pin = this.currentPins.find((p) => p.id === route.id);
+        if (pin) {
+          this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+          openPinDetailModal(pin);
+        }
+      } else if (route.type === 'panel') {
+        if (route.name) {
+          this.panelManager.open(route.name);
+        } else {
+          this.panelManager.close();
+        }
+      }
+    });
+  }
+
+  initTheme() {
+    const saved = localStorage.getItem('khadda_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.mapTheme = saved || (prefersDark ? 'dark' : 'light');
+    this.applyGlobalTheme(this.mapTheme, false);
+
+    // Auto-listen to system color scheme changes if user hasn't explicitly set a preference
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('khadda_theme')) {
+          this.applyGlobalTheme(e.matches ? 'dark' : 'light', false);
+        }
+      });
+    }
+  }
+
+  applyGlobalTheme(theme, persist = true) {
+    this.mapTheme = theme;
+    if (persist) {
+      localStorage.setItem('khadda_theme', theme);
+    }
+
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
+
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', theme === 'dark' ? '#080C14' : '#F8FAFC');
+    }
+
+    if (this.mapAdapter && this.mapAdapter.applyTheme) {
+      this.mapAdapter.applyTheme(theme);
+    }
+
+    if (this.nightGlobe && this.nightGlobe.applyTheme) {
+      this.nightGlobe.applyTheme(theme);
+    }
+
+    if (this.starfield && this.starfield.applyTheme) {
+      this.starfield.applyTheme(theme);
+    }
+
+    this.renderHeaderAndStats();
+  }
+
+  renderHeaderAndStats() {
+    createNavbar({
+      onChaiTipClick: () => openChaiTipModal(),
+      onToggleMapTheme: () => this.toggleMapTheme(),
+      currentTheme: this.mapTheme,
+      activeNav: this.activeNav
+    });
+
+    const statsContainer = document.getElementById('stats-strip-container');
+    if (statsContainer) {
+      renderStatsStrip(statsContainer, this.statsData);
+    }
+  }
+
+  toggleMapTheme() {
+    const nextTheme = this.mapTheme === 'dark' ? 'light' : 'dark';
+    this.applyGlobalTheme(nextTheme, true);
+  }
+
+  setupEventListeners() {
+    // Open Bottom Sheet Report Form
+    const openReportBtn = document.getElementById('btn-open-report');
+    openReportBtn?.addEventListener('click', () => {
+      this.openReportDrawer();
+    });
+
+    // Locate Me Button
+    const locateMeBtn = document.getElementById('btn-locate-me');
+    locateMeBtn?.addEventListener('click', () => {
+      this.locateUserAndCenter();
+    });
+
+    // In-card Info Button -> Opens About Panel
+    const openAboutBtn = document.getElementById('btn-open-about');
+    openAboutBtn?.addEventListener('click', () => {
+      router.navigate('about');
+    });
+
+    // Sticky Mobile Floating Report Button
+    const stickyReportBtn = document.getElementById('btn-sticky-report');
+    stickyReportBtn?.addEventListener('click', () => {
+      this.openReportDrawer();
+    });
+
+    // Card Zoom Controls
+    const zoomInBtn = document.getElementById('btn-zoom-in');
+    const zoomOutBtn = document.getElementById('btn-zoom-out');
+
+    zoomInBtn?.addEventListener('click', () => {
+      if (this.mapAdapter && this.mapAdapter.zoomIn) {
+        this.mapAdapter.zoomIn();
+      }
+    });
+
+    zoomOutBtn?.addEventListener('click', () => {
+      if (this.mapAdapter && this.mapAdapter.zoomOut) {
+        this.mapAdapter.zoomOut();
+      }
+    });
+
+    // Card Fullscreen Toggle Control
+    const fullscreenToggleBtn = document.getElementById('btn-fullscreen-toggle');
+    fullscreenToggleBtn?.addEventListener('click', () => {
+      this.toggleMapFullscreen();
+    });
+
+    // Listen to native and ESC fullscreen changes
+    const onFullscreenChange = () => {
+      const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+      const card = document.getElementById('map-card-container');
+      const isCssFs = card?.classList.contains('is-fullscreen');
+      this.updateFullscreenUI(isNativeFs || isCssFs);
+      if (this.mapAdapter && this.mapAdapter.resize) {
+        setTimeout(() => this.mapAdapter.resize(), 100);
+        setTimeout(() => this.mapAdapter.resize(), 300);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    document.addEventListener('mozfullscreenchange', onFullscreenChange);
+    document.addEventListener('MSFullscreenChange', onFullscreenChange);
+
+    // Global Pin Navigation Handlers
+    window.__khaddaFlyToPin = (pinId) => {
+      const pin = this.currentPins.find((p) => p.id === pinId) ||
+                  (this.panelManager?.leaderboardData?.heroPotholeOfWeek?.id === pinId ? this.panelManager.leaderboardData.heroPotholeOfWeek : null);
+      if (pin) {
+        const mapEl = document.getElementById('map-section');
+        if (mapEl) {
+          mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+        setTimeout(() => {
+          openPinDetailModal(pin);
+        }, 400);
+      }
+    };
+
+    window.__khaddaOpenPinModal = (pin) => {
+      if (pin) openPinDetailModal(pin);
+    };
+
+    window.__khaddaReRenderPins = () => {
+      if (this.mapAdapter && this.currentPins) {
+        this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
+      }
+    };
+
+    // Language Change Event - Synchronous bilingual UI re-render
+    window.addEventListener('languageChanged', () => {
+      renderAllPageI18n();
+      this.renderHeaderAndStats();
+      
+      const fabText = document.getElementById('fab-text');
+      if (fabText) fabText.innerText = t('reportBtn');
+
+      const stickyText = document.querySelector('#btn-sticky-report span:last-child');
+      if (stickyText) stickyText.innerText = t('reportBtn');
+
+      const locateBtnEl = document.getElementById('btn-locate-me');
+      if (locateBtnEl) {
+        locateBtnEl.title = t('locateMe');
+        locateBtnEl.setAttribute('aria-label', t('locateMe'));
+      }
+
+      const aboutBtnEl = document.getElementById('btn-open-about');
+      if (aboutBtnEl) {
+        aboutBtnEl.title = t('aboutBtnTooltip');
+        aboutBtnEl.setAttribute('aria-label', t('aboutBtnTooltip'));
+      }
+
+      const fsBtnEl = document.getElementById('btn-fullscreen-toggle');
+      if (fsBtnEl) {
+        const card = document.getElementById('map-card-container');
+        const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || card?.classList.contains('is-fullscreen'));
+        const label = isFs ? t('exitFullscreenTooltip') : t('fullscreenTooltip');
+        fsBtnEl.title = label;
+        fsBtnEl.setAttribute('aria-label', label);
+      }
+
+      const offlineBanner = document.getElementById('offline-banner');
+      if (offlineBanner) {
+        const span = offlineBanner.querySelector('span');
+        if (span) span.innerText = t('offlineBanner');
+      }
+
+      // Re-render pins so open & future popups immediately use the selected language
+      if (this.mapAdapter && this.currentPins) {
+        this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+      }
+
+      // Re-render in-page Leaderboard preview
+      if (this.leaderboardSection) {
+        this.leaderboardSection.render();
+      }
+
+      // Re-render active panel if open
+      if (this.panelManager && this.panelManager.isOpen) {
+        this.panelManager.renderContent(this.panelManager.activePanelId);
+      }
+
+      // If report bottom sheet is currently open, re-render form in place
+      const reportMount = document.getElementById('report-form-mount');
+      if (reportMount && this.bottomSheet.isOpen) {
+        renderReportForm(reportMount, {
+          currentCoordinates: this.userCoords,
+          onClose: () => this.bottomSheet.close(),
+          onSubmit: async (formData) => {
+            await this.handleReportSubmit(formData);
+          }
+        });
+      }
+    });
+
+    // Expose Upvote & Flag methods to window
+    window.__khaddaUpvotePin = async (pinId) => {
+      if (hasUserReportedOrUpvoted(pinId)) {
+        showToast(t('alreadyReportedAlert'), 'warning');
+        return;
+      }
+
+      const quota = getActionQuota();
+      if (quota.isLimitReached) {
+        showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
+        return;
+      }
+
+      try {
+        const res = await callUpvotePin(pinId);
+        markPinAsUpvoted(pinId);
+        showToast(res.message || t('upvoteSuccess'), 'success');
+        
+        // Optimistic UI update for pins
+        const pin = this.currentPins.find((p) => p.id === pinId);
+        if (pin) {
+          pin.upvotes = (pin.upvotes || 0) + 1;
+          this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
+          this.leaderboardSection?.render();
+          if (this.panelManager && this.panelManager.activePanelId === 'leaderboard') {
+            this.panelManager.renderLeaderboardBody();
+          }
+          openPinDetailModal(pin);
+        }
+      } catch (err) {
+        showToast(err.message || t('alreadyReportedAlert'), 'warning');
+      }
+    };
+
+    window.__khaddaFlagPin = async (pinId) => {
+      const reason = prompt(t('flagPrompt'));
+      if (reason === null) return;
+      try {
+        const res = await callFlagPin(pinId, reason);
+        showToast(res.message || t('flagSuccess'), 'info');
+      } catch (err) {
+        showToast(err.message || t('flagError'), 'error');
+      }
+    };
+  }
+
+  setupFirestoreSubscriptions() {
+    // 1. Subscribe to active pins
+    subscribeToActivePins((livePins) => {
+      const pins = livePins || [];
+      const isInitialLoad = this.knownPinIds.size === 0;
+
+      pins.forEach((pin) => {
+        if (!isInitialLoad && !this.knownPinIds.has(pin.id)) {
+          // Play cinematic arrival ripple on map for real-time live events
+          if (this.mapAdapter && this.mapAdapter.playArrivalRipple) {
+            this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+          }
+        }
+        this.knownPinIds.add(pin.id);
+      });
+
+      this.currentPins = pins;
+      this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
+
+      // Compute real stats from live pins
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      
+      let todayCount = 0;
+      let totalCount = 0;
+      const cityCounts = {};
+
+      this.currentPins.forEach((pin) => {
+        const count = pin.reportCount || 1;
+        totalCount += count;
+
+        let createdTime = 0;
+        if (pin.createdAt?.toDate) {
+          createdTime = pin.createdAt.toDate().getTime();
+        } else if (pin.createdAt) {
+          createdTime = new Date(pin.createdAt).getTime();
+        }
+
+        if (createdTime >= startOfToday) {
+          todayCount += count;
+        }
+
+        const isHindi = getLanguage() === 'hindi';
+        const cName = resolvePinCity(pin, isHindi);
+        cityCounts[cName] = (cityCounts[cName] || 0) + count;
+      });
+
+      let topCity = '-';
+      let maxCityCount = 0;
+      for (const [c, cnt] of Object.entries(cityCounts)) {
+        if (cnt > maxCityCount) {
+          maxCityCount = cnt;
+          topCity = c;
+        }
+      }
+
+      this.statsData = {
+        totalReports: totalCount,
+        todayReports: todayCount,
+        topCity
+      };
+
+      const statsContainer = document.getElementById('stats-strip-container');
+      if (statsContainer) {
+        renderStatsStrip(statsContainer, this.statsData);
+      }
+
+      // If leaderboard doesn't have custom server data yet, construct from live user pins
+      if (this.currentPins.length > 0) {
+        const sorted = [...this.currentPins].sort((a, b) => (b.upvotes || 0) + (b.reportCount || 1) * 3 - ((a.upvotes || 0) + (a.reportCount || 1) * 3));
+        const topCities = Object.entries(cityCounts).map(([name, count]) => ({
+          nameEnglish: name,
+          nameHindi: name,
+          count
+        })).sort((a, b) => b.count - a.count);
+
+        const lbPayload = {
+          heroPotholeOfWeek: sorted[0] || null,
+          weekRankings: sorted,
+          monthRankings: sorted,
+          allTimeRankings: sorted,
+          topCities: topCities
+        };
+        this.leaderboardSection?.setData(lbPayload);
+        this.panelManager?.setData(lbPayload);
+      }
+    });
+
+    // 2. Subscribe to global report counter
+    subscribeToGlobalStats((stats) => {
+      if (stats && stats.totalReports) {
+        this.statsData.totalReports = stats.totalReports;
+        const statsContainer = document.getElementById('stats-strip-container');
+        if (statsContainer) {
+          renderStatsStrip(statsContainer, this.statsData);
+        }
+      }
+    });
+  }
+
+  setupStickyCtaObserver() {
+    const mapSection = document.getElementById('map-section');
+    const stickyCta = document.getElementById('sticky-mobile-cta');
+    if (!mapSection || !stickyCta) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          stickyCta.classList.remove('hidden');
+        } else {
+          stickyCta.classList.add('hidden');
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(mapSection);
+  }
+
+  setupScrollReveal() {
+    const reveals = document.querySelectorAll('.reveal-on-scroll');
+    if (reveals.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -50px 0px', threshold: 0.1 }
+    );
+
+    reveals.forEach((el) => observer.observe(el));
+  }
+
+  detectInitialLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          this.userCoords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          };
+          this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
+        },
+        () => {},
+        { timeout: 5000 }
+      );
+    }
+  }
+
+  locateUserAndCenter() {
+    showToast(t('locating'), 'info', 2000);
+    if (!navigator.geolocation) {
+      showToast(t('gpsUnsupported'), 'error');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.userCoords = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+        this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
+        this.mapAdapter.setView(this.userCoords.lat, this.userCoords.lng, 16);
+        showToast(t('locationFound'), 'success');
+      },
+      () => {
+        showToast(t('locationDenied'), 'warning');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  openReportDrawer() {
+    const quota = getActionQuota();
+    if (quota.isLimitReached) {
+      showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
+    }
+
+    this.bottomSheet.open('<div id="report-form-mount"></div>');
+    const mountPoint = document.getElementById('report-form-mount');
+    if (!mountPoint) return;
+
+    renderReportForm(mountPoint, {
+      currentCoordinates: this.userCoords,
+      onClose: () => this.bottomSheet.close(),
+      onSubmit: async (formData) => {
+        await this.handleReportSubmit(formData);
+      }
+    });
+  }
+
+  async handleReportSubmit(formData) {
+    const quota = getActionQuota();
+    if (quota.isLimitReached) {
+      showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
+      this.bottomSheet.close();
+      return;
+    }
+
+    const isOnline = navigator.onLine;
+
+    if (!isOnline) {
+      await saveReportOffline({
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        landmark: formData.landmark,
+        formOpenTime: formData.formOpenTime
+      });
+      showToast(t('offlineAlert'), 'warning', 6000);
+      this.bottomSheet.close();
+      return;
+    }
+
+    try {
+      let imageUrl = null;
+      let thumbnailUrl = null;
+
+      if (formData.imageData && formData.imageData.mainBlob) {
+        showToast(t('photoCompressing'), 'info', 2000);
+        try {
+          imageUrl = await uploadPotholePhoto(null, formData.imageData.mainBlob, false);
+          thumbnailUrl = await uploadPotholePhoto(null, formData.imageData.thumbnailBlob, true);
+        } catch (uploadErr) {
+          console.warn('Image upload notice:', uploadErr);
+        }
+
+        if (!imageUrl && formData.imageData.mainDataUrl) {
+          imageUrl = formData.imageData.mainDataUrl;
+        }
+        if (!thumbnailUrl && formData.imageData.thumbDataUrl) {
+          thumbnailUrl = formData.imageData.thumbDataUrl;
+        }
+      }
+
+      const reportPayload = {
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        landmark: formData.landmark,
+        imageUrl,
+        thumbnailUrl,
+        website_hp: formData.website_hp,
+        formOpenTime: formData.formOpenTime
+      };
+
+      const result = await callSubmitReport(reportPayload);
+
+      if (result.deduplicated) {
+        showToast(result.message || t('dedupedNotice'), 'warning', 6000);
+      } else {
+        showToast(result.message || t('submitSuccess'), 'success', 5000);
+      }
+
+      const nearestCity = getNearestIndianCity(formData.latitude, formData.longitude);
+      let targetPin = null;
+
+      if (result.deduplicated && result.pinId) {
+        targetPin = this.currentPins.find((p) => p.id === result.pinId);
+        if (targetPin) {
+          targetPin.reportCount = (targetPin.reportCount || 1) + 1;
+          if (!Array.isArray(targetPin.images)) {
+            targetPin.images = targetPin.imageUrl ? [targetPin.imageUrl] : [];
+          }
+          if (imageUrl && !targetPin.images.includes(imageUrl)) {
+            targetPin.images.unshift(imageUrl);
+          }
+          targetPin.imageUrl = imageUrl || targetPin.imageUrl;
+          targetPin.thumbnailUrl = thumbnailUrl || targetPin.thumbnailUrl;
+        }
+      }
+
+      if (!targetPin) {
+        targetPin = {
+          id: result.pinId || ('pin_' + Date.now()),
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+          landmark: formData.landmark || t('defaultLandmark'),
+          cityNameHindi: result.cityNameHindi || nearestCity.nameHindi,
+          cityNameEnglish: result.cityNameEnglish || nearestCity.nameEnglish,
+          cityState: nearestCity.state,
+          reportCount: result.deduplicated ? 2 : 1,
+          upvotes: 0,
+          daysOpen: 1,
+          createdAt: new Date(),
+          imageUrl: imageUrl || '',
+          thumbnailUrl: thumbnailUrl || imageUrl || '',
+          images: imageUrl ? [imageUrl] : []
+        };
+        this.currentPins.unshift(targetPin);
+      }
+
+      this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
+      this.mapAdapter.setView(formData.latitude, formData.longitude, 16);
+
+      this.bottomSheet.close();
+      setTimeout(() => {
+        openPinDetailModal(targetPin);
+      }, 300);
+    } catch (error) {
+      console.error('Submit error:', error);
+      showToast(error.message || t('submitError'), 'error');
+    }
+  }
+
+  setupOfflineSync() {
+    const offlineBanner = document.getElementById('offline-banner');
+
+    const updateOnlineStatus = async () => {
+      if (!navigator.onLine) {
+        if (offlineBanner) {
+          const span = offlineBanner.querySelector('span');
+          if (span) span.innerText = t('offlineBanner');
+          offlineBanner.classList.remove('hidden');
+        }
+      } else {
+        if (offlineBanner) offlineBanner.classList.add('hidden');
+        const pending = await getOfflineReports();
+        if (pending.length > 0) {
+          showToast(t('offlineSyncing', { count: pending.length }), 'info');
+          for (const item of pending) {
+            try {
+              await callSubmitReport({
+                latitude: item.latitude,
+                longitude: item.longitude,
+                landmark: item.landmark,
+                website_hp: '',
+                formOpenTime: item.formOpenTime || (Date.now() - 5000)
+              });
+              await removeOfflineReport(item.id);
+            } catch (syncErr) {
+              console.warn('Sync item failed:', syncErr);
+            }
+          }
+          showToast(t('offlineSyncSuccess'), 'success');
+        }
+      }
+    };
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+  }
+
+  toggleMapFullscreen() {
+    const card = document.getElementById('map-card-container');
+    if (!card) return;
+
+    const isCurrentlyFs = !!(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement ||
+      card.classList.contains('is-fullscreen')
+    );
+
+    if (isCurrentlyFs) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+      card.classList.remove('is-fullscreen');
+      this.updateFullscreenUI(false);
+    } else {
+      if (card.requestFullscreen) {
+        card.requestFullscreen().catch(() => {
+          card.classList.add('is-fullscreen');
+          this.updateFullscreenUI(true);
+        });
+      } else if (card.webkitRequestFullscreen) {
+        card.webkitRequestFullscreen();
+      } else if (card.mozRequestFullScreen) {
+        card.mozRequestFullScreen();
+      } else if (card.msRequestFullscreen) {
+        card.msRequestFullscreen();
+      } else {
+        card.classList.add('is-fullscreen');
+        this.updateFullscreenUI(true);
+      }
+    }
+
+    if (this.mapAdapter && this.mapAdapter.resize) {
+      setTimeout(() => this.mapAdapter.resize(), 120);
+      setTimeout(() => this.mapAdapter.resize(), 350);
+    }
+  }
+
+  updateFullscreenUI(isFullscreen) {
+    const btn = document.getElementById('btn-fullscreen-toggle');
+    const enterIcon = document.getElementById('icon-enter-fullscreen');
+    const exitIcon = document.getElementById('icon-exit-fullscreen');
+
+    if (isFullscreen) {
+      enterIcon?.classList.add('hidden');
+      exitIcon?.classList.remove('hidden');
+      if (btn) {
+        btn.title = t('exitFullscreenTooltip');
+        btn.setAttribute('aria-label', t('exitFullscreenTooltip'));
+      }
+    } else {
+      enterIcon?.classList.remove('hidden');
+      exitIcon?.classList.add('hidden');
+      if (btn) {
+        btn.title = t('fullscreenTooltip');
+        btn.setAttribute('aria-label', t('fullscreenTooltip'));
+      }
+    }
+  }
+}
+
+// Bootstrap Application
+const app = new KhaddaApp();
+app.init().catch((e) => console.error('App init failed:', e));

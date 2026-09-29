@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "pins",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "geohash", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "pins",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

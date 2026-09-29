@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Pothole pins collection: Public read only for active pins.
+    // Direct client writes (create/update/delete) are strictly forbidden.
+    // All creations and modifications must execute exclusively via server Cloud Functions (submitReport, upvotePin, flagPin).
+    match /pins/{pinId} {
+      allow read: if resource == null || resource.data.status == 'active';
+      allow write: if false;
+      
+      // Reporters subcollection (Anti-spam cooldown tracking): Server-only
+      match /reporters/{userId} {
+        allow read, write: if false;
+      }
+
+      // Votes subcollection: Server-only
+      match /votes/{userId} {
+        allow read, write: if false;
+      }
+      
+      // Flags subcollection: Server-only
+      match /flags/{userId} {
+        allow read, write: if false;
+      }
+    }
+    
+    // Anti-spam limits collections: Strictly server-only (Cloud Functions)
+    match /limits/{uid} {
+      allow read, write: if false;
+    }
+
+    match /ipLimits/{ipHash} {
+      allow read, write: if false;
+    }
+    
+    match /rate_limits/{docId} {
+      allow read, write: if false;
+    }
+
+    // Aggregated stats (e.g. total pothole counter)
+    match /stats/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Leaderboard document
+    match /leaderboard/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Default fallback: deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
