@@ -3,7 +3,6 @@ import { LeafletAdapter } from './map/LeafletAdapter';
 import { GoogleMapsAdapter } from './map/GoogleMapsAdapter';
 import { createNavbar } from './components/Navbar';
 import { renderStatsStrip } from './components/StatsStrip';
-import { checkAndShowOnboarding } from './components/OnboardingModal';
 import { BottomSheet } from './components/BottomSheet';
 import { LeaderboardSection } from './components/LeaderboardSheet';
 import { renderReportForm } from './components/ReportForm';
@@ -118,9 +117,6 @@ class KhaddaApp {
     // 9. Sticky Mobile CTA & Scroll Reveal
     this.setupStickyCtaObserver();
     this.setupScrollReveal();
-
-    // 10. First-visit Onboarding Primer (stored in localStorage)
-    checkAndShowOnboarding();
 
     // 10.5. Initialize Animated Pothole Cartoon Strip (Above Footer)
     initPotholeCartoonAnimation('pothole-animation-mount');
