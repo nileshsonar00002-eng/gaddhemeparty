@@ -14,24 +14,11 @@ export default {
         border: 'var(--border)',
         text: 'var(--text)',
         muted: 'var(--muted)',
+        ink: 'var(--ink)',
         accent: 'var(--accent)',
         'accent-ink': 'var(--accent-ink)',
         danger: 'var(--danger)',
         success: 'var(--success)',
-        brand: {
-          navy: '#0B0F14',
-          slate: '#12171E',
-          card: '#182028',
-          cardLight: '#FFFFFF',
-          border: '#232B36',
-          borderLight: '#E3E3DC',
-          amber: '#F5B301',
-          amberHover: '#D97706',
-          rose: '#E5484D',
-          roseHover: '#C5282E',
-          emerald: '#30A46C',
-          chai: '#F5B301'
-        }
       },
       fontFamily: {
         heading: ['"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
@@ -43,7 +30,8 @@ export default {
         'chip': '8px'
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+        'soft': '0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06)',
+        'card': 'var(--shadow-card)',
         'dropdown': '0 4px 12px 0 rgba(0, 0, 0, 0.15)'
       }
     },

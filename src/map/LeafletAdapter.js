@@ -164,7 +164,7 @@ export class LeafletAdapter extends MapAdapter {
     }
 
     const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-    const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
     const url = theme === 'light' ? lightTileUrl : darkTileUrl;
 
     this.tileLayer = L.tileLayer(url, {

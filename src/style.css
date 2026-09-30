@@ -4,32 +4,79 @@
 @tailwind components;
 @tailwind utilities;
 
-:root, [data-theme="dark"] {
+:root, [data-theme="light"], :root.light {
   --header-h: 64px;
   --gap-desktop: 32px;
   --gap-mobile: 24px;
   --scroll-offset: calc(var(--header-h) + 16px);
-  
-  /* Dark Theme Tokens (Calm, Credible Civic-Tech) */
+
+  /* Light Theme Tokens (Cool Grey Page, Deep Contrast) */
+  --bg: #EEF1F5;
+  --surface: #FFFFFF;
+  --surface-2: #F6F8FA;
+  --border: #D9DEE5;
+  --text: #0F172A;
+  --muted: #475569;
+  --ink: #0F172A;
+  --accent: #F5B301;
+  --accent-ink: #1A1300;
+  --danger: #D13438;
+  --success: #1E8A56;
+
+  /* Shadows */
+  --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06);
+  --shadow-header: 0 4px 16px rgba(15, 23, 42, 0.06);
+
+  /* Aliases */
+  --bg-primary: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-card: var(--surface);
+  --bg-card-subtle: var(--surface-2);
+  --bg-card-hover: #EAEFF5;
+  --bg-nav: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.96);
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
+  --text-muted: var(--muted);
+  --border-color: var(--border);
+  --border-subtle: rgba(15, 23, 42, 0.06);
+  --accent-amber: var(--accent);
+  --accent-amber-text: var(--text);
+  --accent-amber-bg: rgba(245, 179, 1, 0.15);
+  --accent-rose: var(--danger);
+  --popup-bg: var(--surface);
+  --map-bg: #E6EAEE;
+  --theme-color: #0F172A;
+}
+
+:root[data-theme="dark"], :root.dark {
+  /* Dark Theme Tokens */
   --bg: #0B0F14;
   --surface: #12171E;
   --surface-2: #182028;
   --border: #232B36;
   --text: #E7EBF0;
   --muted: #8B95A5;
+  --ink: #0F172A;
   --accent: #F5B301;
   --accent-ink: #1A1300;
   --danger: #E5484D;
   --success: #30A46C;
 
-  /* Backward Compatibility Aliases */
+  /* Shadows */
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 4px 24px -2px rgba(0, 0, 0, 0.5);
+  --shadow-header: 0 4px 20px rgba(0, 0, 0, 0.35);
+
+  /* Aliases */
   --bg-primary: var(--bg);
   --bg-surface: var(--surface);
   --bg-card: var(--surface);
   --bg-card-subtle: var(--surface-2);
   --bg-card-hover: var(--surface-2);
-  --bg-nav: rgba(11, 15, 20, 0.94);
-  --bg-glass: rgba(18, 23, 30, 0.92);
+  --bg-nav: var(--surface);
+  --bg-glass: rgba(18, 23, 30, 0.94);
   --text-primary: var(--text);
   --text-secondary: var(--muted);
   --text-muted: var(--muted);
@@ -39,56 +86,16 @@
   --accent-amber-text: var(--accent);
   --accent-amber-bg: rgba(245, 179, 1, 0.12);
   --accent-rose: var(--danger);
-  --shadow-glass: 0 4px 16px 0 rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
   --popup-bg: var(--surface);
   --map-bg: var(--bg);
-  --theme-color: var(--bg);
+  --theme-color: #0B0F14;
 }
 
 @media (max-width: 640px) {
-  :root, [data-theme="dark"] {
+  :root, [data-theme="dark"], [data-theme="light"] {
     --header-h: 56px;
     --scroll-offset: calc(var(--header-h) + 12px);
   }
-}
-
-[data-theme="light"], :root.light {
-  /* Light Theme Tokens */
-  --bg: #F7F7F4;
-  --surface: #FFFFFF;
-  --surface-2: #F0F0EB;
-  --border: #E3E3DC;
-  --text: #14181F;
-  --muted: #5B6472;
-  --accent: #B77900;
-  --accent-fill: #F5B301;
-  --accent-ink: #1A1300;
-  --danger: #D13438;
-  --success: #1E8A56;
-
-  /* Backward Compatibility Aliases */
-  --bg-primary: var(--bg);
-  --bg-surface: var(--surface);
-  --bg-card: var(--surface);
-  --bg-card-subtle: var(--surface-2);
-  --bg-card-hover: #E8E8E2;
-  --bg-nav: rgba(247, 247, 244, 0.94);
-  --bg-glass: rgba(255, 255, 255, 0.92);
-  --text-primary: var(--text);
-  --text-secondary: var(--muted);
-  --text-muted: var(--muted);
-  --border-color: var(--border);
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --accent-amber: var(--accent);
-  --accent-amber-text: var(--accent);
-  --accent-amber-bg: rgba(183, 121, 0, 0.1);
-  --accent-rose: var(--danger);
-  --shadow-glass: 0 4px 16px 0 rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
-  --popup-bg: var(--surface);
-  --map-bg: var(--surface-2);
-  --theme-color: var(--bg);
 }
 
 @layer base {
@@ -132,11 +139,11 @@
   }
 
   h1 {
-    font-size: clamp(2rem, 4vw, 3.25rem);
-    line-height: 1.1;
+    font-size: clamp(2rem, 4vw, 3.125rem);
+    line-height: 1.15;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--text);
+    text-wrap: balance;
   }
 
   h2 {
@@ -144,14 +151,13 @@
     line-height: 1.25;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: var(--text);
+    text-wrap: balance;
   }
 
   h3 {
     font-size: 1.25rem;
     line-height: 1.35;
     font-weight: 600;
-    color: var(--text);
   }
 
   h1, h2, h3, .font-heading {
@@ -165,7 +171,7 @@
   font-feature-settings: "tnum";
 }
 
-/* UI Button Tokens */
+/* Civic UI Button Tokens */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -183,15 +189,16 @@
   text-decoration: none;
   user-select: none;
 }
-[data-theme="light"] .btn-primary {
-  background-color: var(--accent-fill);
-}
 .btn-primary:hover {
-  filter: brightness(1.06);
+  filter: brightness(1.05);
   transform: translateY(-1px);
 }
 .btn-primary:active {
   transform: translateY(0);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid #0F172A;
+  outline-offset: 2px;
 }
 
 .btn-secondary {
@@ -199,13 +206,14 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: transparent;
+  background-color: var(--surface);
   color: var(--text);
   font-weight: 500;
   font-size: 0.875rem;
   padding: 0.5rem 0.875rem;
   border-radius: 12px;
   border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   transition: all 0.15s ease-in-out;
   cursor: pointer;
   text-decoration: none;
@@ -216,18 +224,50 @@
   border-color: var(--border);
   color: var(--text);
 }
+.btn-secondary:focus-visible {
+  outline: 2px solid #0F172A;
+  outline-offset: 2px;
+}
 
 .chip-neutral {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  background-color: var(--surface-2);
-  color: var(--muted);
-  border: 1px solid var(--border);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 9999px;
   font-size: 0.8125rem;
   font-weight: 500;
   padding: 0.3125rem 0.75rem;
+}
+
+/* Subtle Road Line / Topo Texture for Ink Hero Band */
+.ink-hero-pattern {
+  background-color: #0F172A;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px), radial-gradient(rgba(255, 255, 255, 0.04) 1px, #0F172A 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Gentle Mascot Floating Animation */
+@keyframes gentleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-gentle-float {
+  animation: gentleFloat 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-gentle-float {
+    animation: none !important;
+  }
 }
 
 /* Navbar Structure */
@@ -245,22 +285,17 @@
 
 #navbar-container > div {
   height: var(--header-h);
-  background-color: var(--bg);
+  background-color: var(--bg-nav);
   border-bottom: 1px solid var(--border);
 }
 
-[data-theme="light"] #navbar-container > div {
-  background-color: var(--bg);
+#navbar-container.is-scrolled > div {
+  box-shadow: var(--shadow-header);
 }
 
 /* Main body padding to offset fixed header smoothly */
 main {
   padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
-}
-
-/* Theme toggle button transition */
-#btn-theme-toggle {
-  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 /* Fullscreen Map Mode */
@@ -280,16 +315,17 @@ main {
   border-radius: 0 !important;
   border: none !important;
   z-index: 99999 !important;
+  margin-top: 0 !important;
 }
 
-/* Modal Scroll Lock with preserved scroll position */
+/* Modal Scroll Lock */
 body.panel-scroll-locked {
   position: fixed;
   width: 100%;
   overflow-y: hidden;
 }
 
-/* Performance optimization for below-the-fold sections */
+/* Performance optimization */
 .content-auto {
   content-visibility: auto;
   contain-intrinsic-size: 1px 500px;
@@ -299,7 +335,7 @@ body.panel-scroll-locked {
 .map-gesture-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(11, 15, 20, 0.85);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -329,7 +365,7 @@ body.panel-scroll-locked {
   transform: translateY(0);
 }
 
-/* Prevent image preview / hover zoom browser extensions on map tiles */
+/* Map tiles drag prevention */
 #map img,
 .gm-style img,
 .leaflet-tile-container img,
@@ -342,7 +378,6 @@ body.panel-scroll-locked {
   touch-action: none !important;
 }
 
-/* Ensure interactive map elements remain clickable */
 .pothole-pin-icon,
 .pothole-teardrop,
 .custom-cluster-icon,
@@ -352,19 +387,9 @@ body.panel-scroll-locked {
   pointer-events: auto !important;
 }
 
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
 /* Map Container */
 .leaflet-container {
-  background-color: var(--bg) !important;
+  background-color: var(--map-bg) !important;
   font-family: inherit;
 }
 
@@ -385,7 +410,7 @@ body.panel-scroll-locked {
   color: var(--accent) !important;
 }
 
-/* Zoom-Responsive Scale Variables Container */
+/* Zoom-Responsive Scale Variables */
 #map {
   --glow-scale: 1;
   --core-scale: 1;
@@ -406,7 +431,7 @@ body.panel-scroll-locked {
   pointer-events: auto;
 }
 
-/* Calm, Solid Severity Civic Pins */
+/* Calm Severity Civic Pins */
 .civic-pin, .glowing-orb-pin {
   position: relative;
   display: flex;
@@ -423,16 +448,16 @@ body.panel-scroll-locked {
 }
 
 .civic-pin:hover, .glowing-orb-pin:hover {
-  transform: scale(1.12);
+  transform: scale(1.15);
   z-index: 999 !important;
 }
 
-/* Tier 1: 1-2 reports (Amber) */
+/* Tier 1: 1-2 reports (Traffic Amber) */
 .pin-tier-1, .orb-amber {
   background: #F5B301;
   color: #1A1300;
   border: 1.5px solid #FFFFFF;
-  box-shadow: 0 0 0 4px rgba(245, 179, 1, 0.25), 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 3px rgba(245, 179, 1, 0.3), 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
 /* Tier 2: 3-4 reports (Amber-Orange) */
@@ -440,24 +465,15 @@ body.panel-scroll-locked {
   background: #F79009;
   color: #FFFFFF;
   border: 1.5px solid #FFFFFF;
-  box-shadow: 0 0 0 5px rgba(247, 144, 9, 0.25), 0 2px 6px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 4px rgba(247, 144, 9, 0.3), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
-/* Tier 3: 5+ reports (Red / Severe Hazard) */
+/* Tier 3: 5+ reports (Danger Red) */
 .pin-tier-3, .orb-red {
   background: #E5484D;
   color: #FFFFFF;
   border: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 6px rgba(229, 72, 77, 0.3), 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-.orb-count-label {
-  color: inherit;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 11px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 5px rgba(229, 72, 77, 0.35), 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 /* Clean Cluster Orbs */
@@ -476,7 +492,7 @@ body.panel-scroll-locked {
   background: #F5B301;
   color: #1A1300;
   border: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 4px rgba(245, 179, 1, 0.25), 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 0 4px rgba(245, 179, 1, 0.25), 0 3px 8px rgba(0, 0, 0, 0.25);
   font-family: 'Inter', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -493,7 +509,7 @@ body.panel-scroll-locked {
 
 /* Popup Overrides */
 .leaflet-popup-content-wrapper {
-  background: var(--popup-bg) !important;
+  background: var(--surface) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
   border-radius: 14px !important;
@@ -508,7 +524,7 @@ body.panel-scroll-locked {
 }
 
 .leaflet-popup-tip {
-  background: var(--popup-bg) !important;
+  background: var(--surface) !important;
   border: 1px solid var(--border) !important;
 }
 
@@ -534,7 +550,7 @@ body.panel-scroll-locked {
 
 /* Google Maps InfoWindow Overrides */
 .gm-style .gm-style-iw-c {
-  background-color: var(--popup-bg) !important;
+  background-color: var(--surface) !important;
   border: 1px solid var(--border) !important;
   border-radius: 14px !important;
   box-shadow: var(--shadow-card) !important;
@@ -546,17 +562,17 @@ body.panel-scroll-locked {
   overflow: hidden !important;
   padding: 0 !important;
   max-height: 480px !important;
-  background-color: var(--popup-bg) !important;
+  background-color: var(--surface) !important;
   color: var(--text) !important;
 }
 
 .gm-style .gm-style-iw-tc::after {
-  background: var(--popup-bg) !important;
+  background: var(--surface) !important;
   border-color: var(--border) !important;
 }
 
 .gm-style .gm-style-iw-t::after {
-  background: var(--popup-bg) !important;
+  background: var(--surface) !important;
 }
 
 .gm-style .gm-ui-hover-effect {
@@ -584,9 +600,7 @@ body.panel-scroll-locked {
   filter: invert(0) brightness(0.2) !important;
 }
 
-/* ========================================================
-   FUNNY POTHOLE CARTOON ROAD ANIMATION (RIGHT TO LEFT DRIVE)
-   ======================================================== */
+/* Funny Pothole Cartoon Animation Strip */
 @keyframes roadStripesMove {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -598,53 +612,20 @@ body.panel-scroll-locked {
 }
 
 @keyframes vehicleDriveRightToLeft {
-  0% {
-    right: -25%;
-    transform: translateY(0) rotate(0deg);
-  }
-  38% {
-    right: 40%;
-    transform: translateY(0) rotate(0deg);
-  }
-  43% {
-    right: 46%;
-    transform: translateY(16px) rotate(-22deg);
-  }
-  47% {
-    right: 49%;
-    transform: translateY(-20px) rotate(18deg);
-  }
-  51% {
-    right: 53%;
-    transform: translateY(8px) rotate(-10deg);
-  }
-  56% {
-    right: 58%;
-    transform: translateY(-3px) rotate(3deg);
-  }
-  60% {
-    right: 64%;
-    transform: translateY(0) rotate(0deg);
-  }
-  100% {
-    right: 125%;
-    transform: translateY(0) rotate(0deg);
-  }
+  0% { right: -25%; transform: translateY(0) rotate(0deg); }
+  38% { right: 40%; transform: translateY(0) rotate(0deg); }
+  43% { right: 46%; transform: translateY(16px) rotate(-22deg); }
+  47% { right: 49%; transform: translateY(-20px) rotate(18deg); }
+  51% { right: 53%; transform: translateY(8px) rotate(-10deg); }
+  56% { right: 58%; transform: translateY(-3px) rotate(3deg); }
+  60% { right: 64%; transform: translateY(0) rotate(0deg); }
+  100% { right: 125%; transform: translateY(0) rotate(0deg); }
 }
 
 @keyframes comicBubblePop {
-  0%, 40% {
-    opacity: 0;
-    transform: scale(0.3) translateY(8px);
-  }
-  43%, 52% {
-    opacity: 1;
-    transform: scale(1.15) translateY(-6px);
-  }
-  56%, 100% {
-    opacity: 0;
-    transform: scale(0.5) translateY(-14px);
-  }
+  0%, 40% { opacity: 0; transform: scale(0.3) translateY(8px); }
+  43%, 52% { opacity: 1; transform: scale(1.15) translateY(-6px); }
+  56%, 100% { opacity: 0; transform: scale(0.5) translateY(-14px); }
 }
 
 .vehicle-runner {
@@ -652,38 +633,14 @@ body.panel-scroll-locked {
   will-change: right, transform;
 }
 
-.vehicle-bike {
-  animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: 0s;
-}
-.vehicle-bike .comic-bubble {
-  animation: comicBubblePop 14s ease-out infinite;
-  animation-delay: 0s;
-}
+.vehicle-bike { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite 0s; }
+.vehicle-bike .comic-bubble { animation: comicBubblePop 14s ease-out infinite 0s; }
 
-.vehicle-auto {
-  animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: -3.5s;
-}
-.vehicle-auto .comic-bubble {
-  animation: comicBubblePop 14s ease-out infinite;
-  animation-delay: -3.5s;
-}
+.vehicle-auto { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -3.5s; }
+.vehicle-auto .comic-bubble { animation: comicBubblePop 14s ease-out infinite -3.5s; }
 
-.vehicle-car {
-  animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: -7s;
-}
-.vehicle-car .comic-bubble {
-  animation: comicBubblePop 14s ease-out infinite;
-  animation-delay: -7s;
-}
+.vehicle-car { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -7s; }
+.vehicle-car .comic-bubble { animation: comicBubblePop 14s ease-out infinite -7s; }
 
-.vehicle-jeep {
-  animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite;
-  animation-delay: -10.5s;
-}
-.vehicle-jeep .comic-bubble {
-  animation: comicBubblePop 14s ease-out infinite;
-  animation-delay: -10.5s;
-}
+.vehicle-jeep { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -10.5s; }
+.vehicle-jeep .comic-bubble { animation: comicBubblePop 14s ease-out infinite -10.5s; }

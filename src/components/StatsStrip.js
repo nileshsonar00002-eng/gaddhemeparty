@@ -37,30 +37,30 @@ export function renderStatsStrip(container, statsData = {}) {
   const topCity = statsData.topCity || 'दिल्ली / मुंबई';
 
   container.innerHTML = `
-    <div class="px-3.5 py-2 bg-[var(--surface-2)] rounded-xl border border-[var(--border)] flex items-center justify-around sm:justify-start sm:gap-5 text-xs font-normal text-[var(--muted)] transition-colors duration-200 w-full sm:w-auto">
+    <div class="px-3.5 py-2 bg-white/10 backdrop-blur-md rounded-xl border border-white/15 flex items-center justify-around sm:justify-start sm:gap-5 text-xs font-normal text-slate-300 transition-colors duration-200 w-full sm:w-auto shadow-xs">
       <!-- Total Verified Reports -->
       <div class="flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-[var(--danger)]"></span>
-        <span data-i18n="totalCounter">${t('totalCounter')}:</span>
-        <span id="stat-total-counter" class="tabular-nums font-bold text-[var(--text)] text-xs sm:text-sm">${prevTotal.toLocaleString('en-IN')}</span>
+        <span class="w-2 h-2 rounded-full bg-[#E5484D]"></span>
+        <span class="text-slate-300" data-i18n="totalCounter">${t('totalCounter')}:</span>
+        <span id="stat-total-counter" class="tabular-nums font-bold text-[#F5B301] text-xs sm:text-sm">${prevTotal.toLocaleString('en-IN')}</span>
       </div>
 
-      <div class="w-px h-3.5 bg-[var(--border)]"></div>
+      <div class="w-px h-3.5 bg-white/20"></div>
 
       <!-- Reports Logged Today -->
       <div class="flex items-center gap-1.5">
-        <span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
-        <span data-i18n="todayCounter">${t('todayCounter')}:</span>
-        <span id="stat-today-counter" class="tabular-nums font-bold text-[var(--text)] text-xs sm:text-sm">${prevToday.toLocaleString('en-IN')}</span>
+        <span class="w-2 h-2 rounded-full bg-[#F5B301]"></span>
+        <span class="text-slate-300" data-i18n="todayCounter">${t('todayCounter')}:</span>
+        <span id="stat-today-counter" class="tabular-nums font-bold text-white text-xs sm:text-sm">${prevToday.toLocaleString('en-IN')}</span>
       </div>
 
-      <div class="w-px h-3.5 bg-[var(--border)] hidden xs:block"></div>
+      <div class="w-px h-3.5 bg-white/20 hidden xs:block"></div>
 
       <!-- Top Active City -->
       <div class="hidden xs:flex items-center gap-1.5">
-        ${getLucideIcon('navigation', 'w-3.5 h-3.5 text-[var(--muted)]')}
-        <span><span data-i18n="topCity">${t('topCity')}</span>:</span>
-        <span class="font-medium text-[var(--text)]">${topCity}</span>
+        ${getLucideIcon('navigation', 'w-3.5 h-3.5 text-slate-400')}
+        <span class="text-slate-300"><span data-i18n="topCity">${t('topCity')}</span>:</span>
+        <span class="font-medium text-white">${topCity}</span>
       </div>
     </div>
   `;
