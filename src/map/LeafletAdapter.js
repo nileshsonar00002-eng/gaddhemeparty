@@ -335,6 +335,45 @@ export class LeafletAdapter extends MapAdapter {
     }
   }
 
+  setAccuracyCircle(lat, lng, radius = 50) {
+    if (!this.map) return;
+    this.clearAccuracyCircle();
+    this.accuracyCircle = L.circle([lat, lng], {
+      color: '#F5B301',
+      fillColor: '#F5B301',
+      fillOpacity: 0.12,
+      weight: 1.5,
+      radius: Math.max(10, radius)
+    }).addTo(this.map);
+  }
+
+  clearAccuracyCircle() {
+    if (this.accuracyCircle) {
+      this.map.removeLayer(this.accuracyCircle);
+      this.accuracyCircle = null;
+    }
+  }
+
+  onMapDrag(onStart, onEnd) {
+    if (!this.map) return;
+    if (onStart) {
+      this.map.on('movestart dragstart', onStart);
+    }
+    if (onEnd) {
+      this.map.on('moveend dragend', onEnd);
+    }
+  }
+
+  onCenterChanged(callback) {
+    if (!this.map) return;
+    this.map.on('move', () => {
+      callback(this.getCenter());
+    });
+    this.map.on('moveend', () => {
+      callback(this.getCenter());
+    });
+  }
+
   onMoveEnd(callback) {
     if (this.map) {
       this.map.on('moveend', () => {

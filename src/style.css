@@ -432,6 +432,18 @@ body.panel-scroll-locked {
   color: var(--accent) !important;
 }
 
+/* Fixed Center Target Pin Drag & Lift Animation */
+#main-map-center-pin.is-dragging #target-pin-icon {
+  transform: translateY(-16px) scale(1.12);
+  box-shadow: 0 20px 36px rgba(0, 0, 0, 0.45);
+}
+
+#main-map-center-pin.is-dragging #target-pin-shadow {
+  transform: scale(1.6);
+  opacity: 0.2;
+  filter: blur(2.5px);
+}
+
 /* Zoom-Responsive Scale Variables */
 #map {
   --glow-scale: 1;

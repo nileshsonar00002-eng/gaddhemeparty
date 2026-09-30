@@ -465,6 +465,51 @@ export class GoogleMapsAdapter extends MapAdapter {
     }
   }
 
+  setAccuracyCircle(lat, lng, radius = 50) {
+    if (!this.map || !window.google || !window.google.maps) return;
+    this.clearAccuracyCircle();
+    this.accuracyCircle = new google.maps.Circle({
+      strokeColor: '#F5B301',
+      strokeOpacity: 0.85,
+      strokeWeight: 1.5,
+      fillColor: '#F5B301',
+      fillOpacity: 0.12,
+      map: this.map,
+      center: { lat, lng },
+      radius: Math.max(10, radius),
+      zIndex: 50
+    });
+  }
+
+  clearAccuracyCircle() {
+    if (this.accuracyCircle) {
+      this.accuracyCircle.setMap(null);
+      this.accuracyCircle = null;
+    }
+  }
+
+  onMapDrag(onStart, onEnd) {
+    if (!this.map) return;
+    if (onStart) {
+      this.map.addListener('dragstart', onStart);
+    }
+    if (onEnd) {
+      this.map.addListener('dragend', onEnd);
+    }
+  }
+
+  onCenterChanged(callback) {
+    if (!this.map) return;
+    this.map.addListener('center_changed', () => {
+      const c = this.getCenter();
+      callback(c);
+    });
+    this.map.addListener('idle', () => {
+      const c = this.getCenter();
+      callback(c);
+    });
+  }
+
   onMoveEnd(callback) {
     if (this.map) {
       this.map.addListener('idle', () => {

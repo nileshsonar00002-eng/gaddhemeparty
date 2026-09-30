@@ -183,6 +183,20 @@
               </button>
             </div>
 
+            <!-- Fixed Center Pin Target Overlay for Location Confirm Mode -->
+            <div id="main-map-center-pin" class="hidden absolute inset-0 pointer-events-none z-[450] flex items-center justify-center">
+              <div class="relative flex flex-col items-center -translate-y-1/2">
+                <!-- Pin Head & Icon -->
+                <div id="target-pin-icon" class="w-10 h-10 rounded-full bg-[var(--accent)] text-[var(--accent-ink)] shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-black/20 transition-all duration-200 ease-out">
+                  <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                </div>
+                <!-- Pin Shadow on Ground -->
+                <div id="target-pin-shadow" class="w-4 h-1.5 bg-black/50 rounded-full blur-[1.5px] mt-0.5 transition-all duration-200"></div>
+              </div>
+            </div>
+
             <!-- Bottom Sheet Drawer for Reporting -->
             <div id="bottom-sheet-container" class="z-[1050]"></div>
 
@@ -196,6 +210,28 @@
             <div id="toast-container" class="fixed top-20 right-4 z-[1200] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
           </div>
         </section>
+
+        <!-- Floating Map Confirm Location Bar (used during map location picking) -->
+        <div id="map-confirm-bar" class="hidden fixed bottom-4 left-3 right-3 sm:left-6 sm:right-6 max-w-lg mx-auto z-[1060] bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl p-3 sm:p-4 flex flex-col gap-2.5">
+          <div class="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shrink-0"></span>
+              <span id="confirm-bar-coords" class="tabular-nums font-mono text-xs font-semibold text-[var(--text)] truncate">18.52041, 73.85672</span>
+              <span id="confirm-bar-acc" class="tabular-nums text-[10px] font-medium px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">~20m</span>
+            </div>
+            <button id="btn-cancel-confirm-map" type="button" class="btn-secondary w-7 h-7 p-0 flex items-center justify-center rounded-lg text-xs cursor-pointer" title="रद्द करें / Cancel" aria-label="Cancel Location Confirm">
+              <svg class="w-3.5 h-3.5 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <p class="text-xs text-[var(--muted)] leading-tight flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-[var(--accent)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span data-i18n="dragPinHelper">मैप को खिसकाकर पिन को सड़क पर उसी जगह रखें जहाँ गड्ढा है।</span>
+          </p>
+          <button id="btn-done-confirm-map" type="button" class="btn-primary w-full py-2.5 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-i18n="confirmLocationBtn">स्थान की पुष्टि करें</span>
+          </button>
+        </div>
 
         <!-- 4. Live Leaderboard Section (Band 1: --surface with contrast) -->
         <section id="leaderboard" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-y border-[var(--border)] content-auto reveal-on-scroll">

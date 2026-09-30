@@ -1,11 +1,9 @@
-import L from 'leaflet';
 import { t, getLanguage } from '../utils/i18n';
 import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
 import { INDIAN_CITIES } from '../utils/cities';
-import { DARK_MAP_STYLE, LIGHT_MAP_STYLE } from '../map/GoogleMapsAdapter';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
@@ -19,14 +17,11 @@ export function renderReportForm(container, options = {}) {
 
   let currentCoordinates = { ...fallbackCoords };
   let isGpsAcquiring = false;
-  let isLocationConfirmed = (fallbackCoords.accuracy || 50) <= 100;
-  let processedImageData = null;
+  let isLocationConfirmed = options.isLocationConfirmed !== undefined 
+    ? options.isLocationConfirmed 
+    : (fallbackCoords.accuracy || 50) <= 100;
+  let processedImageData = options.imageData || null;
   const quota = getActionQuota();
-
-  let googleMiniMap = null;
-  let googleMiniMarker = null;
-  let leafletMiniMap = null;
-  let leafletMiniMarker = null;
 
   const formatCoords = (coords) => {
     if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return '18.62980, 73.79970';
@@ -80,7 +75,7 @@ export function renderReportForm(container, options = {}) {
         <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden" ${quota.isLimitReached ? 'disabled' : ''} />
 
         <div id="photo-dropzone" class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] rounded-xl p-4 bg-[var(--surface-2)] transition-all flex flex-col items-center justify-center min-h-[120px] text-center overflow-hidden">
-          <div id="photo-placeholder" class="flex flex-col items-center justify-center gap-1.5">
+          <div id="photo-placeholder" class="${processedImageData ? 'hidden' : 'flex'} flex-col items-center justify-center gap-1.5">
             <div class="w-10 h-10 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] group-hover:scale-105 transition">
               ${getLucideIcon('camera', 'w-5 h-5')}
             </div>
@@ -91,14 +86,16 @@ export function renderReportForm(container, options = {}) {
           </div>
 
           <!-- Live Preview Image -->
-          <div id="photo-preview-container" class="hidden w-full relative flex flex-col items-center">
-            <img id="photo-preview-img" class="w-full max-h-[160px] object-cover rounded-xl border border-[var(--border)] shadow-xs" alt="Pothole preview" />
-            <div id="photo-size-badge" class="tabular-nums mt-2 text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-[var(--success)] border border-emerald-500/30 font-medium"></div>
+          <div id="photo-preview-container" class="${processedImageData ? 'flex' : 'hidden'} w-full relative flex flex-col items-center">
+            <img id="photo-preview-img" src="${processedImageData?.previewUrl || ''}" class="w-full max-h-[160px] object-cover rounded-xl border border-[var(--border)] shadow-xs" alt="Pothole preview" />
+            <div id="photo-size-badge" class="tabular-nums mt-2 text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-[var(--success)] border border-emerald-500/30 font-medium">
+              ${processedImageData ? t('photoOptimized', { size: processedImageData.sizeKb }) : ''}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Step: Confirm Location on Map with Draggable Pin -->
+      <!-- Location Verification Card (Integrated with Main Map) -->
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label class="block text-xs font-semibold text-[var(--muted)]">
@@ -114,22 +111,34 @@ export function renderReportForm(container, options = {}) {
         </div>
 
         <!-- GPS Status Bar -->
-        <div id="gps-status-card" class="bg-[var(--surface-2)] border border-[var(--border)] rounded-xl p-2.5 transition-colors duration-200 flex items-center justify-between">
-          <div class="flex items-center gap-2 min-w-0">
-            <span id="gps-dot-indicator" class="w-2.5 h-2.5 rounded-full ${isLocationConfirmed ? 'bg-emerald-500' : 'bg-amber-500'} shrink-0"></span>
-            <div class="min-w-0">
-              <div id="gps-status-text" class="text-xs font-semibold truncate ${isLocationConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}">
-                ${isLocationConfirmed ? t('gpsLocked') : t('gpsSearching')}
+        <div id="gps-status-card" class="bg-[var(--surface-2)] border ${isLocationConfirmed ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-amber-500/30 bg-amber-500/5'} rounded-xl p-3 transition-colors duration-200 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span id="gps-dot-indicator" class="w-2.5 h-2.5 rounded-full ${isLocationConfirmed ? 'bg-emerald-500' : 'bg-amber-500'} shrink-0"></span>
+              <div class="min-w-0">
+                <div id="gps-status-text" class="text-xs font-semibold truncate ${isLocationConfirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}">
+                  ${isLocationConfirmed ? t('locationConfirmed') : t('gpsLocked')}
+                </div>
+                <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)] truncate">
+                  ${formatCoords(currentCoordinates)} ${(currentCoordinates.accuracy ? `(~${Math.round(currentCoordinates.accuracy)}m)` : '')}
+                </div>
               </div>
-              <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)] truncate">
-                ${formatCoords(currentCoordinates)}
-              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="btn-refresh-gps" type="button" class="btn-secondary px-2.5 py-1.5 text-xs rounded-lg flex items-center gap-1 cursor-pointer" title="${t('gpsRetry')}" aria-label="${t('gpsRetry')}">
+                ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
+                <span class="text-[11px] font-medium hidden sm:inline">GPS</span>
+              </button>
             </div>
           </div>
 
-          <button id="btn-refresh-gps" type="button" class="btn-secondary px-2.5 py-1.5 text-xs rounded-lg flex items-center gap-1 cursor-pointer shrink-0" title="${t('gpsRetry')}" aria-label="${t('gpsRetry')}">
-            ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
-            <span class="text-[11px] font-medium hidden sm:inline">GPS</span>
+          <!-- Adjust / Pin on Main Map CTA Button -->
+          <button id="btn-open-map-picker" type="button" class="btn-secondary w-full py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition cursor-pointer">
+            <svg class="w-4 h-4 text-[var(--accent)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            <span>${t('adjustLocationBtn')}</span>
           </button>
         </div>
 
@@ -139,35 +148,9 @@ export function renderReportForm(container, options = {}) {
           <span class="leading-relaxed">${t('weakGpsWarning')}</span>
         </div>
 
-        <!-- Interactive Mini-Map Container -->
-        <div class="relative rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface-2)]">
-          <div id="report-mini-map" class="w-full h-44 sm:h-52 z-0"></div>
-          
-          <!-- Confirm Spot Overlay Button if Unconfirmed -->
-          <div id="confirm-spot-overlay" class="${!isLocationConfirmed ? 'flex' : 'hidden'} absolute bottom-2 left-2 right-2 z-[400] justify-center">
-            <button id="btn-confirm-spot" type="button" class="btn-primary py-1.5 px-4 text-xs font-bold shadow-lg flex items-center gap-1.5 cursor-pointer">
-              ${getLucideIcon('check', 'w-3.5 h-3.5')}
-              <span>${t('confirmLocationBtn')}</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mini-Map Helper Text -->
-        <div class="flex items-center gap-1.5 text-xs text-[var(--muted)] px-0.5">
-          ${getLucideIcon('info', 'w-3.5 h-3.5 shrink-0 text-[var(--accent)]')}
-          <span class="leading-tight">${t('dragPinHelper')}</span>
-        </div>
-
-        <!-- Location Controls: Quick Map Location & City Selector -->
+        <!-- Quick City Selector Fallback -->
         <div class="pt-1 flex items-center gap-2 text-xs flex-wrap">
-          <button id="btn-use-map-center" type="button" class="text-[11px] font-medium text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer">
-            ${getLucideIcon('map', 'w-3 h-3')}
-            <span>${isHindi ? 'मैप की वर्तमान लोकेशन लें' : 'Use Current Map Center'}</span>
-          </button>
-
-          <span class="text-[var(--muted)]">•</span>
-
-          <!-- Quick City Dropdown -->
+          <span class="text-[var(--muted)] text-[11px]">${isHindi ? 'या शहर चुनें:' : 'Or Select City:'}</span>
           <div class="relative inline-block">
             <select id="select-quick-city" class="text-[11px] font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-md px-2 py-0.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent)]">
               <option value="">${isHindi ? '📍 शहर चुनें...' : '📍 Select City...'}</option>
@@ -191,6 +174,7 @@ export function renderReportForm(container, options = {}) {
           type="text"
           id="landmark-input"
           maxlength="100"
+          value="${options.landmark || ''}"
           placeholder="${t('landmarkPlaceholder')}"
           ${quota.isLimitReached ? 'disabled' : ''}
           class="w-full px-3.5 py-2.5 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-transparent transition disabled:opacity-50"
@@ -208,7 +192,7 @@ export function renderReportForm(container, options = {}) {
         id="btn-submit-report"
         type="button"
         ${quota.isLimitReached || (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100) ? 'disabled' : ''}
-        class="btn-primary w-full mt-2 py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+        class="btn-primary w-full mt-2 py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         <span id="submit-btn-spinner" class="hidden w-4 h-4 border-2 border-[var(--accent-ink)] border-t-transparent rounded-full animate-spin"></span>
         <span id="submit-btn-text">
@@ -216,7 +200,7 @@ export function renderReportForm(container, options = {}) {
             quota.isLimitReached
               ? t('dailyLimitReached')
               : (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100)
-              ? (isHindi ? 'पहले लोकेशन कन्फर्म करें' : 'Confirm Location First')
+              ? (isHindi ? 'पहले मैप पर लोकेशन कन्फर्म करें' : 'Confirm Location on Map First')
               : t('submitBtn')
           }
         </span>
@@ -237,7 +221,7 @@ export function renderReportForm(container, options = {}) {
   const submitSpinner = container.querySelector('#submit-btn-spinner');
   const submitText = container.querySelector('#submit-btn-text');
   const refreshGpsBtn = container.querySelector('#btn-refresh-gps');
-  const useMapCenterBtn = container.querySelector('#btn-use-map-center');
+  const openMapPickerBtn = container.querySelector('#btn-open-map-picker');
   const citySelect = container.querySelector('#select-quick-city');
   const gpsStatusCard = container.querySelector('#gps-status-card');
   const gpsDotIndicator = container.querySelector('#gps-dot-indicator');
@@ -245,25 +229,6 @@ export function renderReportForm(container, options = {}) {
   const gpsCoordsText = container.querySelector('#gps-coords-text');
   const pinConfirmBadge = container.querySelector('#pin-confirm-badge');
   const weakGpsWarning = container.querySelector('#weak-gps-warning');
-  const confirmSpotOverlay = container.querySelector('#confirm-spot-overlay');
-  const confirmSpotBtn = container.querySelector('#btn-confirm-spot');
-
-  // Draggable Pin Icon definition for Leaflet fallback
-  const pinIcon = L.divIcon({
-    className: 'custom-report-pin',
-    html: `
-      <div class="relative flex flex-col items-center cursor-grab active:cursor-grabbing transform -translate-x-1/2 -translate-y-full hover:scale-110 transition duration-150">
-        <div class="w-9 h-9 rounded-full bg-[var(--accent)] text-[var(--accent-ink)] shadow-md flex items-center justify-center border-2 border-white ring-2 ring-black/20">
-          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-          </svg>
-        </div>
-        <div class="w-3 h-1 bg-black/40 rounded-full blur-[1px] mt-0.5"></div>
-      </div>
-    `,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0]
-  });
 
   const markLocationConfirmed = (confirmed = true) => {
     isLocationConfirmed = confirmed;
@@ -278,6 +243,19 @@ export function renderReportForm(container, options = {}) {
       }
     }
 
+    if (gpsStatusCard) {
+      gpsStatusCard.className = `bg-[var(--surface-2)] border ${confirmed ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-amber-500/30 bg-amber-500/5'} rounded-xl p-3 transition-colors duration-200 space-y-2.5`;
+    }
+
+    if (gpsDotIndicator) {
+      gpsDotIndicator.className = `w-2.5 h-2.5 rounded-full ${confirmed ? 'bg-emerald-500' : 'bg-amber-500'} shrink-0`;
+    }
+
+    if (gpsStatusText) {
+      gpsStatusText.textContent = confirmed ? t('locationConfirmed') : t('gpsLocked');
+      gpsStatusText.className = `text-xs font-semibold truncate ${confirmed ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`;
+    }
+
     if (weakGpsWarning) {
       if (confirmed || (currentCoordinates.accuracy || 0) <= 100) {
         weakGpsWarning.classList.add('hidden');
@@ -288,143 +266,16 @@ export function renderReportForm(container, options = {}) {
       }
     }
 
-    if (confirmSpotOverlay) {
-      if (confirmed) {
-        confirmSpotOverlay.classList.add('hidden');
-        confirmSpotOverlay.classList.remove('flex');
-      } else {
-        confirmSpotOverlay.classList.remove('hidden');
-        confirmSpotOverlay.classList.add('flex');
-      }
-    }
-
     if (submitBtn && !quota.isLimitReached) {
       if (confirmed || (currentCoordinates.accuracy || 0) <= 100) {
         submitBtn.disabled = false;
         if (submitText) submitText.textContent = t('submitBtn');
       } else {
         submitBtn.disabled = true;
-        if (submitText) submitText.textContent = isHindi ? 'पहले लोकेशन कन्फर्म करें' : 'Confirm Location First';
+        if (submitText) submitText.textContent = isHindi ? 'पहले मैप पर लोकेशन कन्फर्म करें' : 'Confirm Location on Map First';
       }
     }
   };
-
-  const initMiniMap = () => {
-    const mapMount = container.querySelector('#report-mini-map');
-    if (!mapMount || googleMiniMap || leafletMiniMap) return;
-
-    const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
-
-    // 1. Prefer Google Maps if JS API is loaded and available
-    if (window.google && window.google.maps && typeof window.google.maps.Map === 'function') {
-      try {
-        const gCenter = { lat: currentCoordinates.lat, lng: currentCoordinates.lng };
-        googleMiniMap = new google.maps.Map(mapMount, {
-          center: gCenter,
-          zoom: 16,
-          disableDefaultUI: true,
-          zoomControl: true,
-          mapTypeControl: false,
-          streetViewControl: false,
-          clickableIcons: false,
-          styles: isDark ? DARK_MAP_STYLE : LIGHT_MAP_STYLE
-        });
-
-        googleMiniMarker = new google.maps.Marker({
-          position: gCenter,
-          map: googleMiniMap,
-          draggable: true,
-          title: isHindi ? 'गड्ढे का स्थान (खींचें)' : 'Pothole Location (Drag)'
-        });
-
-        googleMiniMarker.addListener('dragend', (e) => {
-          if (!e.latLng) return;
-          const lat = e.latLng.lat();
-          const lng = e.latLng.lng();
-          currentCoordinates.lat = lat;
-          currentCoordinates.lng = lng;
-          currentCoordinates.accuracy = 5;
-          markLocationConfirmed(true);
-          updateGpsUI(currentCoordinates, false);
-        });
-
-        googleMiniMap.addListener('click', (e) => {
-          if (!e.latLng) return;
-          googleMiniMarker?.setPosition(e.latLng);
-          const lat = e.latLng.lat();
-          const lng = e.latLng.lng();
-          currentCoordinates.lat = lat;
-          currentCoordinates.lng = lng;
-          currentCoordinates.accuracy = 5;
-          markLocationConfirmed(true);
-          updateGpsUI(currentCoordinates, false);
-        });
-
-        return;
-      } catch (gErr) {
-        console.warn('[ReportForm] Google Maps mini-map fallback to Leaflet:', gErr);
-      }
-    }
-
-    // 2. Leaflet Fallback (100% Free OpenStreetMap tiles without API key requirements)
-    try {
-      const osmTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-      leafletMiniMap = L.map(mapMount, {
-        center: [currentCoordinates.lat, currentCoordinates.lng],
-        zoom: 16,
-        zoomControl: true,
-        attributionControl: false,
-        scrollWheelZoom: true,
-        dragging: true,
-        touchZoom: true
-      });
-
-      L.tileLayer(osmTileUrl, {
-        subdomains: ['a', 'b', 'c'],
-        maxZoom: 19
-      }).addTo(leafletMiniMap);
-
-      leafletMiniMarker = L.marker([currentCoordinates.lat, currentCoordinates.lng], {
-        draggable: true,
-        icon: pinIcon
-      }).addTo(leafletMiniMap);
-
-      leafletMiniMarker.on('dragend', () => {
-        const pos = leafletMiniMarker.getLatLng();
-        currentCoordinates.lat = pos.lat;
-        currentCoordinates.lng = pos.lng;
-        currentCoordinates.accuracy = 5;
-        markLocationConfirmed(true);
-        updateGpsUI(currentCoordinates, false);
-      });
-
-      leafletMiniMap.on('click', (e) => {
-        leafletMiniMarker.setLatLng(e.latlng);
-        currentCoordinates.lat = e.latlng.lat;
-        currentCoordinates.lng = e.latlng.lng;
-        currentCoordinates.accuracy = 5;
-        markLocationConfirmed(true);
-        updateGpsUI(currentCoordinates, false);
-      });
-
-      // Multi-stage invalidateSize to ensure full rendering during bottom sheet animation
-      [100, 250, 450, 750].forEach(delay => {
-        setTimeout(() => {
-          if (leafletMiniMap) {
-            leafletMiniMap.invalidateSize();
-          }
-        }, delay);
-      });
-    } catch (lErr) {
-      console.warn('[ReportForm] Leaflet mini-map init error:', lErr);
-    }
-  };
-
-  // Initialize mini-map after DOM is mounted
-  setTimeout(() => {
-    initMiniMap();
-  }, 50);
 
   // Trigger file selection on dropzone click
   dropzone?.addEventListener('click', () => {
@@ -448,6 +299,7 @@ export function renderReportForm(container, options = {}) {
         sizeBadge.textContent = t('photoOptimized', { size: processed.sizeKb });
         photoPlaceholder.classList.add('hidden');
         previewContainer.classList.remove('hidden');
+        previewContainer.classList.add('flex');
       }
     } catch (err) {
       console.error('[ReportForm] Image processing error:', err);
@@ -466,33 +318,30 @@ export function renderReportForm(container, options = {}) {
     currentCoordinates = coords;
     setCachedUserLocation(coords, isLive ? 'gps' : 'manual');
 
-    if (gpsStatusCard) {
-      gpsStatusCard.className = 'bg-[var(--surface-2)] border border-emerald-500/30 bg-emerald-500/5 rounded-xl p-2.5 transition-colors duration-200 flex items-center justify-between';
-    }
-    if (gpsDotIndicator) {
-      gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0';
-    }
-    if (gpsStatusText) {
-      gpsStatusText.textContent = isLive ? t('gpsLocked') : (isHindi ? 'लोकेशन सेट ✓' : 'Location Set ✓');
-      gpsStatusText.className = 'text-xs font-semibold text-emerald-600 dark:text-emerald-400 truncate';
-    }
     if (gpsCoordsText) {
-      gpsCoordsText.textContent = formatCoords(coords);
-    }
-
-    // Update Google Maps mini-map if active
-    if (googleMiniMap && googleMiniMarker) {
-      const gPos = { lat: coords.lat, lng: coords.lng };
-      googleMiniMarker.setPosition(gPos);
-      googleMiniMap.panTo(gPos);
-    }
-
-    // Update Leaflet mini-map if active
-    if (leafletMiniMap && leafletMiniMarker) {
-      leafletMiniMarker.setLatLng([coords.lat, coords.lng]);
-      leafletMiniMap.setView([coords.lat, coords.lng], 16, { animate: true });
+      gpsCoordsText.textContent = `${formatCoords(coords)} ${coords.accuracy ? `(~${Math.round(coords.accuracy)}m)` : ''}`;
     }
   };
+
+  // Open Map Pin Confirmation Mode on the Main Map
+  const startMapPinConfirm = () => {
+    if (options.onStartMapPinConfirm) {
+      options.onStartMapPinConfirm({
+        currentCoordinates,
+        imageData: processedImageData,
+        landmark: landmarkInput?.value || '',
+        onConfirm: (confirmedCoords) => {
+          currentCoordinates = { ...confirmedCoords };
+          markLocationConfirmed(true);
+          updateGpsUI(currentCoordinates, false);
+        }
+      });
+    }
+  };
+
+  openMapPickerBtn?.addEventListener('click', () => {
+    startMapPinConfirm();
+  });
 
   // Function to acquire and update GPS state smoothly
   const acquireGps = async (forceRefresh = false) => {
@@ -536,32 +385,14 @@ export function renderReportForm(container, options = {}) {
     }
   };
 
-  // Automatically acquire fresh GPS immediately on mount
-  acquireGps(false);
+  // Only auto-acquire if not passed existing confirmed coordinates
+  if (!options.isLocationConfirmed) {
+    acquireGps(false);
+  }
 
   // Manual GPS Refresh Button Handler
   refreshGpsBtn?.addEventListener('click', () => {
     acquireGps(true);
-  });
-
-  // Confirm spot button handler
-  confirmSpotBtn?.addEventListener('click', () => {
-    markLocationConfirmed(true);
-  });
-
-  // Use Map Center Handler
-  useMapCenterBtn?.addEventListener('click', () => {
-    let center = null;
-    if (options.getMapCenter) {
-      center = options.getMapCenter();
-    } else if (options.mapCenter) {
-      center = options.mapCenter;
-    }
-    if (center && center.lat && center.lng) {
-      center.accuracy = 10;
-      markLocationConfirmed(true);
-      updateGpsUI(center, false);
-    }
   });
 
   // City Selection Handler

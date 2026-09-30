@@ -422,6 +422,9 @@ class KhaddaApp {
       if (reportMount && this.bottomSheet.isOpen) {
         renderReportForm(reportMount, {
           currentCoordinates: this.userCoords,
+          onStartMapPinConfirm: (formState) => {
+            this.startMapLocationConfirm(formState);
+          },
           onClose: () => this.bottomSheet.close(),
           onSubmit: async (formData) => {
             await this.handleReportSubmit(formData);
@@ -645,7 +648,130 @@ class KhaddaApp {
     }
   }
 
-  openReportDrawer() {
+  startMapLocationConfirm(formState = {}) {
+    const { currentCoordinates, imageData, landmark } = formState;
+
+    // 1. Close / hide bottom sheet temporarily
+    this.bottomSheet.close(false);
+
+    // 2. Show fixed center pin & floating confirm bar
+    const centerPinEl = document.getElementById('main-map-center-pin');
+    const confirmBarEl = document.getElementById('map-confirm-bar');
+    const coordsDisplay = document.getElementById('confirm-bar-coords');
+    const accDisplay = document.getElementById('confirm-bar-acc');
+    const doneBtn = document.getElementById('btn-done-confirm-map');
+    const cancelBtn = document.getElementById('btn-cancel-confirm-map');
+
+    if (centerPinEl) {
+      centerPinEl.classList.remove('hidden');
+      centerPinEl.classList.add('flex');
+    }
+    if (confirmBarEl) {
+      confirmBarEl.classList.remove('hidden');
+    }
+
+    // 3. Scroll to map section smoothly
+    const mapSection = document.getElementById('map-section');
+    if (mapSection) {
+      mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // 4. Fly main map to target position at zoom 18
+    const targetLat = currentCoordinates?.lat || this.userCoords?.lat || 18.6298;
+    const targetLng = currentCoordinates?.lng || this.userCoords?.lng || 73.7997;
+    const accuracy = currentCoordinates?.accuracy || 20;
+
+    if (this.mapAdapter) {
+      this.mapAdapter.setView(targetLat, targetLng, 18);
+      this.mapAdapter.setAccuracyCircle?.(targetLat, targetLng, accuracy);
+    }
+
+    const updateBarDisplay = (c) => {
+      if (coordsDisplay && c) {
+        coordsDisplay.textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+      }
+      if (accDisplay) {
+        accDisplay.textContent = 'सटीक पिन / Pin Point';
+      }
+    };
+
+    updateBarDisplay({ lat: targetLat, lng: targetLng });
+
+    // 5. Drag animation: lift pin on dragstart, drop on dragend
+    const onDragStart = () => {
+      centerPinEl?.classList.add('is-dragging');
+    };
+
+    const onDragEnd = () => {
+      centerPinEl?.classList.remove('is-dragging');
+      if (this.mapAdapter) {
+        const c = this.mapAdapter.getCenter();
+        updateBarDisplay(c);
+      }
+    };
+
+    this.mapAdapter?.onMapDrag?.(onDragStart, onDragEnd);
+    this.mapAdapter?.onCenterChanged?.((c) => updateBarDisplay(c));
+
+    // Cleanup & Exit Confirm Mode
+    const cleanupConfirmMode = () => {
+      if (centerPinEl) {
+        centerPinEl.classList.remove('flex', 'is-dragging');
+        centerPinEl.classList.add('hidden');
+      }
+      if (confirmBarEl) {
+        confirmBarEl.classList.add('hidden');
+      }
+      this.mapAdapter?.clearAccuracyCircle?.();
+    };
+
+    // Done / Confirm Button Click
+    const handleDone = () => {
+      cleanupConfirmMode();
+      doneBtn?.removeEventListener('click', handleDone);
+      cancelBtn?.removeEventListener('click', handleCancel);
+
+      const finalCenter = this.mapAdapter ? this.mapAdapter.getCenter() : { lat: targetLat, lng: targetLng };
+      const chosenCoords = {
+        lat: finalCenter.lat,
+        lng: finalCenter.lng,
+        accuracy: 5,
+        manuallyAdjusted: true,
+        source: 'manual_map_pin'
+      };
+
+      this.userCoords = chosenCoords;
+      setCachedUserLocation(chosenCoords);
+
+      // Re-open report sheet in confirmed state with preserved image and landmark!
+      this.openReportDrawer({
+        currentCoordinates: chosenCoords,
+        isLocationConfirmed: true,
+        imageData,
+        landmark
+      });
+    };
+
+    // Cancel Button Click
+    const handleCancel = () => {
+      cleanupConfirmMode();
+      doneBtn?.removeEventListener('click', handleDone);
+      cancelBtn?.removeEventListener('click', handleCancel);
+
+      // Restore report sheet with previous state
+      this.openReportDrawer({
+        currentCoordinates,
+        isLocationConfirmed: formState.isLocationConfirmed,
+        imageData,
+        landmark
+      });
+    };
+
+    doneBtn?.addEventListener('click', handleDone, { once: true });
+    cancelBtn?.addEventListener('click', handleCancel, { once: true });
+  }
+
+  openReportDrawer(initialState = {}) {
     const quota = getActionQuota();
     if (quota.isLimitReached) {
       showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
@@ -656,11 +782,17 @@ class KhaddaApp {
     if (!mountPoint) return;
 
     const mapCenter = this.mapAdapter?.getCenter ? this.mapAdapter.getCenter() : null;
+    const coords = initialState.currentCoordinates || this.userCoords || getCachedUserLocation() || mapCenter;
 
     renderReportForm(mountPoint, {
-      currentCoordinates: this.userCoords || getCachedUserLocation() || mapCenter,
+      currentCoordinates: coords,
+      isLocationConfirmed: initialState.isLocationConfirmed,
+      imageData: initialState.imageData,
+      landmark: initialState.landmark,
       mapCenter,
-      getMapCenter: () => (this.mapAdapter?.getCenter ? this.mapAdapter.getCenter() : mapCenter),
+      onStartMapPinConfirm: (formState) => {
+        this.startMapLocationConfirm(formState);
+      },
       onClose: () => this.bottomSheet.close(),
       onSubmit: async (formData) => {
         await this.handleReportSubmit(formData);
