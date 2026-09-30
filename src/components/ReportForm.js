@@ -3,7 +3,6 @@ import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
-import { INDIAN_CITIES } from '../utils/cities';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
@@ -147,19 +146,6 @@ export function renderReportForm(container, options = {}) {
           ${getLucideIcon('alert', 'w-4 h-4 shrink-0 mt-0.5 text-amber-500')}
           <span class="leading-relaxed">${t('weakGpsWarning')}</span>
         </div>
-
-        <!-- Quick City Selector Fallback -->
-        <div class="pt-1 flex items-center gap-2 text-xs flex-wrap">
-          <span class="text-[var(--muted)] text-[11px]">${isHindi ? 'या शहर चुनें:' : 'Or Select City:'}</span>
-          <div class="relative inline-block">
-            <select id="select-quick-city" class="text-[11px] font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-md px-2 py-0.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent)]">
-              <option value="">${isHindi ? '📍 शहर चुनें...' : '📍 Select City...'}</option>
-              ${INDIAN_CITIES.slice(0, 15).map(c => `
-                <option value="${c.lat},${c.lng}">${isHindi ? c.nameHindi : c.nameEnglish}</option>
-              `).join('')}
-            </select>
-          </div>
-        </div>
       </div>
 
       <!-- Landmark & Description Input -->
@@ -224,7 +210,6 @@ export function renderReportForm(container, options = {}) {
   const submitText = container.querySelector('#submit-btn-text');
   const refreshGpsBtn = container.querySelector('#btn-refresh-gps');
   const openMapPickerBtn = container.querySelector('#btn-open-map-picker');
-  const citySelect = container.querySelector('#select-quick-city');
   const gpsStatusCard = container.querySelector('#gps-status-card');
   const gpsDotIndicator = container.querySelector('#gps-dot-indicator');
   const gpsStatusText = container.querySelector('#gps-status-text');
@@ -413,19 +398,6 @@ export function renderReportForm(container, options = {}) {
   // Manual GPS Refresh Button Handler
   refreshGpsBtn?.addEventListener('click', () => {
     acquireGps(true);
-  });
-
-  // City Selection Handler
-  citySelect?.addEventListener('change', (e) => {
-    const val = e.target.value;
-    if (val) {
-      const [lat, lng] = val.split(',').map(Number);
-      if (!isNaN(lat) && !isNaN(lng)) {
-        const cityCoord = { lat, lng, accuracy: 25, source: 'city_select' };
-        markLocationConfirmed(true);
-        updateGpsUI(cityCoord, false);
-      }
-    }
   });
 
   // Submit Handler
