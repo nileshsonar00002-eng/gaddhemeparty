@@ -8,7 +8,9 @@
  */
 
 const STORAGE_KEY = 'khadda_cached_location';
+const REAL_GPS_KEY = 'khadda_real_device_gps';
 let inMemoryCoords = null;
+let inMemoryRealGps = null;
 let activeLocationPromise = null;
 let defaultFallbackCoords = { lat: 18.5204, lng: 73.8567, accuracy: 100, isFallback: true }; // Default to Maharashtra/Center
 
@@ -28,12 +30,44 @@ try {
       };
     }
   }
+  const cachedGps = localStorage.getItem(REAL_GPS_KEY) || sessionStorage.getItem(REAL_GPS_KEY);
+  if (cachedGps) {
+    const parsedGps = JSON.parse(cachedGps);
+    if (parsedGps && typeof parsedGps.lat === 'number' && typeof parsedGps.lng === 'number') {
+      inMemoryRealGps = {
+        lat: Number(parsedGps.lat),
+        lng: Number(parsedGps.lng),
+        accuracy: parsedGps.accuracy || 25,
+        source: parsedGps.source || 'gps',
+        timestamp: parsedGps.timestamp || Date.now()
+      };
+    }
+  }
 } catch (e) {
   console.warn('[Geo] Cache read warning:', e);
 }
 
 export function getCachedUserLocation() {
   return inMemoryCoords;
+}
+
+export function getRealDeviceGps() {
+  return inMemoryRealGps;
+}
+
+export function setRealDeviceGps(coords, source = 'hardware_gps') {
+  if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return;
+  inMemoryRealGps = {
+    lat: coords.lat,
+    lng: coords.lng,
+    accuracy: coords.accuracy || 15,
+    source,
+    timestamp: Date.now()
+  };
+  try {
+    localStorage.setItem(REAL_GPS_KEY, JSON.stringify(inMemoryRealGps));
+    sessionStorage.setItem(REAL_GPS_KEY, JSON.stringify(inMemoryRealGps));
+  } catch (e) {}
 }
 
 export function setCachedUserLocation(coords, source = 'user') {
@@ -155,6 +189,7 @@ export async function getLiveUserLocation(options = {}) {
           );
         });
 
+        setRealDeviceGps(highAccCoords, 'hardware_gps');
         setCachedUserLocation(highAccCoords, 'hardware_gps');
         return highAccCoords;
       } catch (err1) {
@@ -183,6 +218,7 @@ export async function getLiveUserLocation(options = {}) {
             );
           });
 
+          setRealDeviceGps(stdCoords, 'wifi_geo');
           setCachedUserLocation(stdCoords, 'wifi_geo');
           return stdCoords;
         } catch (err2) {
@@ -195,6 +231,7 @@ export async function getLiveUserLocation(options = {}) {
     try {
       const ipCoords = await fetchIpGeolocation();
       if (ipCoords) {
+        setRealDeviceGps(ipCoords, 'ip_geo');
         console.log('[Geo] Resolved via IP Geolocation:', ipCoords);
         return ipCoords;
       }

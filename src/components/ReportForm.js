@@ -2,7 +2,7 @@ import { t, getLanguage } from '../utils/i18n';
 import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
-import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
+import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps } from '../utils/geo';
 import { haversineDistanceKm } from '../utils/cities';
 
 export function renderReportForm(container, options = {}) {
@@ -320,6 +320,9 @@ export function renderReportForm(container, options = {}) {
   const updateGpsUI = (coords, isLive = true) => {
     if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return;
     currentCoordinates = coords;
+    if (isLive) {
+      setRealDeviceGps(coords, coords.source || 'gps');
+    }
     setCachedUserLocation(coords, isLive ? 'gps' : 'manual');
 
     if (gpsCoordsText) {
@@ -371,6 +374,7 @@ export function renderReportForm(container, options = {}) {
       });
 
       if (coords && coords.lat && coords.lng) {
+        setRealDeviceGps(coords, coords.source || 'gps');
         const accuracy = coords.accuracy || 20;
         if (accuracy > 100) {
           markLocationConfirmed(false);
@@ -435,9 +439,9 @@ export function renderReportForm(container, options = {}) {
     }
 
     // Strict Validation: Max 50km from user's origin GPS location
-    const baseGps = options.baseGps || options.currentCoordinates || getCachedUserLocation();
-    if (baseGps && typeof baseGps.lat === 'number' && typeof baseGps.lng === 'number') {
-      const distKm = haversineDistanceKm(baseGps.lat, baseGps.lng, currentCoordinates.lat, currentCoordinates.lng);
+    const realGps = getRealDeviceGps() || options.baseGps;
+    if (realGps && typeof realGps.lat === 'number' && typeof realGps.lng === 'number') {
+      const distKm = haversineDistanceKm(realGps.lat, realGps.lng, currentCoordinates.lat, currentCoordinates.lng);
       if (distKm > 50) {
         alert(t('maxRadiusExceededAlert'));
         startMapPinConfirm();
