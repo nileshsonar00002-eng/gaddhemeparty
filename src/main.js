@@ -719,7 +719,22 @@ class KhaddaApp {
       } else {
         this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, 20000);
       }
-      this.mapAdapter.setConfirmLocationMarker?.(activeCoords.lat, activeCoords.lng, (newPos) => {
+      this.mapAdapter.setConfirmLocationMarker?.(activeCoords.lat, activeCoords.lng, (newPos, isEnd) => {
+        const distFromOrigin = (realGps && typeof realGps.lat === 'number') 
+          ? haversineDistanceKm(realGps.lat, realGps.lng, newPos.lat, newPos.lng) 
+          : 0;
+
+        if (isEnd && distFromOrigin > 20) {
+          showToast(t('maxRadiusExceededAlert'), 'warning', 4000);
+          if (realGps && typeof realGps.lat === 'number') {
+            activeCoords = { lat: realGps.lat, lng: realGps.lng };
+            this.mapAdapter?.setConfirmMarkerPosition?.(realGps.lat, realGps.lng);
+            this.mapAdapter?.setView(realGps.lat, realGps.lng, 17);
+          }
+          updateBarDisplay(activeCoords);
+          return;
+        }
+
         activeCoords = { ...newPos };
         updateBarDisplay(activeCoords);
       });
@@ -742,15 +757,12 @@ class KhaddaApp {
         : 0;
 
       if (distFromOrigin > 20) {
-        showToast(t('maxRadiusExceededAlert'), 'warning', 5000);
-        if (this.mapAdapter) {
-          this.mapAdapter.setView(realGps.lat, realGps.lng, 18);
-          this.mapAdapter.setConfirmLocationMarker?.(realGps.lat, realGps.lng, (newPos) => {
-            activeCoords = { ...newPos };
-            updateBarDisplay(activeCoords);
-          });
+        showToast(t('maxRadiusExceededAlert'), 'warning', 4000);
+        if (realGps && typeof realGps.lat === 'number') {
+          activeCoords = { lat: realGps.lat, lng: realGps.lng };
+          this.mapAdapter?.setConfirmMarkerPosition?.(realGps.lat, realGps.lng);
+          this.mapAdapter?.setView(realGps.lat, realGps.lng, 17);
         }
-        activeCoords = { lat: realGps.lat, lng: realGps.lng };
         updateBarDisplay(activeCoords);
         return;
       }

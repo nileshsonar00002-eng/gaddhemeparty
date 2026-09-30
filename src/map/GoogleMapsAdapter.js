@@ -164,6 +164,14 @@ class HTMLMarkerOverlay {
     return this.position;
   }
 
+  setPosition(latLng) {
+    if (!latLng) return;
+    this.position = latLng instanceof google.maps.LatLng ? latLng : new google.maps.LatLng(latLng.lat, latLng.lng);
+    if (this.overlay && this.overlay.draw) {
+      this.overlay.draw();
+    }
+  }
+
   triggerClick() {
     if (this.onClick) {
       this.onClick();
@@ -582,6 +590,21 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.clearConfirmLocationMarker();
     if (!this.map || !window.google || !window.google.maps) return;
 
+    // Pulsing / Blinking aura overlay behind the manual draggable pin
+    const pulseHtml = `
+      <div class="confirm-pin-pulse-dot relative flex items-center justify-center pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
+        <div class="absolute w-12 h-12 bg-red-500 rounded-full animate-ping opacity-75"></div>
+        <div class="absolute w-8 h-8 bg-red-500/40 rounded-full animate-pulse"></div>
+      </div>
+    `;
+
+    this.confirmPulseOverlay = new HTMLMarkerOverlay(
+      this.map,
+      { lat, lng },
+      pulseHtml,
+      null
+    );
+
     const pinSvg = {
       path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
       fillColor: '#DC2626',
@@ -602,22 +625,38 @@ export class GoogleMapsAdapter extends MapAdapter {
       title: 'गड्ढे का स्थान (ड्रैग करें)'
     });
 
-    const notifyPos = () => {
+    const notifyPos = (isDragEnd = false) => {
       const pos = this.confirmMarker?.getPosition();
-      if (pos && onPositionChange) {
-        onPositionChange({ lat: pos.lat(), lng: pos.lng() });
+      if (pos) {
+        const coords = { lat: pos.lat(), lng: pos.lng() };
+        if (this.confirmPulseOverlay) {
+          this.confirmPulseOverlay.setPosition(coords);
+        }
+        if (onPositionChange) {
+          onPositionChange(coords, isDragEnd);
+        }
       }
     };
 
-    this.confirmMarker.addListener('drag', notifyPos);
-    this.confirmMarker.addListener('dragend', notifyPos);
+    this.confirmMarker.addListener('drag', () => notifyPos(false));
+    this.confirmMarker.addListener('dragend', () => notifyPos(true));
 
     // Map click jumps draggable pin
     this.confirmMapClickListener = this.map.addListener('click', (e) => {
       if (!e.latLng || !this.confirmMarker) return;
       this.confirmMarker.setPosition(e.latLng);
-      notifyPos();
+      notifyPos(true);
     });
+  }
+
+  setConfirmMarkerPosition(lat, lng) {
+    if (this.confirmMarker && window.google && window.google.maps) {
+      const pos = new google.maps.LatLng(lat, lng);
+      this.confirmMarker.setPosition(pos);
+      if (this.confirmPulseOverlay) {
+        this.confirmPulseOverlay.setPosition(pos);
+      }
+    }
   }
 
   getConfirmLocationPosition() {
@@ -634,6 +673,10 @@ export class GoogleMapsAdapter extends MapAdapter {
     if (this.confirmMarker) {
       this.confirmMarker.setMap(null);
       this.confirmMarker = null;
+    }
+    if (this.confirmPulseOverlay) {
+      this.confirmPulseOverlay.setMap(null);
+      this.confirmPulseOverlay = null;
     }
     if (this.confirmMapClickListener && window.google && window.google.maps) {
       google.maps.event.removeListener(this.confirmMapClickListener);

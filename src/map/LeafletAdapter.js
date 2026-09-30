@@ -362,13 +362,23 @@ export class LeafletAdapter extends MapAdapter {
     const pinIcon = L.divIcon({
       className: 'custom-draggable-report-pin',
       html: `
-        <div class="relative flex flex-col items-center cursor-grab active:cursor-grabbing transform -translate-x-1/2 -translate-y-full hover:scale-110 transition duration-150">
-          <div class="w-10 h-10 rounded-full bg-red-600 text-white shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-black/20">
+        <div class="relative flex flex-col items-center cursor-grab active:cursor-grabbing transform -translate-x-1/2 -translate-y-full hover:scale-105 transition duration-150">
+          <!-- Live Blinking / Pulsing Aura -->
+          <div class="absolute -top-1.5 -left-1.5 w-13 h-13 bg-red-500 rounded-full animate-ping opacity-75 pointer-events-none"></div>
+          <div class="absolute -top-1 -left-1 w-12 h-12 bg-red-500/40 rounded-full animate-pulse pointer-events-none"></div>
+
+          <!-- Red Pin Body -->
+          <div class="relative w-10 h-10 rounded-full bg-red-600 text-white shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-red-900/40">
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>
           </div>
-          <div class="w-3.5 h-1.5 bg-black/40 rounded-full blur-[1px] mt-0.5"></div>
+
+          <!-- Base Ground Pulsing Dot -->
+          <div class="relative flex items-center justify-center mt-0.5">
+            <div class="absolute w-6 h-6 bg-red-500/60 rounded-full animate-ping pointer-events-none"></div>
+            <div class="w-3.5 h-1.5 bg-black/50 rounded-full blur-[1px]"></div>
+          </div>
         </div>
       `,
       iconSize: [0, 0],
@@ -381,10 +391,17 @@ export class LeafletAdapter extends MapAdapter {
       zIndexOffset: 2000
     }).addTo(this.map);
 
-    this.confirmMarker.on('drag dragend', () => {
+    this.confirmMarker.on('drag', () => {
       const pos = this.confirmMarker.getLatLng();
       if (onPositionChange) {
-        onPositionChange({ lat: pos.lat, lng: pos.lng });
+        onPositionChange({ lat: pos.lat, lng: pos.lng }, false);
+      }
+    });
+
+    this.confirmMarker.on('dragend', () => {
+      const pos = this.confirmMarker.getLatLng();
+      if (onPositionChange) {
+        onPositionChange({ lat: pos.lat, lng: pos.lng }, true);
       }
     });
 
@@ -392,12 +409,18 @@ export class LeafletAdapter extends MapAdapter {
       if (this.confirmMarker) {
         this.confirmMarker.setLatLng(e.latlng);
         if (onPositionChange) {
-          onPositionChange({ lat: e.latlng.lat, lng: e.latlng.lng });
+          onPositionChange({ lat: e.latlng.lat, lng: e.latlng.lng }, true);
         }
       }
     };
 
     this.map.on('click', this.confirmMapClickHandler);
+  }
+
+  setConfirmMarkerPosition(lat, lng) {
+    if (this.confirmMarker) {
+      this.confirmMarker.setLatLng([lat, lng]);
+    }
   }
 
   getConfirmLocationPosition() {
