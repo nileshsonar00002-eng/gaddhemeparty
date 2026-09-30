@@ -172,13 +172,11 @@ export class LeafletAdapter extends MapAdapter {
       this.map.removeLayer(this.tileLayer);
     }
 
-    const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-    const lightTileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-    const url = theme === 'light' ? lightTileUrl : darkTileUrl;
+    const osmTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    this.tileLayer = L.tileLayer(url, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-      subdomains: 'abcd',
+    this.tileLayer = L.tileLayer(osmTileUrl, {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      subdomains: ['a', 'b', 'c'],
       maxZoom: 19
     }).addTo(this.map);
   }

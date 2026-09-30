@@ -399,6 +399,22 @@ body.panel-scroll-locked {
   font-family: inherit;
 }
 
+[data-theme="dark"] .leaflet-tile-pane,
+:root.dark .leaflet-tile-pane {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+[data-theme="light"] .leaflet-tile-pane,
+:root.light .leaflet-tile-pane {
+  filter: none;
+}
+
+.leaflet-marker-pane,
+.leaflet-popup-pane,
+.leaflet-overlay-pane {
+  filter: none !important;
+}
+
 .leaflet-control-zoom {
   display: none !important;
 }

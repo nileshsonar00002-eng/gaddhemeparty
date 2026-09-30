@@ -366,11 +366,9 @@ export function renderReportForm(container, options = {}) {
       }
     }
 
-    // 2. Leaflet Fallback (100% Free Carto/OSM tiles without API key requirements)
+    // 2. Leaflet Fallback (100% Free OpenStreetMap tiles without API key requirements)
     try {
-      const tileUrl = isDark
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      const osmTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
       leafletMiniMap = L.map(mapMount, {
         center: [currentCoordinates.lat, currentCoordinates.lng],
@@ -382,8 +380,8 @@ export function renderReportForm(container, options = {}) {
         touchZoom: true
       });
 
-      L.tileLayer(tileUrl, {
-        subdomains: 'abcd',
+      L.tileLayer(osmTileUrl, {
+        subdomains: ['a', 'b', 'c'],
         maxZoom: 19
       }).addTo(leafletMiniMap);
 
@@ -410,9 +408,14 @@ export function renderReportForm(container, options = {}) {
         updateGpsUI(currentCoordinates, false);
       });
 
-      setTimeout(() => {
-        leafletMiniMap?.invalidateSize();
-      }, 250);
+      // Multi-stage invalidateSize to ensure full rendering during bottom sheet animation
+      [100, 250, 450, 750].forEach(delay => {
+        setTimeout(() => {
+          if (leafletMiniMap) {
+            leafletMiniMap.invalidateSize();
+          }
+        }, delay);
+      });
     } catch (lErr) {
       console.warn('[ReportForm] Leaflet mini-map init error:', lErr);
     }
