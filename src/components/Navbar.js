@@ -3,6 +3,7 @@ import { router } from '../utils/router';
 import { getLucideIcon } from '../utils/icons';
 
 let isScrollListenerAttached = false;
+let isEscListenerAttached = false;
 
 export function createNavbar(options = {}) {
   const container = document.getElementById('navbar-container');
@@ -24,28 +25,26 @@ export function createNavbar(options = {}) {
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
   container.innerHTML = `
-    <div class="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--bg)] border-b border-[var(--border)] relative z-50 transition-colors duration-200">
-      <!-- Left: Brand Logo + Titles -->
-      <div class="flex items-center gap-2.5 sm:gap-3">
-        <!-- Logo Badge -->
-        <button type="button" id="nav-brand-btn" class="flex-shrink-0 cursor-pointer focus:outline-none" title="${t('appNameHindi')}">
+    <div class="w-full h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--bg-nav)] border-b border-[var(--border)] relative z-50 transition-colors duration-200 flex-nowrap overflow-hidden">
+      
+      <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
+        <button type="button" id="nav-brand-btn" class="shrink-0 cursor-pointer focus:outline-none flex items-center justify-center" title="${t('appNameHindi')}">
           <img src="/logo.svg" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl transition transform duration-150 hover:scale-105" />
         </button>
 
-        <!-- Titles & Tagline -->
-        <div class="flex flex-col justify-center">
-          <span class="font-heading font-bold text-sm sm:text-base text-[var(--text)] tracking-tight leading-tight">
+        <div class="flex flex-col justify-center min-w-0 overflow-hidden">
+          <span class="font-heading font-semibold text-sm sm:text-base text-[var(--text)] tracking-tight leading-tight whitespace-nowrap truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
             ${t('appNameHindi')}
           </span>
-          <p class="font-medium text-[10px] sm:text-xs text-[var(--accent)] tracking-normal leading-none mt-0.5">
+          <p class="hidden sm:block font-medium text-[11px] sm:text-xs text-[var(--muted)] tracking-normal leading-none mt-0.5 whitespace-nowrap truncate">
             "${t('tagline')}"
           </p>
         </div>
       </div>
 
-      <!-- Center Nav Links (Desktop) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)] select-none">
-        <!-- Map -->
+      <!-- Center Nav Links (Desktop >= 1024px) -->
+      <nav class="hidden lg:flex items-center gap-1 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)] select-none shrink-0">
         <button
           type="button"
           data-nav-panel="map"
@@ -55,7 +54,6 @@ export function createNavbar(options = {}) {
           <span>${t('navMap')}</span>
         </button>
 
-        <!-- Leaderboard -->
         <button
           type="button"
           data-nav-panel="leaderboard"
@@ -65,7 +63,6 @@ export function createNavbar(options = {}) {
           <span>${t('navLeaderboard')}</span>
         </button>
 
-        <!-- Mission -->
         <button
           type="button"
           data-nav-panel="mission"
@@ -75,7 +72,6 @@ export function createNavbar(options = {}) {
           <span>${t('navMission')}</span>
         </button>
 
-        <!-- How It Works -->
         <button
           type="button"
           data-nav-panel="how"
@@ -85,7 +81,6 @@ export function createNavbar(options = {}) {
           <span>${t('navHowItWorks')}</span>
         </button>
 
-        <!-- About Us -->
         <button
           type="button"
           data-nav-panel="about"
@@ -96,137 +91,191 @@ export function createNavbar(options = {}) {
         </button>
       </nav>
 
-      <!-- Right Actions: Theme + Lang + Chai + WhatsApp Share + Mobile Hamburger -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
-        <!-- Dark / Light Theme Toggle Button -->
+      <!-- Desktop Right Controls (>= 1024px) -->
+      <div class="hidden lg:flex items-center gap-2 shrink-0">
         <button
-          id="btn-theme-toggle"
+          id="btn-theme-toggle-desktop"
           type="button"
-          class="btn-secondary p-2 text-xs"
+          class="btn-secondary p-2 text-xs min-w-[40px] min-h-[40px]"
           title="${currentTheme === 'dark' ? t('switchToLightMode') : t('switchToDarkMode')}"
           aria-label="${currentTheme === 'dark' ? t('switchToLightMode') : t('switchToDarkMode')}"
         >
           ${currentTheme === 'dark' ? getLucideIcon('sun', 'w-4 h-4 text-amber-400') : getLucideIcon('moon', 'w-4 h-4 text-slate-700')}
         </button>
 
-        <!-- Segmented Language Toggle Pill [ हिंदी | EN ] -->
         <div class="flex items-center bg-[var(--surface-2)] p-0.5 rounded-xl border border-[var(--border)]">
           <button
-            id="btn-lang-hi"
+            id="btn-lang-hi-desktop"
             type="button"
-            class="px-2 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
           >
             हिंदी
           </button>
           <button
-            id="btn-lang-en"
+            id="btn-lang-en-desktop"
             type="button"
-            class="px-2 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
           >
             EN
           </button>
         </div>
 
-        <!-- Chai Tip Button (Secondary button style with Lucide coffee icon) -->
         <button
-          id="btn-chai-tip"
+          id="btn-chai-tip-desktop"
           type="button"
-          class="btn-secondary px-2.5 sm:px-3 py-1.5 text-xs text-[var(--text)]"
+          class="btn-secondary px-3 py-2 text-xs min-h-[40px]"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
-          ${getLucideIcon('coffee', 'w-3.5 h-3.5 text-[var(--accent)]')}
-          <span class="hidden sm:inline">${t('tipChai')}</span>
-          <span class="sm:hidden font-medium">${t('tipChaiMobile')}</span>
+          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--accent)]')}
+          <span class="font-medium">${t('tipChai')}</span>
         </button>
 
-        <!-- WhatsApp Share Button -->
         <a
           href="${whatsappShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          id="btn-nav-share-whatsapp"
-          class="btn-secondary px-2.5 sm:px-3 py-1.5 text-xs"
-          title="Share Gaddhe Me Party on WhatsApp"
+          class="btn-secondary px-3 py-2 text-xs min-h-[40px]"
+          title="Share on WhatsApp"
           aria-label="Share on WhatsApp"
         >
-          ${getLucideIcon('share', 'w-3.5 h-3.5 text-[#25D366]')}
-          <span class="font-medium tracking-normal hidden xs:inline">Share</span>
+          ${getLucideIcon('share', 'w-4 h-4 text-[#25D366]')}
+          <span class="font-medium">Share</span>
         </a>
+      </div>
 
-        <!-- Mobile Hamburger Menu Button -->
+      <!-- Mobile Right Controls (< 1024px): Exactly TWO 40-44px tap targets with 8px gap -->
+      <div class="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
+        <button
+          id="btn-chai-tip-mobile"
+          type="button"
+          class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl shrink-0 cursor-pointer"
+          title="${t('tipChai')}"
+          aria-label="${t('tipChai')}"
+        >
+          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--accent)]')}
+        </button>
+
         <button
           id="btn-mobile-menu-toggle"
           type="button"
-          class="lg:hidden btn-secondary p-2"
-          aria-label="Toggle navigation menu"
+          class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl shrink-0 cursor-pointer"
+          aria-label="Open navigation menu"
         >
-          ${getLucideIcon('menu', 'w-4 h-4')}
+          ${getLucideIcon('menu', 'w-4 h-4 text-[var(--text)]')}
         </button>
       </div>
     </div>
 
-    <!-- Mobile Navigation Drawer Overlay -->
-    <div id="mobile-nav-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1050] hidden transition-opacity duration-200">
-      <div class="fixed top-0 right-0 w-4/5 max-w-xs h-full bg-[var(--surface)] border-l border-[var(--border)] p-5 flex flex-col justify-between shadow-xl animate-in slide-in-from-right duration-200">
-        <div class="space-y-4">
-          <!-- Drawer Header -->
+    <!-- Mobile Full-Height Navigation Drawer Overlay -->
+    <div id="mobile-nav-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1150] hidden transition-opacity duration-200">
+      <div
+        id="mobile-nav-panel"
+        class="fixed top-0 right-0 w-[85%] max-w-sm h-full bg-[var(--surface)] border-l border-[var(--border)] p-5 flex flex-col justify-between shadow-2xl overflow-y-auto transform transition-transform duration-250 ease-out translate-x-full"
+      >
+        <div class="space-y-5">
+          <!-- Drawer Top Header -->
           <div class="flex items-center justify-between pb-3 border-b border-[var(--border)]">
-            <div class="flex items-center gap-2">
-              <img src="/logo.svg" alt="Logo" class="w-7 h-7 rounded-lg" />
-              <span class="font-heading font-bold text-sm text-[var(--text)]">${t('appNameHindi')}</span>
+            <div class="flex items-center gap-2.5">
+              <img src="/logo.svg" alt="Logo" class="w-8 h-8 rounded-lg" />
+              <div class="flex flex-col">
+                <span class="font-heading font-bold text-sm text-[var(--text)]">${t('appNameHindi')}</span>
+                <span class="text-[11px] text-[var(--muted)]">"${t('tagline')}"</span>
+              </div>
             </div>
-            <button id="btn-close-mobile-nav" class="btn-secondary p-1.5" aria-label="Close menu">
-              ${getLucideIcon('x', 'w-4 h-4')}
+            <button id="btn-close-mobile-nav" class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl" aria-label="Close menu">
+              ${getLucideIcon('x', 'w-5 h-5')}
             </button>
           </div>
 
-          <!-- Drawer Navigation Links -->
-          <nav class="flex flex-col gap-1.5 pt-2">
-            <button type="button" data-nav-panel="map" class="mobile-nav-panel-btn flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition cursor-pointer ${activeNav === 'map' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'}">
-              ${getLucideIcon('map', 'w-4 h-4')} <span>${t('navMap')}</span>
+          <!-- Drawer Navigation Rows (Large 48px tap targets with icons) -->
+          <nav class="flex flex-col gap-1">
+            <button type="button" data-nav-panel="map" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'map' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+              ${getLucideIcon('map', 'w-5 h-5 shrink-0')} <span>${t('navMap')}</span>
             </button>
-            <button type="button" data-nav-panel="leaderboard" class="mobile-nav-panel-btn flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'}">
-              ${getLucideIcon('trophy', 'w-4 h-4')} <span>${t('navLeaderboard')}</span>
+            <button type="button" data-nav-panel="leaderboard" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+              ${getLucideIcon('trophy', 'w-5 h-5 shrink-0')} <span>${t('navLeaderboard')}</span>
             </button>
-            <button type="button" data-nav-panel="mission" class="mobile-nav-panel-btn flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'}">
-              ${getLucideIcon('target', 'w-4 h-4')} <span>${t('navMission')}</span>
+            <button type="button" data-nav-panel="mission" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+              ${getLucideIcon('target', 'w-5 h-5 shrink-0')} <span>${t('navMission')}</span>
             </button>
-            <button type="button" data-nav-panel="how" class="mobile-nav-panel-btn flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'}">
-              ${getLucideIcon('zap', 'w-4 h-4')} <span>${t('navHowItWorks')}</span>
+            <button type="button" data-nav-panel="how" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+              ${getLucideIcon('zap', 'w-5 h-5 shrink-0')} <span>${t('navHowItWorks')}</span>
             </button>
-            <button type="button" data-nav-panel="about" class="mobile-nav-panel-btn flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition cursor-pointer ${activeNav === 'about' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'}">
-              ${getLucideIcon('info', 'w-4 h-4')} <span>${t('navAbout')}</span>
+            <button type="button" data-nav-panel="about" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'about' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+              ${getLucideIcon('info', 'w-5 h-5 shrink-0')} <span>${t('navAbout')}</span>
+            </button>
+            <button type="button" data-nav-panel="terms" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'terms' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+              ${getLucideIcon('flag', 'w-5 h-5 shrink-0')} <span>${t('navTerms')}</span>
             </button>
           </nav>
+
+          <!-- Divider -->
+          <div class="h-px bg-[var(--border)] my-1"></div>
+
+          <!-- Controls Section: Language + Theme in Drawer -->
+          <div class="space-y-3 pt-1">
+            <!-- Segmented Language Switcher -->
+            <div class="flex flex-col gap-1.5">
+              <span class="text-xs font-medium text-[var(--muted)]">Language / भाषा</span>
+              <div class="grid grid-cols-2 gap-1.5 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)]">
+                <button
+                  id="btn-lang-hi-drawer"
+                  type="button"
+                  class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+                >
+                  हिंदी
+                </button>
+                <button
+                  id="btn-lang-en-drawer"
+                  type="button"
+                  class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${!isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+                >
+                  English
+                </button>
+              </div>
+            </div>
+
+            <!-- Theme Toggle Row -->
+            <div class="flex flex-col gap-1.5">
+              <span class="text-xs font-medium text-[var(--muted)]">Theme / थीम</span>
+              <button
+                id="btn-theme-toggle-drawer"
+                type="button"
+                class="btn-secondary h-11 w-full px-3.5 flex items-center justify-between rounded-xl"
+              >
+                <div class="flex items-center gap-2.5 text-sm font-medium">
+                  ${currentTheme === 'dark' ? getLucideIcon('sun', 'w-4 h-4 text-amber-400') : getLucideIcon('moon', 'w-4 h-4 text-slate-700')}
+                  <span>${currentTheme === 'dark' ? t('switchToLightMode') : t('switchToDarkMode')}</span>
+                </div>
+                <span class="text-xs font-semibold uppercase px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]">${currentTheme}</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Drawer Footer -->
-        <div class="pt-4 border-t border-[var(--border)] space-y-2.5">
-          <!-- Mobile Chai Tip Action Button -->
+        <!-- Drawer Bottom Actions: Tip Chai + WhatsApp Share -->
+        <div class="pt-5 border-t border-[var(--border)] space-y-2.5 mt-4">
           <button
             type="button"
-            id="btn-mobile-chai-tip"
-            class="btn-secondary w-full py-2.5 px-3 flex items-center justify-between text-sm"
+            id="btn-drawer-chai-tip"
+            class="btn-primary w-full h-12 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl"
           >
-            <div class="flex items-center gap-2">
-              ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--accent)]')}
-              <span>${t('tipChai')}</span>
-            </div>
-            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-[var(--surface-2)] border border-[var(--border)] text-[var(--muted)]">Tip</span>
+            ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
+            <span>${isHindi ? 'सर्वर चाय टिप (₹20)' : 'Tip Server Chai (₹20)'}</span>
           </button>
 
           <a
             href="${whatsappShareUrl}"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn-secondary w-full py-2.5 px-3 flex items-center justify-center gap-2 text-sm"
+            class="btn-secondary w-full h-11 flex items-center justify-center gap-2 text-sm font-medium rounded-xl"
           >
             ${getLucideIcon('share', 'w-4 h-4 text-[#25D366]')}
-            <span>WhatsApp पर शेयर करें</span>
+            <span>${isHindi ? 'WhatsApp पर शेयर करें' : 'Share on WhatsApp'}</span>
           </a>
 
-          <p class="text-[11px] text-[var(--muted)] font-normal text-center">
+          <p class="text-[11px] text-[var(--muted)] font-normal text-center pt-1">
             ${isHindi ? 'नागरिक पहल • 100% Free' : 'Civic Initiative • 100% Free'}
           </p>
         </div>
@@ -240,40 +289,83 @@ export function createNavbar(options = {}) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  document.getElementById('btn-lang-hi')?.addEventListener('click', () => {
+  // Desktop Language Handlers
+  document.getElementById('btn-lang-hi-desktop')?.addEventListener('click', () => {
     if (getLanguage() !== 'hindi') setLanguage('hindi');
   });
-
-  document.getElementById('btn-lang-en')?.addEventListener('click', () => {
+  document.getElementById('btn-lang-en-desktop')?.addEventListener('click', () => {
     if (getLanguage() !== 'english') setLanguage('english');
   });
 
-  document.getElementById('btn-theme-toggle')?.addEventListener('click', () => {
-    if (onToggleMapTheme) onToggleMapTheme();
+  // Drawer Language Handlers
+  document.getElementById('btn-lang-hi-drawer')?.addEventListener('click', () => {
+    if (getLanguage() !== 'hindi') setLanguage('hindi');
+    closeDrawer();
+  });
+  document.getElementById('btn-lang-en-drawer')?.addEventListener('click', () => {
+    if (getLanguage() !== 'english') setLanguage('english');
+    closeDrawer();
   });
 
-  document.getElementById('btn-chai-tip')?.addEventListener('click', () => {
+  // Theme Handlers
+  const handleToggleTheme = () => {
+    if (onToggleMapTheme) onToggleMapTheme();
+  };
+  document.getElementById('btn-theme-toggle-desktop')?.addEventListener('click', handleToggleTheme);
+  document.getElementById('btn-theme-toggle-drawer')?.addEventListener('click', () => {
+    handleToggleTheme();
+    closeDrawer();
+  });
+
+  // Chai Tip Handlers
+  document.getElementById('btn-chai-tip-desktop')?.addEventListener('click', () => {
     if (onChaiTipClick) onChaiTipClick();
   });
-
-  document.getElementById('btn-mobile-chai-tip')?.addEventListener('click', () => {
+  document.getElementById('btn-chai-tip-mobile')?.addEventListener('click', () => {
+    if (onChaiTipClick) onChaiTipClick();
+  });
+  document.getElementById('btn-drawer-chai-tip')?.addEventListener('click', () => {
     closeDrawer();
     if (onChaiTipClick) onChaiTipClick();
   });
 
-  // Mobile Drawer Toggle
+  // Mobile Drawer Toggle Logic
   const mobileDrawer = document.getElementById('mobile-nav-drawer');
+  const mobilePanel = document.getElementById('mobile-nav-panel');
   const toggleBtn = document.getElementById('btn-mobile-menu-toggle');
   const closeBtn = document.getElementById('btn-close-mobile-nav');
 
-  const openDrawer = () => mobileDrawer?.classList.remove('hidden');
-  const closeDrawer = () => mobileDrawer?.classList.add('hidden');
+  const openDrawer = () => {
+    mobileDrawer?.classList.remove('hidden');
+    document.body.classList.add('panel-scroll-locked');
+    requestAnimationFrame(() => {
+      mobilePanel?.classList.remove('translate-x-full');
+    });
+  };
+
+  const closeDrawer = () => {
+    mobilePanel?.classList.add('translate-x-full');
+    document.body.classList.remove('panel-scroll-locked');
+    setTimeout(() => {
+      mobileDrawer?.classList.add('hidden');
+    }, 250);
+  };
 
   toggleBtn?.addEventListener('click', openDrawer);
   closeBtn?.addEventListener('click', closeDrawer);
   mobileDrawer?.addEventListener('click', (e) => {
     if (e.target === mobileDrawer) closeDrawer();
   });
+
+  // Global ESC Key handler for drawer
+  if (!isEscListenerAttached) {
+    isEscListenerAttached = true;
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !mobileDrawer?.classList.contains('hidden')) {
+        closeDrawer();
+      }
+    });
+  }
 
   // Panel navigation buttons
   container.querySelectorAll('.nav-panel-btn, .mobile-nav-panel-btn').forEach((btn) => {
@@ -288,10 +380,11 @@ export function createNavbar(options = {}) {
     });
   });
 
+  // Scroll listener for sticky header shadow
   if (!isScrollListenerAttached) {
     isScrollListenerAttached = true;
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 20) {
+      if (window.scrollY > 15) {
         container.classList.add('is-scrolled');
       } else {
         container.classList.remove('is-scrolled');

@@ -276,6 +276,9 @@
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
   z-index: 1000;
   height: var(--header-h);
   min-height: var(--header-h);
@@ -284,6 +287,9 @@
 }
 
 #navbar-container > div {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   height: var(--header-h);
   background-color: var(--bg-nav);
   border-bottom: 1px solid var(--border);
@@ -644,3 +650,38 @@ body.panel-scroll-locked {
 
 .vehicle-jeep { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -10.5s; }
 .vehicle-jeep .comic-bubble { animation: comicBubblePop 14s ease-out infinite -10.5s; }
+
+/* Strict horizontal overflow prevention on mobile viewports */
+html, body {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+  position: relative;
+}
+
+#app, main, header, section, footer {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip !important;
+}
+
+/* Leaflet control bounds prevention */
+.leaflet-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.leaflet-control-attribution {
+  max-width: calc(100vw - 24px) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 8px !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+
+[data-theme="dark"] .leaflet-control-attribution {
+  background: rgba(18, 23, 30, 0.8) !important;
+  color: #8B95A5 !important;
+}

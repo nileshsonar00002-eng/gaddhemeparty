@@ -72,7 +72,7 @@
       <main class="w-full flex flex-col pb-0 pt-0 max-w-full overflow-x-hidden">
 
         <!-- 2. Hero Section: Full-width Dark Ink Band (#0F172A) in BOTH themes with subtle texture -->
-        <section id="hero-section" class="w-full ink-hero-pattern text-white pt-8 pb-20 sm:pt-12 sm:pb-24 lg:pt-14 lg:pb-28 border-b border-slate-800">
+        <section id="hero-section" class="w-full max-w-full overflow-hidden ink-hero-pattern text-white pt-[calc(var(--header-h)+24px)] sm:pt-12 sm:pb-24 lg:pt-14 lg:pb-28 pb-16 border-b border-slate-800">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
@@ -84,12 +84,12 @@
                 </div>
 
                 <!-- Balanced H1 without quotation marks -->
-                <h1 id="hero-title" class="font-heading font-bold text-white tracking-tight leading-[1.15]" data-i18n-html="heroTitleHtml">
+                <h1 id="hero-title" class="w-full font-heading font-bold text-white tracking-tight text-[clamp(1.75rem,7vw,2.25rem)] leading-[1.15] break-words" data-i18n-html="heroTitleHtml">
                   जहाँ गड्ढा, <span class="text-[var(--accent)] font-bold">वहाँ पार्टी</span>
                 </h1>
 
                 <!-- Concrete, Human Description -->
-                <p class="text-sm sm:text-base text-slate-300 max-w-[58ch] leading-relaxed font-normal" data-i18n="heroDescription">
+                <p class="w-full max-w-xl text-sm sm:text-base text-slate-300 leading-relaxed font-normal break-words" data-i18n="heroDescription">
                   सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें और अपने शहर की रैंकिंग देखें। 100% खुली व सुरक्षित नागरिक पहल।
                 </p>
 
@@ -99,7 +99,7 @@
 
               <!-- Right Column: Mascot Illustration with Float Animation & #gddp Text Tag -->
               <div class="lg:col-span-4 flex flex-col justify-center items-center py-2">
-                <div class="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 flex items-center justify-center animate-gentle-float">
+                <div class="relative w-32 h-32 sm:w-44 sm:h-44 lg:w-52 lg:h-52 flex items-center justify-center animate-gentle-float">
                   <img src="/khaddawaliparty-logo.svg" alt="Gaddhe Me Party Mascot" class="w-full h-full object-contain drop-shadow-xl" />
                 </div>
                 <!-- Small Text Tag Beneath Mascot -->
@@ -165,21 +165,21 @@
             </div>
 
             <!-- Floating Controls: Locate Me, Info & Primary Report Button (Anchored inside Card) -->
-            <div class="absolute bottom-4 left-3 right-3 sm:left-6 sm:right-6 z-[400] flex items-center gap-2.5 sm:gap-3.5 pointer-events-none">
-              <!-- Locate Me Button -->
-              <button id="btn-locate-me" type="button" class="pointer-events-auto btn-secondary p-2.5 sm:p-3 bg-[var(--surface)] shadow-md" title="मेरी लोकेशन" aria-label="मेरी लोकेशन" data-i18n-title="locateMe" data-i18n-aria="locateMe">
-                <svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            <div class="absolute bottom-3 sm:bottom-4 left-2.5 right-2.5 sm:left-6 sm:right-6 z-[400] flex items-center gap-2 sm:gap-3.5 pointer-events-none">
+              <!-- Locate Me Button (Min 40px tap target) -->
+              <button id="btn-locate-me" type="button" class="pointer-events-auto btn-secondary w-10 h-10 sm:w-11 sm:h-11 p-0 flex items-center justify-center bg-[var(--surface)] shadow-md shrink-0 rounded-xl" title="मेरी लोकेशन" aria-label="मेरी लोकेशन" data-i18n-title="locateMe" data-i18n-aria="locateMe">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
               </button>
 
-              <!-- About / Info Modal Button -->
-              <button id="btn-open-about" type="button" class="pointer-events-auto btn-secondary p-2.5 sm:p-3 bg-[var(--surface)] shadow-md" title="नागरिक पहल जानकारी" aria-label="About Gaddhe Me Party" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
-                <svg class="w-5 h-5 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <!-- About / Info Modal Button (Min 40px tap target) -->
+              <button id="btn-open-about" type="button" class="pointer-events-auto btn-secondary w-10 h-10 sm:w-11 sm:h-11 p-0 flex items-center justify-center bg-[var(--surface)] shadow-md shrink-0 rounded-xl" title="नागरिक पहल जानकारी" aria-label="About Gaddhe Me Party" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               </button>
 
               <!-- Primary Floating Pill Button: "खराब रास्ता रिपोर्ट करें" -->
-              <button id="btn-open-report" type="button" class="pointer-events-auto flex-1 btn-primary py-3 sm:py-3.5 px-4 sm:px-6 shadow-md text-sm sm:text-base font-semibold">
-                <svg class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                <span id="fab-text" data-i18n="reportBtn">खराब रास्ता रिपोर्ट करें</span>
+              <button id="btn-open-report" type="button" class="pointer-events-auto flex-1 min-w-0 btn-primary py-2.5 sm:py-3.5 px-3 sm:px-6 shadow-md text-xs sm:text-base font-semibold truncate rounded-xl">
+                <svg class="w-4 h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <span id="fab-text" data-i18n="reportBtn" class="truncate">खराब रास्ता रिपोर्ट करें</span>
               </button>
             </div>
 
