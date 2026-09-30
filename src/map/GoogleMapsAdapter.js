@@ -109,8 +109,13 @@ class HTMLMarkerOverlay {
 
     this.overlay.onAdd = function () {
       self.div = document.createElement('div');
+      self.div.className = 'gmap-marker-anchor';
       self.div.style.position = 'absolute';
-      self.div.style.cursor = 'pointer';
+      self.div.style.width = '0px';
+      self.div.style.height = '0px';
+      self.div.style.margin = '0px';
+      self.div.style.padding = '0px';
+      self.div.style.pointerEvents = 'none';
       self.div.style.userSelect = 'none';
       self.div.style.zIndex = '10';
       self.div.innerHTML = self.htmlContent;
@@ -134,8 +139,8 @@ class HTMLMarkerOverlay {
 
       const point = overlayProjection.fromLatLngToDivPixel(self.position);
       if (point) {
-        self.div.style.left = `${point.x - 18}px`;
-        self.div.style.top = `${point.y - 48}px`;
+        self.div.style.left = `${point.x}px`;
+        self.div.style.top = `${point.y}px`;
       }
     };
 
@@ -280,14 +285,14 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.zoomRafId = requestAnimationFrame(() => {
       if (!this.map) return;
       const zoom = this.map.getZoom() || this.defaultZoom;
-      // Interpolate: zoom 4 -> glow 0.3x, core 0.6x; zoom 16+ -> glow 1.6x, core 1.25x
-      const t = Math.max(0, Math.min(1.2, (zoom - 4) / 12));
-      const glowScale = (0.3 + t * 1.3).toFixed(3);
-      const coreScale = (0.6 + t * 0.65).toFixed(3);
+      // Interpolate: zoom 4 -> 0.7x; zoom 18 -> 1.25x
+      const t = Math.max(0, Math.min(1.2, (zoom - 4) / 14));
+      const pinScale = (0.7 + t * 0.55).toFixed(3);
       const container = document.getElementById('map');
       if (container) {
-        container.style.setProperty('--glow-scale', glowScale);
-        container.style.setProperty('--core-scale', coreScale);
+        container.style.setProperty('--pin-scale', pinScale);
+        container.style.setProperty('--core-scale', pinScale);
+        container.style.setProperty('--glow-scale', pinScale);
       }
     });
   }
@@ -385,60 +390,145 @@ export class GoogleMapsAdapter extends MapAdapter {
     }, 4500);
   }
 
-  renderPins(pins, onPinClick, createPopupHtml) {
+  renderPins(pins, onPinClick) {
+    this.pinsData = pins || [];
+    this.onPinClickCallback = onPinClick;
+
+    if (!this.map || !window.google || !window.google.maps) return;
+
+    if (!this.hasIdleClusterListener) {
+      this.hasIdleClusterListener = true;
+      this.map.addListener('idle', () => {
+        this.clusterAndRenderPins();
+      });
+    }
+
+    this.clusterAndRenderPins();
+  }
+
+  clusterAndRenderPins() {
     if (!this.map || !window.google || !window.google.maps) return;
 
     // Clear existing markers
     this.markersMap.forEach((marker) => marker.setMap(null));
     this.markersMap.clear();
 
-    pins.forEach((pin) => {
+    const allPins = this.pinsData || [];
+    if (allPins.length === 0) return;
+
+    const zoom = this.map.getZoom() || this.defaultZoom;
+
+    // At zoom >= 14, always render individual unclustered pins
+    if (zoom >= 14) {
+      allPins.forEach((pin) => this.createSinglePinMarker(pin));
+      return;
+    }
+
+    // Grid-based Centroid Clustering for lower zoom levels
+    const threshold = 180 / (256 * Math.pow(2, zoom)) * 42;
+    const clusters = [];
+
+    allPins.forEach((pin) => {
       if (!pin.latitude || !pin.longitude) return;
+      const weight = Math.max(1, pin.reportCount || 1);
 
-      const reportCount = pin.reportCount || 1;
-      const upvotes = pin.upvotes || 0;
-      const photoCount = Array.isArray(pin.images) ? pin.images.length : (pin.imageUrl ? 1 : 0);
-      const isSevere = reportCount >= 5 || upvotes >= 5 || photoCount >= 5;
-      const isMedium = (reportCount >= 2 || upvotes >= 2 || photoCount >= 2) && !isSevere;
-      
-      const orbTierClass = isSevere ? 'pin-tier-3' : isMedium ? 'pin-tier-2' : 'pin-tier-1';
-      const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
-      const badgeCount = Math.max(reportCount, photoCount);
-
-      // Glowing Orb HTML ("Earth at Night / Glowing City Light Node") with Scale Wrapper
-      const iconHtml = `
-        <div class="pin-scale-wrapper">
-          <div class="civic-pin ${orbTierClass}" style="width: ${orbSize}px; height: ${orbSize}px;" title="${pin.landmark || 'Hazard'}">
-            ${badgeCount > 1 ? `<span class="tabular-nums">${badgeCount}</span>` : ''}
-          </div>
-        </div>
-      `;
-
-      const clickHandler = () => {
-        // Drop click if user was actively dragging or just finished a gesture (< 300ms)
-        if (this.isGestureActive || Date.now() - this.lastGestureEndTime < 300) {
-          return;
+      let matchedCluster = null;
+      for (const cl of clusters) {
+        const dLat = Math.abs(cl.centerLat - pin.latitude);
+        const dLng = Math.abs(cl.centerLng - pin.longitude);
+        if (dLat < threshold && dLng < threshold) {
+          matchedCluster = cl;
+          break;
         }
+      }
 
-        if (onPinClick) {
-          onPinClick(pin);
-        } else if (createPopupHtml && this.infoWindow) {
-          const html = createPopupHtml(pin);
-          this.infoWindow.setContent(html);
-          this.infoWindow.setPosition({ lat: pin.latitude, lng: pin.longitude });
-          this.infoWindow.open(this.map);
-        }
-      };
-
-      const marker = new HTMLMarkerOverlay(
-        this.map,
-        { lat: pin.latitude, lng: pin.longitude },
-        iconHtml,
-        clickHandler
-      );
-
-      this.markersMap.set(pin.id, marker);
+      if (matchedCluster) {
+        matchedCluster.pins.push(pin);
+        matchedCluster.totalWeight += weight;
+        matchedCluster.weightedLatSum += pin.latitude * weight;
+        matchedCluster.weightedLngSum += pin.longitude * weight;
+        matchedCluster.centerLat = matchedCluster.weightedLatSum / matchedCluster.totalWeight;
+        matchedCluster.centerLng = matchedCluster.weightedLngSum / matchedCluster.totalWeight;
+      } else {
+        clusters.push({
+          pins: [pin],
+          totalWeight: weight,
+          weightedLatSum: pin.latitude * weight,
+          weightedLngSum: pin.longitude * weight,
+          centerLat: pin.latitude,
+          centerLng: pin.longitude
+        });
+      }
     });
+
+    clusters.forEach((cl, idx) => {
+      if (cl.pins.length === 1) {
+        this.createSinglePinMarker(cl.pins[0]);
+      } else {
+        this.createClusterMarker(cl, `cluster-${idx}`);
+      }
+    });
+  }
+
+  createSinglePinMarker(pin) {
+    const reportCount = pin.reportCount || 1;
+    const upvotes = pin.upvotes || 0;
+    const photoCount = Array.isArray(pin.images) ? pin.images.length : (pin.imageUrl ? 1 : 0);
+    const isSevere = reportCount >= 5 || upvotes >= 5 || photoCount >= 5;
+    const isMedium = (reportCount >= 2 || upvotes >= 2 || photoCount >= 2) && !isSevere;
+
+    const orbTierClass = isSevere ? 'pin-tier-3' : isMedium ? 'pin-tier-2' : 'pin-tier-1';
+    const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
+    const badgeCount = Math.max(reportCount, photoCount);
+
+    const iconHtml = `
+      <div class="pin-scale-wrapper">
+        <div class="civic-pin ${orbTierClass}" style="width: ${orbSize}px; height: ${orbSize}px;" title="${pin.landmark || 'Hazard'}">
+          ${badgeCount > 1 ? `<span class="tabular-nums">${badgeCount}</span>` : ''}
+        </div>
+      </div>
+    `;
+
+    const clickHandler = () => {
+      if (this.isGestureActive || Date.now() - this.lastGestureEndTime < 300) return;
+      if (this.onPinClickCallback) {
+        this.onPinClickCallback(pin);
+      }
+    };
+
+    const marker = new HTMLMarkerOverlay(
+      this.map,
+      { lat: pin.latitude, lng: pin.longitude },
+      iconHtml,
+      clickHandler
+    );
+
+    this.markersMap.set(pin.id, marker);
+  }
+
+  createClusterMarker(cl, id) {
+    const count = cl.pins.reduce((sum, p) => sum + (p.reportCount || 1), 0);
+    const iconHtml = `
+      <div class="pin-scale-wrapper">
+        <div class="custom-cluster-civic" style="cursor: pointer;">
+          <span>${count}</span>
+        </div>
+      </div>
+    `;
+
+    const clickHandler = () => {
+      if (this.isGestureActive || Date.now() - this.lastGestureEndTime < 300) return;
+      this.setView(cl.centerLat, cl.centerLng, (this.map.getZoom() || 5) + 3);
+    };
+
+    const marker = new HTMLMarkerOverlay(
+      this.map,
+      { lat: cl.centerLat, lng: cl.centerLng },
+      iconHtml,
+      clickHandler
+    );
+
+    this.markersMap.set(id, marker);
   }
 
   setUserLocationMarker(lat, lng) {

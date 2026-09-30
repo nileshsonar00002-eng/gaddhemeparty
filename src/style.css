@@ -448,6 +448,16 @@ body.panel-scroll-locked {
 #map {
   --glow-scale: 1;
   --core-scale: 1;
+  --pin-scale: 1;
+}
+
+.gmap-marker-anchor {
+  position: absolute;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
 }
 
 .pothole-pin-icon {
@@ -456,13 +466,17 @@ body.panel-scroll-locked {
 }
 
 .pin-scale-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transform: scale(var(--core-scale, 1));
-  transform-origin: center center;
-  transition: transform 150ms ease-out;
+  transform: translate(-50%, -50%) scale(var(--pin-scale, 1));
+  transform-origin: 50% 50%;
   pointer-events: auto;
+  transition: opacity 100ms ease;
+  will-change: transform;
 }
 
 /* Calm Severity Civic Pins */
@@ -477,7 +491,6 @@ body.panel-scroll-locked {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   font-size: 11px;
-  transition: transform 0.15s ease;
   user-select: none;
 }
 
@@ -532,13 +545,11 @@ body.panel-scroll-locked {
   font-weight: 700;
   font-size: 12px;
   cursor: pointer;
-  transform: scale(var(--core-scale, 1));
-  transform-origin: center center;
-  transition: transform 150ms ease;
+  user-select: none;
 }
 
 .custom-cluster-civic:hover, .custom-cluster-orb:hover {
-  transform: scale(calc(var(--core-scale, 1) * 1.15));
+  transform: scale(1.12);
 }
 
 /* Popup Overrides */

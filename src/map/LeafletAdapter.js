@@ -97,14 +97,14 @@ export class LeafletAdapter extends MapAdapter {
     this.zoomRafId = requestAnimationFrame(() => {
       if (!this.map) return;
       const zoom = this.map.getZoom();
-      // Interpolate: zoom 4 -> glow 0.3x, core 0.6x; zoom 16+ -> glow 1.6x, core 1.25x
-      const t = Math.max(0, Math.min(1.2, (zoom - 4) / 12));
-      const glowScale = (0.3 + t * 1.3).toFixed(3);
-      const coreScale = (0.6 + t * 0.65).toFixed(3);
+      // Interpolate: zoom 4 -> 0.7x; zoom 18 -> 1.25x
+      const t = Math.max(0, Math.min(1.2, (zoom - 4) / 14));
+      const pinScale = (0.7 + t * 0.55).toFixed(3);
       const container = this.map.getContainer ? this.map.getContainer() : document.getElementById('map');
       if (container) {
-        container.style.setProperty('--glow-scale', glowScale);
-        container.style.setProperty('--core-scale', coreScale);
+        container.style.setProperty('--pin-scale', pinScale);
+        container.style.setProperty('--core-scale', pinScale);
+        container.style.setProperty('--glow-scale', pinScale);
       }
     });
   }
@@ -281,9 +281,9 @@ export class LeafletAdapter extends MapAdapter {
       const customIcon = L.divIcon({
         className: 'pothole-pin-icon',
         html: iconHtml,
-        iconSize: [orbSize, orbSize],
-        iconAnchor: [orbSize / 2, orbSize / 2],
-        popupAnchor: [0, -orbSize]
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+        popupAnchor: [0, -18]
       });
 
       const marker = L.marker([pin.latitude, pin.longitude], { icon: customIcon });
