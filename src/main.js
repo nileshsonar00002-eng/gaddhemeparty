@@ -654,7 +654,11 @@ class KhaddaApp {
 
   startMapLocationConfirm(formState = {}) {
     const { currentCoordinates, imageData, landmark } = formState;
-    const realGps = getRealDeviceGps() || this.realDeviceGps || formState.baseGps || currentCoordinates;
+    const realGps = getRealDeviceGps() || this.realDeviceGps || formState.baseGps || currentCoordinates || { lat: 18.5204, lng: 73.8567 };
+    if (!this.realDeviceGps && realGps) {
+      this.realDeviceGps = realGps;
+      setRealDeviceGps(realGps);
+    }
 
     // 1. Close / hide bottom sheet temporarily
     this.bottomSheet.close(false);

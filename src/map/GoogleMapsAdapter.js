@@ -97,11 +97,12 @@ export const LIGHT_MAP_STYLE = [
 
 // Custom Overlay to render animated HTML pins on Google Maps
 class HTMLMarkerOverlay {
-  constructor(map, position, htmlContent, onClick) {
+  constructor(map, position, htmlContent, onClick, zIndex = 10) {
     this.map = map;
     this.position = new google.maps.LatLng(position.lat, position.lng);
     this.htmlContent = htmlContent;
     this.onClick = onClick;
+    this.zIndex = zIndex;
     this.div = null;
 
     this.overlay = new google.maps.OverlayView();
@@ -117,7 +118,7 @@ class HTMLMarkerOverlay {
       self.div.style.padding = '0px';
       self.div.style.pointerEvents = 'none';
       self.div.style.userSelect = 'none';
-      self.div.style.zIndex = '10';
+      self.div.style.zIndex = String(self.zIndex || 10);
       self.div.innerHTML = self.htmlContent;
 
       if (self.onClick) {
@@ -602,7 +603,8 @@ export class GoogleMapsAdapter extends MapAdapter {
       this.map,
       { lat, lng },
       pulseHtml,
-      null
+      null,
+      999998
     );
 
     const pinSvg = {
@@ -620,7 +622,7 @@ export class GoogleMapsAdapter extends MapAdapter {
       map: this.map,
       draggable: true,
       icon: pinSvg,
-      zIndex: 2000,
+      zIndex: 999999,
       animation: google.maps.Animation.DROP,
       title: 'गड्ढे का स्थान (ड्रैग करें)'
     });
@@ -645,6 +647,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.confirmMapClickListener = this.map.addListener('click', (e) => {
       if (!e.latLng || !this.confirmMarker) return;
       this.confirmMarker.setPosition(e.latLng);
+      this.confirmMarker.setZIndex(999999);
       notifyPos(true);
     });
   }
@@ -653,6 +656,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     if (this.confirmMarker && window.google && window.google.maps) {
       const pos = new google.maps.LatLng(lat, lng);
       this.confirmMarker.setPosition(pos);
+      this.confirmMarker.setZIndex(999999);
       if (this.confirmPulseOverlay) {
         this.confirmPulseOverlay.setPosition(pos);
       }

@@ -386,10 +386,17 @@ export class LeafletAdapter extends MapAdapter {
     this.confirmMarker = L.marker([lat, lng], {
       draggable: true,
       icon: pinIcon,
-      zIndexOffset: 2000
+      zIndexOffset: 100000
     }).addTo(this.map);
 
+    if (this.confirmMarker._icon) {
+      this.confirmMarker._icon.style.zIndex = '999999';
+    }
+
     this.confirmMarker.on('drag', () => {
+      if (this.confirmMarker._icon) {
+        this.confirmMarker._icon.style.zIndex = '999999';
+      }
       const pos = this.confirmMarker.getLatLng();
       if (onPositionChange) {
         onPositionChange({ lat: pos.lat, lng: pos.lng }, false);
@@ -397,6 +404,9 @@ export class LeafletAdapter extends MapAdapter {
     });
 
     this.confirmMarker.on('dragend', () => {
+      if (this.confirmMarker._icon) {
+        this.confirmMarker._icon.style.zIndex = '999999';
+      }
       const pos = this.confirmMarker.getLatLng();
       if (onPositionChange) {
         onPositionChange({ lat: pos.lat, lng: pos.lng }, true);
@@ -406,6 +416,10 @@ export class LeafletAdapter extends MapAdapter {
     this.confirmMapClickHandler = (e) => {
       if (this.confirmMarker) {
         this.confirmMarker.setLatLng(e.latlng);
+        this.confirmMarker.setZIndexOffset(100000);
+        if (this.confirmMarker._icon) {
+          this.confirmMarker._icon.style.zIndex = '999999';
+        }
         if (onPositionChange) {
           onPositionChange({ lat: e.latlng.lat, lng: e.latlng.lng }, true);
         }
@@ -418,6 +432,10 @@ export class LeafletAdapter extends MapAdapter {
   setConfirmMarkerPosition(lat, lng) {
     if (this.confirmMarker) {
       this.confirmMarker.setLatLng([lat, lng]);
+      this.confirmMarker.setZIndexOffset(100000);
+      if (this.confirmMarker._icon) {
+        this.confirmMarker._icon.style.zIndex = '999999';
+      }
     }
   }
 
