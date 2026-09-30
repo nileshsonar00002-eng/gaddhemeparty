@@ -535,38 +535,38 @@ export class GoogleMapsAdapter extends MapAdapter {
     if (!this.map) return;
 
     if (this.userMarker) {
-      this.userMarker.setPosition({ lat, lng });
-    } else {
-      const userSvg = {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#06B6D4',
-        fillOpacity: 1,
-        strokeColor: '#FFFFFF',
-        strokeWeight: 2.5,
-        scale: 7
-      };
-
-      this.userMarker = new google.maps.Marker({
-        position: { lat, lng },
-        map: this.map,
-        icon: userSvg,
-        zIndex: 1000
-      });
+      this.userMarker.setMap(null);
+      this.userMarker = null;
     }
+
+    const htmlContent = `
+      <div class="user-live-gps-dot relative flex items-center justify-center w-8 h-8 pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
+        <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
+        <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
+        <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-xl"></div>
+      </div>
+    `;
+
+    this.userMarker = new HTMLMarkerOverlay(
+      this.map,
+      { lat, lng },
+      htmlContent,
+      null
+    );
   }
 
-  setAccuracyCircle(lat, lng, radius = 50) {
+  setAccuracyCircle(lat, lng, radius = 20000) {
     if (!this.map || !window.google || !window.google.maps) return;
     this.clearAccuracyCircle();
     this.accuracyCircle = new google.maps.Circle({
       strokeColor: '#DC2626',
-      strokeOpacity: 0.85,
-      strokeWeight: 1.5,
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
       fillColor: '#DC2626',
-      fillOpacity: 0.15,
+      fillOpacity: 0.08,
       map: this.map,
       center: { lat, lng },
-      radius: Math.max(10, radius),
+      radius: radius,
       zIndex: 50
     });
   }

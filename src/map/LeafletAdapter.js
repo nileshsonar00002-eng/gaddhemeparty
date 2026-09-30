@@ -322,28 +322,29 @@ export class LeafletAdapter extends MapAdapter {
       const userIcon = L.divIcon({
         className: 'user-location-icon',
         html: `
-          <div class="relative flex items-center justify-center w-7 h-7">
-            <div class="absolute w-7 h-7 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
+          <div class="relative flex items-center justify-center w-8 h-8">
+            <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
+            <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
             <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-lg"></div>
           </div>
         `,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
       });
 
       this.userMarker = L.marker([lat, lng], { icon: userIcon, zIndexOffset: 1000 }).addTo(this.map);
     }
   }
 
-  setAccuracyCircle(lat, lng, radius = 50) {
+  setAccuracyCircle(lat, lng, radius = 20000) {
     if (!this.map) return;
     this.clearAccuracyCircle();
     this.accuracyCircle = L.circle([lat, lng], {
       color: '#DC2626',
       fillColor: '#DC2626',
-      fillOpacity: 0.15,
-      weight: 1.5,
-      radius: Math.max(10, radius)
+      fillOpacity: 0.08,
+      weight: 2,
+      radius: radius
     }).addTo(this.map);
   }
 

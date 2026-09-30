@@ -692,8 +692,8 @@ class KhaddaApp {
         : 0;
 
       if (accDisplay) {
-        if (distFromOrigin > 50) {
-          accDisplay.textContent = `>50km (${Math.round(distFromOrigin)}km - सीमा से बाहर)`;
+        if (distFromOrigin > 20) {
+          accDisplay.textContent = `>20km (${Math.round(distFromOrigin)}km - सीमा से बाहर)`;
           accDisplay.className = 'tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/50';
           if (doneBtn) {
             doneBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -710,10 +710,15 @@ class KhaddaApp {
 
     updateBarDisplay(activeCoords);
 
-    // 5. Place interactive draggable pin marker & accuracy circle on main map
+    // 5. Place interactive draggable pin marker & 20km boundary circle on main map
     if (this.mapAdapter) {
       this.mapAdapter.setView(activeCoords.lat, activeCoords.lng, 18);
-      this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, accuracy);
+      if (realGps && typeof realGps.lat === 'number') {
+        this.mapAdapter.setUserLocationMarker?.(realGps.lat, realGps.lng);
+        this.mapAdapter.setAccuracyCircle?.(realGps.lat, realGps.lng, 20000);
+      } else {
+        this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, 20000);
+      }
       this.mapAdapter.setConfirmLocationMarker?.(activeCoords.lat, activeCoords.lng, (newPos) => {
         activeCoords = { ...newPos };
         updateBarDisplay(activeCoords);
@@ -736,7 +741,7 @@ class KhaddaApp {
         ? haversineDistanceKm(realGps.lat, realGps.lng, pinPos.lat, pinPos.lng) 
         : 0;
 
-      if (distFromOrigin > 50) {
+      if (distFromOrigin > 20) {
         showToast(t('maxRadiusExceededAlert'), 'warning', 5000);
         if (this.mapAdapter) {
           this.mapAdapter.setView(realGps.lat, realGps.lng, 18);
@@ -847,11 +852,11 @@ class KhaddaApp {
       return;
     }
 
-    // 50km radius spam defense check against live hardware/device GPS
+    // 20km radius spam defense check against live hardware/device GPS
     const realGps = getRealDeviceGps() || this.realDeviceGps;
     if (realGps && typeof realGps.lat === 'number' && typeof realGps.lng === 'number') {
       const distKm = haversineDistanceKm(realGps.lat, realGps.lng, latitude, longitude);
-      if (distKm > 50) {
+      if (distKm > 20) {
         showToast(t('maxRadiusExceededAlert'), 'error', 5000);
         return;
       }
