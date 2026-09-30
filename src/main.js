@@ -654,18 +654,13 @@ class KhaddaApp {
     // 1. Close / hide bottom sheet temporarily
     this.bottomSheet.close(false);
 
-    // 2. Show fixed center pin & floating confirm bar
-    const centerPinEl = document.getElementById('main-map-center-pin');
+    // 2. Show floating confirm bar
     const confirmBarEl = document.getElementById('map-confirm-bar');
     const coordsDisplay = document.getElementById('confirm-bar-coords');
     const accDisplay = document.getElementById('confirm-bar-acc');
     const doneBtn = document.getElementById('btn-done-confirm-map');
     const cancelBtn = document.getElementById('btn-cancel-confirm-map');
 
-    if (centerPinEl) {
-      centerPinEl.classList.remove('hidden');
-      centerPinEl.classList.add('flex');
-    }
     if (confirmBarEl) {
       confirmBarEl.classList.remove('hidden');
     }
@@ -676,65 +671,53 @@ class KhaddaApp {
       mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // 4. Fly main map to target position at zoom 18
-    const targetLat = currentCoordinates?.lat || this.userCoords?.lat || 18.6298;
-    const targetLng = currentCoordinates?.lng || this.userCoords?.lng || 73.7997;
+    // 4. Target initial position
+    let activeCoords = {
+      lat: currentCoordinates?.lat || this.userCoords?.lat || 18.6298,
+      lng: currentCoordinates?.lng || this.userCoords?.lng || 73.7997
+    };
     const accuracy = currentCoordinates?.accuracy || 20;
-
-    if (this.mapAdapter) {
-      this.mapAdapter.setView(targetLat, targetLng, 18);
-      this.mapAdapter.setAccuracyCircle?.(targetLat, targetLng, accuracy);
-    }
 
     const updateBarDisplay = (c) => {
       if (coordsDisplay && c) {
         coordsDisplay.textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
       }
       if (accDisplay) {
-        accDisplay.textContent = 'सटीक पिन / Pin Point';
+        accDisplay.textContent = 'सटीक पिन / Pin Placed';
       }
     };
 
-    updateBarDisplay({ lat: targetLat, lng: targetLng });
+    updateBarDisplay(activeCoords);
 
-    // 5. Drag animation: lift pin on dragstart, drop on dragend
-    const onDragStart = () => {
-      centerPinEl?.classList.add('is-dragging');
-    };
-
-    const onDragEnd = () => {
-      centerPinEl?.classList.remove('is-dragging');
-      if (this.mapAdapter) {
-        const c = this.mapAdapter.getCenter();
-        updateBarDisplay(c);
-      }
-    };
-
-    this.mapAdapter?.onMapDrag?.(onDragStart, onDragEnd);
-    this.mapAdapter?.onCenterChanged?.((c) => updateBarDisplay(c));
+    // 5. Place interactive draggable pin marker & accuracy circle on main map
+    if (this.mapAdapter) {
+      this.mapAdapter.setView(activeCoords.lat, activeCoords.lng, 18);
+      this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, accuracy);
+      this.mapAdapter.setConfirmLocationMarker?.(activeCoords.lat, activeCoords.lng, (newPos) => {
+        activeCoords = { ...newPos };
+        updateBarDisplay(activeCoords);
+      });
+    }
 
     // Cleanup & Exit Confirm Mode
     const cleanupConfirmMode = () => {
-      if (centerPinEl) {
-        centerPinEl.classList.remove('flex', 'is-dragging');
-        centerPinEl.classList.add('hidden');
-      }
       if (confirmBarEl) {
         confirmBarEl.classList.add('hidden');
       }
+      this.mapAdapter?.clearConfirmLocationMarker?.();
       this.mapAdapter?.clearAccuracyCircle?.();
     };
 
     // Done / Confirm Button Click
     const handleDone = () => {
+      const pinPos = this.mapAdapter?.getConfirmLocationPosition?.() || activeCoords;
       cleanupConfirmMode();
       doneBtn?.removeEventListener('click', handleDone);
       cancelBtn?.removeEventListener('click', handleCancel);
 
-      const finalCenter = this.mapAdapter ? this.mapAdapter.getCenter() : { lat: targetLat, lng: targetLng };
       const chosenCoords = {
-        lat: finalCenter.lat,
-        lng: finalCenter.lng,
+        lat: pinPos.lat,
+        lng: pinPos.lng,
         accuracy: 5,
         manuallyAdjusted: true,
         source: 'manual_map_pin'

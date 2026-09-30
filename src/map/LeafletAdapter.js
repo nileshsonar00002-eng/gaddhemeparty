@@ -354,6 +354,70 @@ export class LeafletAdapter extends MapAdapter {
     }
   }
 
+  setConfirmLocationMarker(lat, lng, onPositionChange) {
+    this.clearConfirmLocationMarker();
+    if (!this.map) return;
+
+    const pinIcon = L.divIcon({
+      className: 'custom-draggable-report-pin',
+      html: `
+        <div class="relative flex flex-col items-center cursor-grab active:cursor-grabbing transform -translate-x-1/2 -translate-y-full hover:scale-110 transition duration-150">
+          <div class="w-10 h-10 rounded-full bg-[var(--accent)] text-[var(--accent-ink)] shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-black/20">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <div class="w-3.5 h-1.5 bg-black/40 rounded-full blur-[1px] mt-0.5"></div>
+        </div>
+      `,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0]
+    });
+
+    this.confirmMarker = L.marker([lat, lng], {
+      draggable: true,
+      icon: pinIcon,
+      zIndexOffset: 2000
+    }).addTo(this.map);
+
+    this.confirmMarker.on('drag dragend', () => {
+      const pos = this.confirmMarker.getLatLng();
+      if (onPositionChange) {
+        onPositionChange({ lat: pos.lat, lng: pos.lng });
+      }
+    });
+
+    this.confirmMapClickHandler = (e) => {
+      if (this.confirmMarker) {
+        this.confirmMarker.setLatLng(e.latlng);
+        if (onPositionChange) {
+          onPositionChange({ lat: e.latlng.lat, lng: e.latlng.lng });
+        }
+      }
+    };
+
+    this.map.on('click', this.confirmMapClickHandler);
+  }
+
+  getConfirmLocationPosition() {
+    if (this.confirmMarker) {
+      const pos = this.confirmMarker.getLatLng();
+      return { lat: pos.lat, lng: pos.lng };
+    }
+    return null;
+  }
+
+  clearConfirmLocationMarker() {
+    if (this.confirmMarker && this.map) {
+      this.map.removeLayer(this.confirmMarker);
+      this.confirmMarker = null;
+    }
+    if (this.confirmMapClickHandler && this.map) {
+      this.map.off('click', this.confirmMapClickHandler);
+      this.confirmMapClickHandler = null;
+    }
+  }
+
   onMapDrag(onStart, onEnd) {
     if (!this.map) return;
     if (onStart) {

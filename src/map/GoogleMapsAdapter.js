@@ -578,6 +578,69 @@ export class GoogleMapsAdapter extends MapAdapter {
     }
   }
 
+  setConfirmLocationMarker(lat, lng, onPositionChange) {
+    this.clearConfirmLocationMarker();
+    if (!this.map || !window.google || !window.google.maps) return;
+
+    const pinSvg = {
+      path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
+      fillColor: '#F5B301',
+      fillOpacity: 1,
+      strokeColor: '#FFFFFF',
+      strokeWeight: 2,
+      scale: 1.8,
+      anchor: new google.maps.Point(12, 22)
+    };
+
+    this.confirmMarker = new google.maps.Marker({
+      position: { lat, lng },
+      map: this.map,
+      draggable: true,
+      icon: pinSvg,
+      zIndex: 2000,
+      animation: google.maps.Animation.DROP,
+      title: 'गड्ढे का स्थान (ड्रैग करें)'
+    });
+
+    const notifyPos = () => {
+      const pos = this.confirmMarker?.getPosition();
+      if (pos && onPositionChange) {
+        onPositionChange({ lat: pos.lat(), lng: pos.lng() });
+      }
+    };
+
+    this.confirmMarker.addListener('drag', notifyPos);
+    this.confirmMarker.addListener('dragend', notifyPos);
+
+    // Map click jumps draggable pin
+    this.confirmMapClickListener = this.map.addListener('click', (e) => {
+      if (!e.latLng || !this.confirmMarker) return;
+      this.confirmMarker.setPosition(e.latLng);
+      notifyPos();
+    });
+  }
+
+  getConfirmLocationPosition() {
+    if (this.confirmMarker) {
+      const pos = this.confirmMarker.getPosition();
+      if (pos) {
+        return { lat: pos.lat(), lng: pos.lng() };
+      }
+    }
+    return null;
+  }
+
+  clearConfirmLocationMarker() {
+    if (this.confirmMarker) {
+      this.confirmMarker.setMap(null);
+      this.confirmMarker = null;
+    }
+    if (this.confirmMapClickListener && window.google && window.google.maps) {
+      google.maps.event.removeListener(this.confirmMapClickListener);
+      this.confirmMapClickListener = null;
+    }
+  }
+
   onMapDrag(onStart, onEnd) {
     if (!this.map) return;
     if (onStart) {
