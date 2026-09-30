@@ -34,8 +34,8 @@ export default {
         }
       },
       fontFamily: {
-        heading: ['"Baloo 2"', '"Noto Sans Devanagari"', 'cursive', 'sans-serif'],
-        sans: ['"Inter"', '"Noto Sans Devanagari"', '"Poppins"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+        heading: ['"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
       },
       borderRadius: {
         'btn': '12px',
