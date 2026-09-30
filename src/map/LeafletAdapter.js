@@ -339,9 +339,9 @@ export class LeafletAdapter extends MapAdapter {
     if (!this.map) return;
     this.clearAccuracyCircle();
     this.accuracyCircle = L.circle([lat, lng], {
-      color: '#F5B301',
-      fillColor: '#F5B301',
-      fillOpacity: 0.12,
+      color: '#DC2626',
+      fillColor: '#DC2626',
+      fillOpacity: 0.15,
       weight: 1.5,
       radius: Math.max(10, radius)
     }).addTo(this.map);
@@ -362,7 +362,7 @@ export class LeafletAdapter extends MapAdapter {
       className: 'custom-draggable-report-pin',
       html: `
         <div class="relative flex flex-col items-center cursor-grab active:cursor-grabbing transform -translate-x-1/2 -translate-y-full hover:scale-110 transition duration-150">
-          <div class="w-10 h-10 rounded-full bg-[var(--accent)] text-[var(--accent-ink)] shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-black/20">
+          <div class="w-10 h-10 rounded-full bg-red-600 text-white shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-black/20">
             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>

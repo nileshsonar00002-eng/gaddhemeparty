@@ -559,11 +559,11 @@ export class GoogleMapsAdapter extends MapAdapter {
     if (!this.map || !window.google || !window.google.maps) return;
     this.clearAccuracyCircle();
     this.accuracyCircle = new google.maps.Circle({
-      strokeColor: '#F5B301',
+      strokeColor: '#DC2626',
       strokeOpacity: 0.85,
       strokeWeight: 1.5,
-      fillColor: '#F5B301',
-      fillOpacity: 0.12,
+      fillColor: '#DC2626',
+      fillOpacity: 0.15,
       map: this.map,
       center: { lat, lng },
       radius: Math.max(10, radius),
@@ -584,7 +584,7 @@ export class GoogleMapsAdapter extends MapAdapter {
 
     const pinSvg = {
       path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
-      fillColor: '#F5B301',
+      fillColor: '#DC2626',
       fillOpacity: 1,
       strokeColor: '#FFFFFF',
       strokeWeight: 2,
