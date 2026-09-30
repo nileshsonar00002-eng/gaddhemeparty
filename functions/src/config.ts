@@ -12,8 +12,8 @@ export const ANTI_SPAM_CONFIG = {
   // Maximum total actions allowed per IP address in rolling 24 hours (shared carrier/Wi-Fi friendly)
   MAX_ACTIONS_PER_IP_PER_24H: 30,
 
-  // Deduplication radius: a new report within 20 meters of an existing pin is converted to a +1
-  DUPLICATE_RADIUS_M: 20,
+  // Deduplication radius: a new report within 5 meters of an existing pin is converted to a +1
+  DUPLICATE_RADIUS_M: 5,
 
   // Proximity requirement: user must be within 300 meters of the pin to submit a +1 upvote
   PROXIMITY_UPVOTE_RADIUS_M: 300,

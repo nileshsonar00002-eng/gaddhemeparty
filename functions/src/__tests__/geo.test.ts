@@ -1,11 +1,11 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   calculateHaversineDistance,
   encodeGeohash,
   getGeohashNeighbors,
 } from '../geo';
 
-describe('Geo Utilities & 20-Meter Haversine Deduplication', () => {
+describe('Geo Utilities & 5-Meter Haversine Deduplication', () => {
   it('calculates 0 meters for identical coordinates', () => {
     const dist = calculateHaversineDistance(28.6139, 77.2090, 28.6139, 77.2090);
     expect(dist).toBe(0);
