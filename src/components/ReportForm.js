@@ -3,6 +3,7 @@ import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
+import { haversineDistanceKm } from '../utils/cities';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
@@ -431,6 +432,17 @@ export function renderReportForm(container, options = {}) {
       alert(isHindi ? 'कृपया पहले मैप पर सही स्थान चुनें।' : 'Please confirm location on map first.');
       startMapPinConfirm();
       return;
+    }
+
+    // Strict Validation: Max 50km from user's origin GPS location
+    const baseGps = options.baseGps || options.currentCoordinates || getCachedUserLocation();
+    if (baseGps && typeof baseGps.lat === 'number' && typeof baseGps.lng === 'number') {
+      const distKm = haversineDistanceKm(baseGps.lat, baseGps.lng, currentCoordinates.lat, currentCoordinates.lng);
+      if (distKm > 50) {
+        alert(t('maxRadiusExceededAlert'));
+        startMapPinConfirm();
+        return;
+      }
     }
 
     const landmark = landmarkInput?.value?.trim() || t('defaultLandmark');

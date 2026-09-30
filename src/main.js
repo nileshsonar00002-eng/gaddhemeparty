@@ -11,7 +11,7 @@ import { openChaiTipModal } from './components/ChaiTipModal';
 import { showToast } from './components/Toast';
 import { t, getLanguage, renderAllPageI18n } from './utils/i18n';
 import { modalManager } from './utils/modalManager';
-import { resolvePinCity, getNearestIndianCity } from './utils/cities';
+import { resolvePinCity, getNearestIndianCity, haversineDistanceKm } from './utils/cities';
 import { getActionQuota, hasUserReportedOrUpvoted, hasUserUpvoted, markPinAsUpvoted } from './utils/upvoteStorage';
 import {
   initAnonymousAuth,
@@ -650,6 +650,7 @@ class KhaddaApp {
 
   startMapLocationConfirm(formState = {}) {
     const { currentCoordinates, imageData, landmark } = formState;
+    const baseGps = formState.baseGps || currentCoordinates || this.userCoords || getCachedUserLocation() || { lat: 18.6298, lng: 73.7997 };
 
     // 1. Close / hide bottom sheet temporarily
     this.bottomSheet.close(false);
@@ -682,8 +683,18 @@ class KhaddaApp {
       if (coordsDisplay && c) {
         coordsDisplay.textContent = `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
       }
+      const distFromOrigin = (baseGps && typeof baseGps.lat === 'number') 
+        ? haversineDistanceKm(baseGps.lat, baseGps.lng, c.lat, c.lng) 
+        : 0;
+
       if (accDisplay) {
-        accDisplay.textContent = 'सटीक पिन / Pin Placed';
+        if (distFromOrigin > 50) {
+          accDisplay.textContent = `>50km (${Math.round(distFromOrigin)}km - सीमा से बाहर)`;
+          accDisplay.className = 'tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/50';
+        } else {
+          accDisplay.textContent = 'सटीक पिन / Pin Placed';
+          accDisplay.className = 'tabular-nums text-[10px] font-medium px-2 py-0.5 rounded-md bg-red-900/80 text-red-200 border border-red-700/60';
+        }
       }
     };
 
@@ -711,6 +722,24 @@ class KhaddaApp {
     // Done / Confirm Button Click
     const handleDone = () => {
       const pinPos = this.mapAdapter?.getConfirmLocationPosition?.() || activeCoords;
+      const distFromOrigin = (baseGps && typeof baseGps.lat === 'number') 
+        ? haversineDistanceKm(baseGps.lat, baseGps.lng, pinPos.lat, pinPos.lng) 
+        : 0;
+
+      if (distFromOrigin > 50) {
+        showToast(t('maxRadiusExceededAlert'), 'warning', 5000);
+        if (this.mapAdapter) {
+          this.mapAdapter.setView(baseGps.lat, baseGps.lng, 18);
+          this.mapAdapter.setConfirmLocationMarker?.(baseGps.lat, baseGps.lng, (newPos) => {
+            activeCoords = { ...newPos };
+            updateBarDisplay(activeCoords);
+          });
+        }
+        activeCoords = { lat: baseGps.lat, lng: baseGps.lng };
+        updateBarDisplay(activeCoords);
+        return;
+      }
+
       cleanupConfirmMode();
       doneBtn?.removeEventListener('click', handleDone);
       cancelBtn?.removeEventListener('click', handleCancel);
@@ -729,6 +758,7 @@ class KhaddaApp {
       // Re-open report sheet in confirmed state with preserved image and landmark!
       this.openReportDrawer({
         currentCoordinates: chosenCoords,
+        baseGps,
         isLocationConfirmed: true,
         imageData,
         landmark
@@ -744,6 +774,7 @@ class KhaddaApp {
       // Restore report sheet with previous state
       this.openReportDrawer({
         currentCoordinates,
+        baseGps,
         isLocationConfirmed: formState.isLocationConfirmed,
         imageData,
         landmark
@@ -766,15 +797,17 @@ class KhaddaApp {
 
     const mapCenter = this.mapAdapter?.getCenter ? this.mapAdapter.getCenter() : null;
     const coords = initialState.currentCoordinates || this.userCoords || getCachedUserLocation() || mapCenter;
+    const baseGps = initialState.baseGps || this.userCoords || getCachedUserLocation() || coords;
 
     renderReportForm(mountPoint, {
       currentCoordinates: coords,
+      baseGps,
       isLocationConfirmed: initialState.isLocationConfirmed,
       imageData: initialState.imageData,
       landmark: initialState.landmark,
       mapCenter,
       onStartMapPinConfirm: (formState) => {
-        this.startMapLocationConfirm(formState);
+        this.startMapLocationConfirm({ ...formState, baseGps });
       },
       onClose: () => this.bottomSheet.close(),
       onSubmit: async (formData) => {
@@ -802,6 +835,16 @@ class KhaddaApp {
     if (!formData.imageData && !formData.imageUrl) {
       showToast(t('photoRequiredAlert'), 'warning');
       return;
+    }
+
+    // 50km radius spam defense check against live GPS
+    const baseGps = this.userCoords || getCachedUserLocation();
+    if (baseGps && typeof baseGps.lat === 'number' && typeof baseGps.lng === 'number') {
+      const distKm = haversineDistanceKm(baseGps.lat, baseGps.lng, latitude, longitude);
+      if (distKm > 50) {
+        showToast(t('maxRadiusExceededAlert'), 'error', 5000);
+        return;
+      }
     }
 
     this.userCoords = { lat: latitude, lng: longitude };
