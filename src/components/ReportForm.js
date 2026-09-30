@@ -1,17 +1,30 @@
-import { t } from '../utils/i18n';
+import { t, getLanguage } from '../utils/i18n';
 import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
+import { INDIAN_CITIES } from '../utils/cities';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
-  let currentCoordinates = options.currentCoordinates || getCachedUserLocation() || null;
+  const isHindi = getLanguage() === 'hindi';
+
+  // Guaranteed fallback coordinates: options -> cached -> map center -> default Pune/Pimpri
+  const fallbackCoords = options.currentCoordinates ||
+    getCachedUserLocation() ||
+    options.mapCenter ||
+    { lat: 18.6298, lng: 73.7997, accuracy: 50 };
+
+  let currentCoordinates = { ...fallbackCoords };
   let isGpsAcquiring = false;
   let processedImageData = null;
+  let locationSource = currentCoordinates.source || (currentCoordinates.accuracy <= 25 ? 'gps' : 'map');
   const quota = getActionQuota();
 
-  const isInitialLocked = Boolean(currentCoordinates && currentCoordinates.lat && currentCoordinates.lng);
+  const formatCoords = (coords) => {
+    if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return '18.62980, 73.79970';
+    return `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
+  };
 
   container.innerHTML = `
     <div class="space-y-4 text-[var(--text)]">
@@ -78,23 +91,47 @@ export function renderReportForm(container, options = {}) {
         </div>
       </div>
 
-      <!-- GPS Location Status Chip (Auto-Locking & Live Status) -->
-      <div id="gps-status-card" class="bg-[var(--surface-2)] border ${isInitialLocked ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-[var(--border)]'} rounded-xl p-3 transition-colors duration-200">
+      <!-- GPS & Location Status Box (Auto-Locking with Map Fallback) -->
+      <div id="gps-status-card" class="bg-[var(--surface-2)] border border-emerald-500/30 bg-emerald-500/5 rounded-xl p-3 transition-colors duration-200 space-y-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5 min-w-0">
-            <span id="gps-dot-indicator" class="w-2.5 h-2.5 rounded-full ${isInitialLocked ? 'bg-emerald-500' : 'bg-[var(--accent)] animate-ping'} shrink-0"></span>
+            <span id="gps-dot-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
             <div class="min-w-0">
-              <div id="gps-status-text" class="text-xs font-semibold ${isInitialLocked ? 'text-emerald-500 dark:text-emerald-400' : 'text-[var(--text)]'} truncate">
-                ${isInitialLocked ? t('gpsLocked') : t('gpsSearching')}
+              <div id="gps-status-text" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 truncate">
+                ${t('gpsLocked')}
               </div>
               <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)] truncate">
-                ${isInitialLocked ? `${currentCoordinates.lat.toFixed(5)}, ${currentCoordinates.lng.toFixed(5)}` : t('gpsSearching')}
+                ${formatCoords(currentCoordinates)}
               </div>
             </div>
           </div>
-          <button id="btn-refresh-gps" type="button" class="btn-secondary p-2 text-xs shrink-0 rounded-lg" title="${t('gpsRetry')}" aria-label="${t('gpsRetry')}">
-            ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="btn-refresh-gps" type="button" class="btn-secondary px-2.5 py-1.5 text-xs rounded-lg flex items-center gap-1 cursor-pointer" title="${t('gpsRetry')}" aria-label="${t('gpsRetry')}">
+              ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
+              <span class="text-[11px] font-medium hidden sm:inline">GPS</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Location Controls: Quick Map Location or City Selector -->
+        <div class="pt-1.5 border-t border-[var(--border)] flex items-center gap-2 text-xs flex-wrap">
+          <button id="btn-use-map-center" type="button" class="text-[11px] font-medium text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer">
+            ${getLucideIcon('map', 'w-3 h-3')}
+            <span>${isHindi ? 'मैप की वर्तमान लोकेशन लें' : 'Use Current Map Center'}</span>
           </button>
+
+          <span class="text-[var(--muted)]">•</span>
+
+          <!-- Quick City Dropdown -->
+          <div class="relative inline-block">
+            <select id="select-quick-city" class="text-[11px] font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] rounded-md px-2 py-0.5 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[var(--accent)]">
+              <option value="">${isHindi ? '📍 शहर चुनें...' : '📍 Select City...'}</option>
+              ${INDIAN_CITIES.slice(0, 15).map(c => `
+                <option value="${c.lat},${c.lng}">${isHindi ? c.nameHindi : c.nameEnglish}</option>
+              `).join('')}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -148,6 +185,8 @@ export function renderReportForm(container, options = {}) {
   const submitSpinner = container.querySelector('#submit-btn-spinner');
   const submitText = container.querySelector('#submit-btn-text');
   const refreshGpsBtn = container.querySelector('#btn-refresh-gps');
+  const useMapCenterBtn = container.querySelector('#btn-use-map-center');
+  const citySelect = container.querySelector('#select-quick-city');
   const gpsStatusCard = container.querySelector('#gps-status-card');
   const gpsDotIndicator = container.querySelector('#gps-dot-indicator');
   const gpsStatusText = container.querySelector('#gps-status-text');
@@ -188,12 +227,32 @@ export function renderReportForm(container, options = {}) {
     if (charCounter) charCounter.textContent = `${length}/100`;
   });
 
+  const updateGpsUI = (coords, isLive = true) => {
+    if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return;
+    currentCoordinates = coords;
+    setCachedUserLocation(coords, isLive ? 'gps' : 'manual');
+
+    if (gpsStatusCard) {
+      gpsStatusCard.className = 'bg-[var(--surface-2)] border border-emerald-500/30 bg-emerald-500/5 rounded-xl p-3 transition-colors duration-200 space-y-2';
+    }
+    if (gpsDotIndicator) {
+      gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0';
+    }
+    if (gpsStatusText) {
+      gpsStatusText.textContent = isLive ? t('gpsLocked') : (isHindi ? 'लोकेशन सेट ✓' : 'Location Set ✓');
+      gpsStatusText.className = 'text-xs font-semibold text-emerald-600 dark:text-emerald-400 truncate';
+    }
+    if (gpsCoordsText) {
+      gpsCoordsText.textContent = formatCoords(coords);
+    }
+  };
+
   // Function to acquire and update GPS state smoothly
   const acquireGps = async (forceRefresh = false) => {
     if (isGpsAcquiring) return;
     isGpsAcquiring = true;
 
-    if (!currentCoordinates || forceRefresh) {
+    if (forceRefresh) {
       if (gpsStatusText) {
         gpsStatusText.textContent = t('gpsSearching');
         gpsStatusText.className = 'text-xs font-semibold text-[var(--text)] truncate';
@@ -206,45 +265,19 @@ export function renderReportForm(container, options = {}) {
     try {
       const coords = await getLiveUserLocation({
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 6000,
         maximumAge: forceRefresh ? 0 : 30000,
-        fallbackToCache: !forceRefresh
+        fallbackToCache: true
       });
 
       if (coords && coords.lat && coords.lng) {
-        currentCoordinates = coords;
-        setCachedUserLocation(coords);
-
-        if (gpsStatusCard) {
-          gpsStatusCard.className = 'bg-[var(--surface-2)] border border-emerald-500/30 bg-emerald-500/5 rounded-xl p-3 transition-colors duration-200';
-        }
-        if (gpsDotIndicator) {
-          gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0';
-        }
-        if (gpsStatusText) {
-          gpsStatusText.textContent = t('gpsLocked');
-          gpsStatusText.className = 'text-xs font-semibold text-emerald-500 dark:text-emerald-400 truncate';
-        }
-        if (gpsCoordsText) {
-          gpsCoordsText.textContent = `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
-        }
+        updateGpsUI(coords, coords.source !== 'cache' && coords.source !== 'fallback');
       }
     } catch (err) {
       console.warn('[ReportForm] Live GPS error:', err);
-      if (!currentCoordinates) {
-        if (gpsStatusCard) {
-          gpsStatusCard.className = 'bg-[var(--surface-2)] border border-rose-500/30 bg-rose-500/5 rounded-xl p-3 transition-colors duration-200';
-        }
-        if (gpsDotIndicator) {
-          gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0';
-        }
-        if (gpsStatusText) {
-          gpsStatusText.textContent = t('locationDenied');
-          gpsStatusText.className = 'text-xs font-semibold text-[var(--danger)] truncate';
-        }
-        if (gpsCoordsText) {
-          gpsCoordsText.textContent = 'GPS permission needed';
-        }
+      // Even if live GPS throws, fallback to existing coordinates smoothly
+      if (currentCoordinates) {
+        updateGpsUI(currentCoordinates, false);
       }
     } finally {
       isGpsAcquiring = false;
@@ -257,6 +290,31 @@ export function renderReportForm(container, options = {}) {
   // Manual GPS Refresh Button Handler
   refreshGpsBtn?.addEventListener('click', () => {
     acquireGps(true);
+  });
+
+  // Use Map Center Handler
+  useMapCenterBtn?.addEventListener('click', () => {
+    if (options.getMapCenter) {
+      const center = options.getMapCenter();
+      if (center && center.lat && center.lng) {
+        updateGpsUI(center, false);
+        return;
+      }
+    }
+    if (options.mapCenter) {
+      updateGpsUI(options.mapCenter, false);
+    }
+  });
+
+  // City Selection Handler
+  citySelect?.addEventListener('change', (e) => {
+    const val = e.target.value;
+    if (val) {
+      const [lat, lng] = val.split(',').map(Number);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        updateGpsUI({ lat, lng, accuracy: 250, source: 'city_select' }, false);
+      }
+    }
   });
 
   // Submit Handler
@@ -273,23 +331,9 @@ export function renderReportForm(container, options = {}) {
       return;
     }
 
-    // If coordinates are still acquiring, wait up to 4s for GPS to resolve
-    if (!currentCoordinates) {
-      submitBtn.disabled = true;
-      submitSpinner?.classList.remove('hidden');
-      if (submitText) submitText.textContent = t('gpsSearching');
-
-      try {
-        await acquireGps(true);
-      } catch (e) {}
-
-      if (!currentCoordinates) {
-        submitBtn.disabled = false;
-        submitSpinner?.classList.add('hidden');
-        if (submitText) submitText.textContent = t('submitBtn');
-        alert(t('gpsRequiredAlert'));
-        return;
-      }
+    // Coordinates are always guaranteed (fallback to map center or default if needed)
+    if (!currentCoordinates || typeof currentCoordinates.lat !== 'number' || typeof currentCoordinates.lng !== 'number') {
+      currentCoordinates = fallbackCoords;
     }
 
     const landmark = landmarkInput?.value?.trim() || t('defaultLandmark');

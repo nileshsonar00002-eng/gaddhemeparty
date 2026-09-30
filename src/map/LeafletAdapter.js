@@ -19,6 +19,15 @@ export class LeafletAdapter extends MapAdapter {
     this.gestureTimeout = null;
   }
 
+  getCenter() {
+    if (!this.map) return { lat: 18.5204, lng: 73.8567 };
+    const center = this.map.getCenter();
+    return {
+      lat: typeof center.lat === 'function' ? center.lat() : center.lat,
+      lng: typeof center.lng === 'function' ? center.lng() : center.lng
+    };
+  }
+
   init(containerId, options = {}) {
     this.theme = options.theme || 'dark';
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;

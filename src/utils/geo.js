@@ -1,25 +1,30 @@
 /**
- * Robust Geolocation Manager for Gaddhe Me Party
- * Manages location caching, background tracking, instant acquisition, and permission states
+ * Robust Multi-Tier Geolocation Manager for Gaddhe Me Party
+ * Tiers:
+ * 1. High Accuracy GPS (Device hardware)
+ * 2. Standard Accuracy (Wi-Fi / Cell tower triangulation)
+ * 3. IP-based Geolocation (Fast public APIs for desktop/laptop fallback)
+ * 4. Map Center / Cached Coords Fallback
  */
 
 const STORAGE_KEY = 'khadda_cached_location';
 let inMemoryCoords = null;
 let activeLocationPromise = null;
+let defaultFallbackCoords = { lat: 18.5204, lng: 73.8567, accuracy: 100, isFallback: true }; // Default to Maharashtra/Center
 
-// Initialize from localStorage / sessionStorage cache
+// Initialize from localStorage cache
 try {
   const cached = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
   if (cached) {
     const parsed = JSON.parse(cached);
-    // Cache valid for up to 12 hours
-    if (parsed && parsed.lat && parsed.lng && (Date.now() - (parsed.timestamp || 0)) < 12 * 60 * 60 * 1000) {
+    if (parsed && typeof parsed.lat === 'number' && typeof parsed.lng === 'number') {
       inMemoryCoords = {
         lat: Number(parsed.lat),
         lng: Number(parsed.lng),
         accuracy: parsed.accuracy || 25,
         isCached: true,
-        timestamp: parsed.timestamp
+        source: parsed.source || 'cache',
+        timestamp: parsed.timestamp || Date.now()
       };
     }
   }
@@ -27,23 +32,18 @@ try {
   console.warn('[Geo] Cache read warning:', e);
 }
 
-/**
- * Get current in-memory cached coordinates synchronously
- */
 export function getCachedUserLocation() {
   return inMemoryCoords;
 }
 
-/**
- * Save coordinates into memory and storage
- */
-export function setCachedUserLocation(coords) {
+export function setCachedUserLocation(coords, source = 'user') {
   if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return;
   inMemoryCoords = {
     lat: coords.lat,
     lng: coords.lng,
     accuracy: coords.accuracy || 15,
     isCached: false,
+    source,
     timestamp: Date.now()
   };
   try {
@@ -51,96 +51,167 @@ export function setCachedUserLocation(coords) {
   } catch (e) {}
 }
 
+export function setDefaultFallbackCoords(coords) {
+  if (coords && typeof coords.lat === 'number' && typeof coords.lng === 'number') {
+    defaultFallbackCoords = {
+      lat: coords.lat,
+      lng: coords.lng,
+      accuracy: 50,
+      isFallback: true
+    };
+  }
+}
+
 /**
- * Request accurate live geolocation
- * Returns Promise<{ lat: number, lng: number, accuracy: number }>
+ * Fast IP-based geolocation fallback for desktop browsers with no hardware GPS
+ */
+async function fetchIpGeolocation() {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timer);
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+        const coords = {
+          lat: data.latitude,
+          lng: data.longitude,
+          accuracy: 2500, // IP accuracy is city-level (~2.5km)
+          city: data.city,
+          source: 'ip_geo',
+          isIpFallback: true,
+          timestamp: Date.now()
+        };
+        setCachedUserLocation(coords, 'ip_geo');
+        return coords;
+      }
+    }
+  } catch (e) {
+    // Try secondary endpoint
+    try {
+      const res2 = await fetch('https://freeipapi.com/api/json');
+      if (res2.ok) {
+        const data2 = await res2.json();
+        if (data2 && typeof data2.latitude === 'number' && typeof data2.longitude === 'number') {
+          const coords = {
+            lat: data2.latitude,
+            lng: data2.longitude,
+            accuracy: 3000,
+            city: data2.cityName,
+            source: 'ip_geo',
+            isIpFallback: true,
+            timestamp: Date.now()
+          };
+          setCachedUserLocation(coords, 'ip_geo');
+          return coords;
+        }
+      }
+    } catch (e2) {}
+  }
+  return null;
+}
+
+/**
+ * Primary multi-tier location acquisition
  */
 export async function getLiveUserLocation(options = {}) {
   const {
     enableHighAccuracy = true,
-    timeout = 12000,
+    timeout = 8000,
     maximumAge = 60000,
     fallbackToCache = true
   } = options;
 
-  if (typeof navigator === 'undefined' || !navigator.geolocation) {
-    if (fallbackToCache && inMemoryCoords) return inMemoryCoords;
-    throw new Error('Geolocation unsupported');
-  }
-
-  // If a request is already running, return it
+  // If a request is already running, reuse it
   if (activeLocationPromise) {
     return activeLocationPromise;
   }
 
-  activeLocationPromise = new Promise((resolve, reject) => {
-    let hasResolved = false;
+  activeLocationPromise = (async () => {
+    // Tier 1: Try Browser Geolocation (High Accuracy)
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      try {
+        const highAccCoords = await new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('GPS Timeout')), Math.min(timeout, 5000));
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              clearTimeout(timer);
+              resolve({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+                accuracy: pos.coords.accuracy || 10,
+                source: 'hardware_gps',
+                timestamp: Date.now()
+              });
+            },
+            (err) => {
+              clearTimeout(timer);
+              reject(err);
+            },
+            { enableHighAccuracy: true, timeout: Math.min(timeout, 5000), maximumAge }
+          );
+        });
 
-    const timer = setTimeout(() => {
-      if (!hasResolved) {
-        hasResolved = true;
-        activeLocationPromise = null;
-        if (fallbackToCache && inMemoryCoords) {
-          console.log('[Geo] Timeout reached, using cached position:', inMemoryCoords);
-          resolve(inMemoryCoords);
-        } else {
-          reject(new Error('Geolocation timeout'));
+        setCachedUserLocation(highAccCoords, 'hardware_gps');
+        return highAccCoords;
+      } catch (err1) {
+        console.log('[Geo] High accuracy GPS skipped, trying standard accuracy:', err1.message);
+
+        // Tier 2: Try Browser Geolocation (Standard Accuracy - Wi-Fi/Cell)
+        try {
+          const stdCoords = await new Promise((resolve, reject) => {
+            const timer = setTimeout(() => reject(new Error('Wi-Fi Geolocation Timeout')), 4000);
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                clearTimeout(timer);
+                resolve({
+                  lat: pos.coords.latitude,
+                  lng: pos.coords.longitude,
+                  accuracy: pos.coords.accuracy || 50,
+                  source: 'wifi_geo',
+                  timestamp: Date.now()
+                });
+              },
+              (err) => {
+                clearTimeout(timer);
+                reject(err);
+              },
+              { enableHighAccuracy: false, timeout: 4000, maximumAge: 300000 }
+            );
+          });
+
+          setCachedUserLocation(stdCoords, 'wifi_geo');
+          return stdCoords;
+        } catch (err2) {
+          console.log('[Geo] Standard geolocation skipped:', err2.message);
         }
       }
-    }, timeout);
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (hasResolved) return;
-        hasResolved = true;
-        clearTimeout(timer);
-        activeLocationPromise = null;
-
-        const coords = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          accuracy: pos.coords.accuracy || 10,
-          isCached: false,
-          timestamp: Date.now()
-        };
-
-        setCachedUserLocation(coords);
-        resolve(coords);
-      },
-      (err) => {
-        if (hasResolved) return;
-        hasResolved = true;
-        clearTimeout(timer);
-        activeLocationPromise = null;
-        console.warn('[Geo] getCurrentPosition failed:', err.message);
-
-        if (fallbackToCache && inMemoryCoords) {
-          console.log('[Geo] Fallback to cached position:', inMemoryCoords);
-          resolve(inMemoryCoords);
-        } else {
-          reject(err);
-        }
-      },
-      {
-        enableHighAccuracy,
-        timeout: timeout - 500,
-        maximumAge
-      }
-    );
-  });
-
-  return activeLocationPromise;
-}
-
-/**
- * Check if permission is already granted
- */
-export async function checkLocationPermission() {
-  try {
-    if (navigator.permissions && navigator.permissions.query) {
-      const status = await navigator.permissions.query({ name: 'geolocation' });
-      return status.state; // 'granted' | 'prompt' | 'denied'
     }
-  } catch (e) {}
-  return 'unknown';
+
+    // Tier 3: IP-based Geolocation (Works even when OS location is off)
+    try {
+      const ipCoords = await fetchIpGeolocation();
+      if (ipCoords) {
+        console.log('[Geo] Resolved via IP Geolocation:', ipCoords);
+        return ipCoords;
+      }
+    } catch (e) {}
+
+    // Tier 4: Cached Coordinates or Map Center Fallback
+    if (fallbackToCache && inMemoryCoords) {
+      return inMemoryCoords;
+    }
+
+    return defaultFallbackCoords;
+  })();
+
+  try {
+    const res = await activeLocationPromise;
+    return res;
+  } finally {
+    activeLocationPromise = null;
+  }
 }

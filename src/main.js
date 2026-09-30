@@ -643,8 +643,12 @@ class KhaddaApp {
     const mountPoint = document.getElementById('report-form-mount');
     if (!mountPoint) return;
 
+    const mapCenter = this.mapAdapter?.getCenter ? this.mapAdapter.getCenter() : null;
+
     renderReportForm(mountPoint, {
-      currentCoordinates: this.userCoords || getCachedUserLocation(),
+      currentCoordinates: this.userCoords || getCachedUserLocation() || mapCenter,
+      mapCenter,
+      getMapCenter: () => (this.mapAdapter?.getCenter ? this.mapAdapter.getCenter() : mapCenter),
       onClose: () => this.bottomSheet.close(),
       onSubmit: async (formData) => {
         await this.handleReportSubmit(formData);
