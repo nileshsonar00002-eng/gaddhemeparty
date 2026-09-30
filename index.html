@@ -194,11 +194,9 @@
 
             <!-- Toast Notifications Container -->
             <div id="toast-container" class="fixed top-20 right-4 z-[1200] flex flex-col gap-2 max-w-sm pointer-events-none"></div>
-          </div>
-        </section>
 
-        <!-- Floating Map Confirm Location Bar (used during map location picking) -->
-        <div id="map-confirm-bar" class="hidden fixed bottom-4 left-3 right-3 sm:left-6 sm:right-6 max-w-lg mx-auto z-[1060] bg-[#3b080c]/95 backdrop-blur-md text-white border border-red-800/70 rounded-2xl shadow-2xl shadow-red-950/70 p-3 sm:p-4 flex flex-col gap-2.5">
+        <!-- Floating Map Confirm Location Bar (used during map location picking - stays in front in normal & fullscreen) -->
+        <div id="map-confirm-bar" class="hidden absolute bottom-3 sm:bottom-4 left-3 right-3 sm:left-6 sm:right-6 max-w-lg mx-auto z-[1060] bg-[#3b080c]/95 backdrop-blur-md text-white border border-red-800/70 rounded-2xl shadow-2xl shadow-red-950/70 p-3 sm:p-4 flex flex-col gap-2.5">
           <div class="flex items-center justify-between gap-2 border-b border-red-900/60 pb-2">
             <div class="flex items-center gap-2 min-w-0">
               <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse shrink-0"></span>
@@ -218,6 +216,8 @@
             <span data-i18n="confirmLocationBtn">स्थान की पुष्टि करें</span>
           </button>
         </div>
+      </div>
+    </section>
 
         <!-- 4. Live Leaderboard Section (Band 1: --surface with contrast) -->
         <section id="leaderboard" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-y border-[var(--border)] content-auto reveal-on-scroll">
