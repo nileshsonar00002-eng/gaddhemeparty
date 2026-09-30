@@ -744,3 +744,9 @@ html, body {
 .user-live-gps-dot * {
   z-index: 999990 !important;
 }
+
+/* Lock page scroll during map location picking so only map is interactive */
+body.map-confirm-active {
+  overflow: hidden !important;
+  touch-action: pan-x pan-y pinch-zoom;
+}

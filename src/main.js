@@ -663,7 +663,12 @@ class KhaddaApp {
     // 1. Close / hide bottom sheet temporarily
     this.bottomSheet.close(false);
 
-    // 2. Show floating confirm bar
+    // 2. Lock page background scrolling so only the map section is visible & interactive
+    document.body.classList.add('map-confirm-active');
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    // 3. Show floating confirm bar
     const confirmBarEl = document.getElementById('map-confirm-bar');
     const coordsDisplay = document.getElementById('confirm-bar-coords');
     const accDisplay = document.getElementById('confirm-bar-acc');
@@ -674,13 +679,13 @@ class KhaddaApp {
       confirmBarEl.classList.remove('hidden');
     }
 
-    // 3. Scroll to map section smoothly
+    // 4. Scroll to map section smoothly
     const mapSection = document.getElementById('map-section');
     if (mapSection) {
       mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // 4. Target initial position
+    // 5. Target initial position
     let activeCoords = {
       lat: currentCoordinates?.lat || this.userCoords?.lat || 18.6298,
       lng: currentCoordinates?.lng || this.userCoords?.lng || 73.7997
@@ -714,7 +719,7 @@ class KhaddaApp {
 
     updateBarDisplay(activeCoords);
 
-    // 5. Place interactive draggable pin marker & 20km boundary circle on main map
+    // 6. Place interactive draggable pin marker & 20km boundary circle on main map
     if (this.mapAdapter) {
       this.mapAdapter.setView(activeCoords.lat, activeCoords.lng, 18);
       if (realGps && typeof realGps.lat === 'number') {
@@ -744,8 +749,11 @@ class KhaddaApp {
       });
     }
 
-    // Cleanup & Exit Confirm Mode
+    // Cleanup & Exit Confirm Mode - Restore page scrolling
     const cleanupConfirmMode = () => {
+      document.body.classList.remove('map-confirm-active');
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       if (confirmBarEl) {
         confirmBarEl.classList.add('hidden');
       }
@@ -805,7 +813,7 @@ class KhaddaApp {
       // Restore report sheet with previous state
       this.openReportDrawer({
         currentCoordinates,
-        baseGps,
+        baseGps: realGps,
         isLocationConfirmed: formState.isLocationConfirmed,
         imageData,
         landmark
