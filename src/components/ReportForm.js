@@ -44,7 +44,6 @@ export function renderReportForm(container, options = {}) {
               ${t('reportsRemainingBadge', { count: quota.remaining })}
             </span>
           </div>
-          <p class="text-xs text-[var(--muted)] mt-0.5">${t('sheetSubtitle')}</p>
         </div>
       </div>
 
@@ -81,7 +80,6 @@ export function renderReportForm(container, options = {}) {
             <div class="text-xs font-semibold text-[var(--text)]">
               ${t('takePhoto')}
             </div>
-            <p class="text-[11px] text-[var(--muted)]">${t('photoOptNote')}</p>
           </div>
 
           <!-- Live Preview Image -->
