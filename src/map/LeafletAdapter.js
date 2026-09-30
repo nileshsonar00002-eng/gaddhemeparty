@@ -151,7 +151,7 @@ export class LeafletAdapter extends MapAdapter {
       this.map.dragging.disable();
     }, { passive: true });
 
-    // Desktop wheel handling: Ctrl+wheel zooms, wheel alone scrolls page & shows hint
+    // Desktop wheel handling: Ctrl+wheel zooms, wheel alone scrolls page smoothly without showing popup message
     container.addEventListener('wheel', (e) => {
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
@@ -160,8 +160,6 @@ export class LeafletAdapter extends MapAdapter {
         } else if (e.deltaY > 0) {
           this.map.zoomOut();
         }
-      } else {
-        showHint(t('gestureHintDesktop'));
       }
     }, { passive: false });
   }
