@@ -32,18 +32,18 @@ export class LeaderboardSection {
     this.container.innerHTML = `
       <div class="max-w-5xl mx-auto space-y-6">
         <!-- Section Header with View Full Leaderboard Button -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
           <div>
             <div class="flex items-center gap-2.5">
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-heading font-black bg-rose-500/20 text-rose-400 dark:text-rose-300 border border-rose-500/40 animate-pulse">
                 <span class="w-2 h-2 rounded-full bg-rose-500"></span>
                 ${t('liveBadge')}
               </span>
-              <h2 class="text-xl sm:text-2xl font-heading font-extrabold text-[var(--text-primary)]">
+              <h2 class="text-xl sm:text-2xl font-heading font-extrabold text-[var(--text)]">
                 ${t('leaderboardTitle')}
               </h2>
             </div>
-            <p class="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
+            <p class="text-xs sm:text-sm text-[var(--muted)] mt-1">
               ${t('leaderboardSubtitle')}
             </p>
           </div>
@@ -51,7 +51,7 @@ export class LeaderboardSection {
           <button
             type="button"
             id="btn-open-full-leaderboard"
-            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active:scale-95 text-slate-950 font-heading font-extrabold text-xs sm:text-sm shadow-md transition cursor-pointer"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl btn-primary text-xs sm:text-sm font-heading font-extrabold text-xs sm:text-sm shadow-md transition cursor-pointer"
           >
             <span>🏆</span>
             <span>${isHindi ? 'पूरा लीडरबोर्ड देखें' : 'View Full Leaderboard'}</span>
@@ -63,18 +63,18 @@ export class LeaderboardSection {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <!-- #1 Rank Hero Card (7 Cols) -->
           ${heroPin ? `
-            <div class="lg:col-span-7 rounded-3xl bg-[var(--bg-card)] border-2 border-amber-500/50 p-4 sm:p-5 shadow-xl flex flex-col justify-between group">
+            <div class="lg:col-span-7 rounded-2xl bg-[var(--surface)] border-2 border-amber-500/50 p-4 sm:p-5 shadow-xl flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-3">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-black bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-md">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-black bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-md">
                     ${t('heroBadgeRank')}
                   </span>
-                  <span class="text-xs font-mono font-bold text-[var(--accent-amber-text)] bg-amber-500/20 px-2.5 py-0.5 rounded-lg border border-amber-500/30">
+                  <span class="text-xs tabular-nums font-mono font-bold text-[var(--accent)] bg-amber-500/20 px-2.5 py-0.5 rounded-lg border border-amber-500/30">
                     👑 #1 RANK
                   </span>
                 </div>
 
-                <div class="w-full h-44 sm:h-52 rounded-2xl overflow-hidden bg-[var(--bg-card-subtle)] border border-[var(--border-color)] mb-3.5 relative">
+                <div class="w-full h-44 sm:h-52 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] mb-3.5 relative">
                   <img
                     src="${heroPin.thumbnailUrl || heroPin.imageUrl || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400&auto=format&fit=crop&q=60'}"
                     alt="Hero Pothole"
@@ -85,25 +85,25 @@ export class LeaderboardSection {
                   </div>
                 </div>
 
-                <h3 class="font-heading font-bold text-base text-[var(--text-primary)] line-clamp-2 leading-snug">
+                <h3 class="font-heading font-bold text-base text-[var(--text)] line-clamp-2 leading-snug">
                   ${heroPin.landmark || t('defaultLandmark')}
                 </h3>
 
-                <div class="flex items-center gap-2 mt-2 text-xs font-mono text-[var(--text-secondary)] flex-wrap">
+                <div class="flex items-center gap-2 mt-2 text-xs tabular-nums font-mono text-[var(--muted)] flex-wrap">
                   <span class="bg-rose-500/20 text-rose-500 dark:text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-lg">
                     ${t('rankRowReports', { n: heroPin.reportCount || 1 })}
                   </span>
-                  <span class="bg-amber-500/20 text-[var(--accent-amber-text)] border border-amber-500/30 px-2 py-0.5 rounded-lg">
+                  <span class="bg-amber-500/20 text-[var(--accent)] border border-amber-500/30 px-2 py-0.5 rounded-lg">
                     ${t('daysOpenText', { n: heroPin.daysOpen || 1 })}
                   </span>
                 </div>
               </div>
 
-              <div class="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center gap-2">
+              <div class="mt-4 pt-3 border-t border-[var(--border)] flex items-center gap-2">
                 <button
                   type="button"
                   onclick="window.__khaddaFlyToPin('${heroPin.id}')"
-                  class="flex-1 py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-[var(--accent-amber-text)] border border-amber-500/40 font-heading font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+                  class="flex-1 py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-[var(--accent)] border border-amber-500/40 font-heading font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
                 >
                   <span>📍</span>
                   <span>${t('tapToViewOnMap')}</span>
@@ -111,7 +111,7 @@ export class LeaderboardSection {
               </div>
             </div>
           ` : `
-            <div class="lg:col-span-7 p-8 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] text-center text-[var(--text-muted)] text-sm">
+            <div class="lg:col-span-7 p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center text-[var(--muted)] text-sm">
               ${t('leaderboardEmptyTitle')}
             </div>
           `}
@@ -121,13 +121,13 @@ export class LeaderboardSection {
             ${runnerUps.length > 0 ? runnerUps.map((pin, idx) => `
               <div
                 onclick="window.__khaddaFlyToPin('${pin.id}')"
-                class="flex-1 p-4 rounded-3xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] hover:border-amber-500/40 transition flex items-center gap-3.5 cursor-pointer group shadow-sm"
+                class="flex-1 p-4 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-amber-500/40 transition flex items-center gap-3.5 cursor-pointer group shadow-sm"
               >
-                <div class="w-9 h-9 rounded-2xl ${idx === 0 ? 'bg-slate-300 text-slate-950 font-black' : 'bg-amber-700 text-white font-black'} font-mono text-xs flex items-center justify-center flex-shrink-0">
+                <div class="w-9 h-9 rounded-2xl ${idx === 0 ? 'bg-slate-300 text-slate-950 font-black' : 'bg-amber-700 text-white font-black'} tabular-nums font-mono text-xs flex items-center justify-center flex-shrink-0">
                   #${idx + 2}
                 </div>
 
-                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex-shrink-0">
+                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] flex-shrink-0">
                   ${pin.thumbnailUrl || pin.imageUrl ? `
                     <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="thumb" class="w-full h-full object-cover" />
                   ` : `
@@ -136,13 +136,13 @@ export class LeaderboardSection {
                 </div>
 
                 <div class="flex-1 min-w-0">
-                  <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate group-hover:text-[var(--accent-amber-text)] transition">
+                  <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] truncate group-hover:text-[var(--accent)] transition">
                     ${pin.landmark || t('defaultLandmark')}
                   </h4>
-                  <p class="text-[11px] text-[var(--text-muted)] mt-0.5 truncate">
+                  <p class="text-[11px] text-[var(--muted)] mt-0.5 truncate">
                     📍 ${resolvePinCity(pin, isHindi)}
                   </p>
-                  <div class="flex items-center gap-2 mt-1 text-[10px] font-mono text-[var(--accent-amber-text)]">
+                  <div class="flex items-center gap-2 mt-1 text-[10px] tabular-nums font-mono text-[var(--accent)]">
                     <span>🚨 ${pin.reportCount || 1} reps</span>
                     <span>👍 ${pin.upvotes || 0} votes</span>
                   </div>
@@ -184,11 +184,11 @@ export class LeaderboardSheet {
       <!-- Responsive Leaderboard: Bottom Sheet on Mobile (< 768px), Right Drawer on Desktop (>= 768px) -->
       <div
         id="lb-panel"
-        class="fixed z-[1035] transition-all duration-300 ease-out bg-[var(--bg-surface)] backdrop-blur-md border-[var(--border-color)] shadow-2xl flex flex-col overflow-hidden opacity-0 pointer-events-none hidden
-               bottom-0 left-0 right-0 max-h-[92dvh] rounded-t-3xl border-t md:bottom-6 md:top-20 md:right-4 md:left-auto md:w-[410px] md:max-h-[calc(100dvh-104px)] md:rounded-3xl md:border"
+        class="fixed z-[1035] transition-all duration-300 ease-out bg-[var(--surface)] backdrop-blur-md border-[var(--border)] shadow-2xl flex flex-col overflow-hidden opacity-0 pointer-events-none hidden
+               bottom-0 left-0 right-0 max-h-[92dvh] rounded-t-3xl border-t md:bottom-6 md:top-20 md:right-4 md:left-auto md:w-[410px] md:max-h-[calc(100dvh-104px)] md:rounded-2xl md:border"
       >
         <!-- Header & Drag Handle -->
-        <div class="flex-shrink-0 pt-2.5 pb-2 px-4 border-b border-[var(--border-color)]">
+        <div class="flex-shrink-0 pt-2.5 pb-2 px-4 border-b border-[var(--border)]">
           <!-- Mobile Drag Handle -->
           <div id="lb-drag-handle" class="w-full pb-2 flex items-center justify-center cursor-grab active:cursor-grabbing md:hidden">
             <div class="w-12 h-1.5 rounded-full bg-[var(--text-muted)] opacity-50"></div>
@@ -198,10 +198,10 @@ export class LeaderboardSheet {
             <div class="flex items-center gap-2">
               <span class="text-xl">🏆</span>
               <div>
-                <h3 class="font-heading font-extrabold text-base sm:text-lg text-[var(--text-primary)] leading-tight">
+                <h3 class="font-heading font-extrabold text-base sm:text-lg text-[var(--text)] leading-tight">
                   ${t('leaderboardTitle')}
                 </h3>
-                <p class="text-[11px] text-[var(--text-muted)] leading-none mt-0.5">
+                <p class="text-[11px] text-[var(--muted)] leading-none mt-0.5">
                   ${t('leaderboardSubtitle')}
                 </p>
               </div>
@@ -212,7 +212,7 @@ export class LeaderboardSheet {
               id="btn-close-lb"
               type="button"
               onclick="window.__khaddaCloseLeaderboard && window.__khaddaCloseLeaderboard()"
-              class="p-2 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] border border-[var(--border-color)] active:scale-95 transition cursor-pointer"
+              class="p-2 rounded-full bg-[var(--surface-2)] text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)] border border-[var(--border)] active:scale-95 transition cursor-pointer"
               aria-label="Close"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -220,18 +220,18 @@ export class LeaderboardSheet {
           </div>
 
           <!-- 2 Main Tabs: Pothole of Week, Top Cities -->
-          <div class="flex items-center gap-1.5 mt-3 bg-[var(--bg-card-subtle)] p-1 rounded-xl border border-[var(--border-color)]">
+          <div class="flex items-center gap-1.5 mt-3 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)]">
             <button
               id="tab-btn-week"
               type="button"
-              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'week' ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}"
+              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'week' ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
             >
               ${t('tabPotholeOfWeek')}
             </button>
             <button
               id="tab-btn-cities"
               type="button"
-              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'cities' ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}"
+              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'cities' ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
             >
               ${t('tabTopCities')}
             </button>
@@ -365,38 +365,38 @@ export class LeaderboardSheet {
       const whatsappHref = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
 
       html += `
-        <div class="relative overflow-hidden rounded-2xl bg-[var(--bg-card)] border-2 border-amber-500/50 p-3.5 shadow-lg group">
+        <div class="relative overflow-hidden rounded-2xl bg-[var(--surface)] border-2 border-amber-500/50 p-3.5 shadow-lg group">
           <!-- Hero Badge -->
           <div class="flex items-center justify-between mb-2">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 shadow-sm">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-sm">
               ${t('heroBadgeRank')}
             </span>
-            <span class="text-[11px] font-mono font-bold text-[var(--accent-amber-text)] bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
+            <span class="text-[11px] tabular-nums font-mono font-bold text-[var(--accent)] bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
               #1 RANK
             </span>
           </div>
 
           <!-- Hero Image & Info Grid -->
           <div class="flex gap-3">
-            <div class="w-24 h-24 rounded-xl overflow-hidden bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex-shrink-0 relative">
+            <div class="w-24 h-24 rounded-xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] flex-shrink-0 relative">
               <img src="${photo}" alt="Hero Pothole" class="w-full h-full object-cover group-hover:scale-105 transition" />
             </div>
 
             <div class="flex-1 min-w-0 flex flex-col justify-between">
               <div>
-                <p class="font-heading font-bold text-xs sm:text-sm text-[var(--text-primary)] line-clamp-2 leading-snug">
+                <p class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] line-clamp-2 leading-snug">
                   ${area}
                 </p>
-                <p class="text-[11px] text-[var(--accent-amber-text)] font-semibold mt-0.5">
+                <p class="text-[11px] text-[var(--accent)] font-semibold mt-0.5">
                   📍 ${city}
                 </p>
               </div>
 
-              <div class="flex items-center gap-2 text-[10px] font-mono text-[var(--text-secondary)] mt-1">
+              <div class="flex items-center gap-2 text-[10px] tabular-nums font-mono text-[var(--muted)] mt-1">
                 <span class="bg-rose-500/20 text-rose-500 dark:text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded">
                   ${t('rankRowReports', { n: reports })}
                 </span>
-                <span class="bg-amber-500/20 text-[var(--accent-amber-text)] border border-amber-500/30 px-1.5 py-0.5 rounded">
+                <span class="bg-amber-500/20 text-[var(--accent)] border border-amber-500/30 px-1.5 py-0.5 rounded">
                   ${t('daysOpenText', { n: days })}
                 </span>
               </div>
@@ -404,7 +404,7 @@ export class LeaderboardSheet {
           </div>
 
           <!-- Actions: Fly to map & WhatsApp Share -->
-          <div class="mt-3 pt-2.5 border-t border-[var(--border-color)] flex items-center gap-2">
+          <div class="mt-3 pt-2.5 border-t border-[var(--border)] flex items-center gap-2">
             <button
               type="button"
               onclick="window.__khaddaFlyToPin('${heroPin.id}')"
@@ -432,7 +432,7 @@ export class LeaderboardSheet {
     if (ranks.length > 0) {
       html += `
         <div class="space-y-2 pt-1">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] px-1">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--muted)] px-1">
             Top Contenders (Ranks 2 - 10)
           </h4>
       `;
@@ -448,15 +448,15 @@ export class LeaderboardSheet {
         html += `
           <div
             onclick="window.__khaddaFlyToPin('${pin.id}')"
-            class="flex items-center gap-3 p-2.5 rounded-2xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] border border-[var(--border-color)] active:scale-[0.99] transition cursor-pointer group"
+            class="flex items-center gap-3 p-2.5 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] active:scale-[0.99] transition cursor-pointer group"
           >
             <!-- Rank Number -->
-            <div class="w-7 h-7 rounded-xl bg-[var(--bg-card-subtle)] group-hover:bg-amber-500 group-hover:text-slate-950 font-mono font-black text-xs text-[var(--text-secondary)] flex items-center justify-center flex-shrink-0 transition">
+            <div class="w-7 h-7 rounded-xl bg-[var(--surface-2)] group-hover:bg-amber-500 group-hover:text-slate-950 tabular-nums font-mono font-black text-xs text-[var(--muted)] flex items-center justify-center flex-shrink-0 transition">
               #${rankNum}
             </div>
 
             <!-- Thumbnail -->
-            <div class="w-10 h-10 rounded-lg overflow-hidden bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex-shrink-0">
+            <div class="w-10 h-10 rounded-lg overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] flex-shrink-0">
               ${thumb ? `
                 <img src="${thumb}" alt="thumb" class="w-full h-full object-cover" />
               ` : `
@@ -466,20 +466,20 @@ export class LeaderboardSheet {
 
             <!-- Details -->
             <div class="flex-1 min-w-0">
-              <p class="text-xs font-semibold text-[var(--text-primary)] line-clamp-1 group-hover:text-[var(--accent-amber-text)] transition">
+              <p class="text-xs font-semibold text-[var(--text)] line-clamp-1 group-hover:text-[var(--accent)] transition">
                 ${area}
               </p>
-              <p class="text-[10px] text-[var(--text-muted)]">
+              <p class="text-[10px] text-[var(--muted)]">
                 📍 ${city}
               </p>
             </div>
 
             <!-- Counts -->
             <div class="text-right flex-shrink-0">
-              <div class="text-xs font-heading font-extrabold text-[var(--accent-amber-text)]">
+              <div class="text-xs font-heading font-extrabold text-[var(--accent)]">
                 ${t('rankRowReports', { n: reports })}
               </div>
-              <div class="text-[10px] text-[var(--text-muted)]">
+              <div class="text-[10px] text-[var(--muted)]">
                 +${upvotes} votes
               </div>
             </div>
@@ -504,7 +504,7 @@ export class LeaderboardSheet {
 
     let html = `
       <div class="space-y-2">
-        <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] px-1">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-[var(--muted)] px-1">
           ${t('tabTopCities')} (Active Road Hazards)
         </h4>
     `;
@@ -514,17 +514,17 @@ export class LeaderboardSheet {
       const rankBadge = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
 
       html += `
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-amber-500/40 transition">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] hover:border-amber-500/40 transition">
           <div class="flex items-center gap-3">
-            <span class="text-base font-mono font-bold w-6 text-center">${rankBadge}</span>
+            <span class="text-base tabular-nums font-mono font-bold w-6 text-center">${rankBadge}</span>
             <div>
-              <p class="font-heading font-bold text-sm text-[var(--text-primary)]">${cityName}</p>
-              <p class="text-[10px] text-[var(--text-muted)]">${city.totalUpvotes || 0} नागरिक सत्यापन</p>
+              <p class="font-heading font-bold text-sm text-[var(--text)]">${cityName}</p>
+              <p class="text-[10px] text-[var(--muted)]">${city.totalUpvotes || 0} नागरिक सत्यापन</p>
             </div>
           </div>
 
           <div class="text-right">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-heading font-extrabold bg-amber-500/15 text-[var(--accent-amber-text)] border border-amber-500/30">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-heading font-extrabold bg-amber-500/15 text-[var(--accent)] border border-amber-500/30">
               ${t('cityReportsCount', { n: city.count })}
             </span>
           </div>
@@ -565,7 +565,7 @@ export class LeaderboardSheet {
           onclick="window.__khaddaFlyToPin('${pin.id}')"
           class="flex items-center gap-3 p-2.5 rounded-2xl bg-[#080C14] hover:bg-[#131C2E] border border-slate-800 hover:border-slate-700 active:scale-[0.99] transition cursor-pointer group"
         >
-          <div class="w-7 h-7 rounded-xl bg-slate-800 group-hover:bg-rose-500 group-hover:text-white font-mono font-black text-xs text-slate-300 flex items-center justify-center flex-shrink-0 transition">
+          <div class="w-7 h-7 rounded-xl bg-slate-800 group-hover:bg-rose-500 group-hover:text-white tabular-nums font-mono font-black text-xs text-slate-300 flex items-center justify-center flex-shrink-0 transition">
             #${rankNum}
           </div>
 

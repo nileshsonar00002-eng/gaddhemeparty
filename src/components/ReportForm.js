@@ -1,6 +1,7 @@
 import { t } from '../utils/i18n';
 import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
+import { getLucideIcon } from '../utils/icons';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
@@ -9,24 +10,23 @@ export function renderReportForm(container, options = {}) {
   const quota = getActionQuota();
 
   container.innerHTML = `
-    <div class="space-y-4 text-[var(--text-primary)]">
+    <div class="space-y-4 text-[var(--text)]">
       <!-- Title & Subtitle with Quota Badge -->
-      <div class="flex items-center justify-between border-b border-[var(--border-color)] pb-3">
+      <div class="flex items-center justify-between border-b border-[var(--border)] pb-3">
         <div>
           <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
-            <h2 class="font-heading font-extrabold text-xl text-[var(--text-primary)]">
+            <h2 class="font-heading font-bold text-lg text-[var(--text)]">
               ${t('sheetTitle')}
             </h2>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${
+            <span class="tabular-nums text-[10px] font-medium px-2 py-0.5 rounded-full ${
               quota.isLimitReached
-                ? 'bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30'
-                : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                ? 'bg-rose-500/15 text-[var(--danger)] border border-rose-500/30'
+                : 'bg-emerald-500/15 text-[var(--success)] border border-emerald-500/30'
             }">
               ${t('reportsRemainingBadge', { count: quota.remaining })}
             </span>
           </div>
-          <p class="text-xs text-[var(--text-muted)] mt-0.5">${t('sheetSubtitle')}</p>
+          <p class="text-xs text-[var(--muted)] mt-0.5">${t('sheetSubtitle')}</p>
         </div>
       </div>
 
@@ -34,13 +34,11 @@ export function renderReportForm(container, options = {}) {
         quota.isLimitReached
           ? `
         <!-- Limit Reached Notice Banner -->
-        <div class="bg-rose-500/10 border border-rose-500/30 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-rose-600 dark:text-rose-300">
-          <svg class="w-5 h-5 text-rose-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-          </svg>
+        <div class="bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-[var(--danger)]">
+          ${getLucideIcon('alert', 'w-4 h-4 shrink-0 mt-0.5')}
           <div>
-            <div class="font-bold text-rose-600 dark:text-rose-200">${t('dailyLimitReached')}</div>
-            <div class="text-[11px] text-rose-600/80 dark:text-rose-300/80 mt-0.5">
+            <div class="font-bold">${t('dailyLimitReached')}</div>
+            <div class="text-[11px] opacity-85 mt-0.5">
               ${t('nextReportAvailable', { time: quota.waitFormatted || 'कुछ समय' })}
             </div>
           </div>
@@ -51,47 +49,47 @@ export function renderReportForm(container, options = {}) {
 
       <!-- Photo Upload Dropzone -->
       <div>
-        <label class="block text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-1.5">
-          ${t('tapToPhoto')} <span class="text-rose-500">*</span>
+        <label class="block text-xs font-semibold text-[var(--muted)] mb-1.5">
+          ${t('tapToPhoto')} <span class="text-[var(--danger)]">*</span>
         </label>
         
         <input type="file" id="photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden" ${quota.isLimitReached ? 'disabled' : ''} />
 
-        <div id="photo-dropzone" class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border-color)] hover:border-amber-500/80 rounded-2xl p-4 bg-[var(--bg-card-subtle)] transition-all flex flex-col items-center justify-center min-h-[140px] text-center overflow-hidden">
-          <div id="photo-placeholder" class="flex flex-col items-center justify-center gap-2">
-            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-[var(--accent-amber-text)] group-hover:scale-110 transition">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <div id="photo-dropzone" class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border)] hover:border-[var(--accent)] rounded-xl p-4 bg-[var(--surface-2)] transition-all flex flex-col items-center justify-center min-h-[130px] text-center overflow-hidden">
+          <div id="photo-placeholder" class="flex flex-col items-center justify-center gap-1.5">
+            <div class="w-10 h-10 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] group-hover:scale-105 transition">
+              ${getLucideIcon('camera', 'w-5 h-5')}
             </div>
-            <div class="text-xs font-bold text-[var(--text-secondary)]">
-              <span class="text-[var(--accent-amber-text)] font-heading text-sm">${t('takePhoto')}</span>
+            <div class="text-xs font-semibold text-[var(--text)]">
+              ${t('takePhoto')}
             </div>
-            <p class="text-[11px] text-[var(--text-muted)]">${t('photoOptNote')}</p>
+            <p class="text-[11px] text-[var(--muted)]">${t('photoOptNote')}</p>
           </div>
 
-          <!-- Live Preview Canvas / Image -->
+          <!-- Live Preview Image -->
           <div id="photo-preview-container" class="hidden w-full relative flex flex-col items-center">
-            <img id="photo-preview-img" class="w-full max-h-[170px] object-cover rounded-2xl border border-[var(--border-color)] shadow-md" alt="Pothole preview" />
-            <div id="photo-size-badge" class="mt-2 text-[11px] font-mono px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold"></div>
+            <img id="photo-preview-img" class="w-full max-h-[160px] object-cover rounded-xl border border-[var(--border)] shadow-xs" alt="Pothole preview" />
+            <div id="photo-size-badge" class="tabular-nums mt-2 text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-[var(--success)] border border-emerald-500/30 font-medium"></div>
           </div>
         </div>
       </div>
 
       <!-- GPS Location Status Chip -->
-      <div class="bg-[var(--bg-card-subtle)] border border-[var(--border-color)] rounded-2xl p-3.5">
+      <div class="bg-[var(--surface-2)] border border-[var(--border)] rounded-xl p-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
-            <div id="gps-indicator" class="w-3 h-3 rounded-full bg-amber-500 animate-ping"></div>
+            <span class="w-2.5 h-2.5 rounded-full bg-[var(--accent)]"></span>
             <div>
-              <div id="gps-status-text" class="text-xs font-bold text-[var(--text-primary)]">
+              <div id="gps-status-text" class="text-xs font-semibold text-[var(--text)]">
                 ${t('gpsSearching')}
               </div>
-              <div id="gps-coords-text" class="text-[11px] font-mono text-[var(--text-muted)]">
+              <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)]">
                 ${currentCoordinates ? `${currentCoordinates.lat.toFixed(5)}, ${currentCoordinates.lng.toFixed(5)}` : t('gpsSearching')}
               </div>
             </div>
           </div>
-          <button id="btn-refresh-gps" type="button" class="p-2 text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] rounded-xl border border-[var(--border-color)] active:scale-95 transition" title="${t('gpsRetry')}">
-            <svg class="w-4 h-4 text-[var(--accent-amber-text)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <button id="btn-refresh-gps" type="button" class="btn-secondary p-1.5 text-xs" title="${t('gpsRetry')}">
+            ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
           </button>
         </div>
       </div>
@@ -99,10 +97,10 @@ export function renderReportForm(container, options = {}) {
       <!-- Landmark & Description Input -->
       <div>
         <div class="flex items-center justify-between mb-1.5">
-          <label for="landmark-input" class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+          <label for="landmark-input" class="text-xs font-semibold text-[var(--muted)]">
             ${t('landmarkLabel')}
           </label>
-          <span id="char-counter" class="text-[10px] font-mono text-[var(--text-muted)]">0/100</span>
+          <span id="char-counter" class="tabular-nums text-[10px] font-mono text-[var(--muted)]">0/100</span>
         </div>
         <input
           type="text"
@@ -110,7 +108,7 @@ export function renderReportForm(container, options = {}) {
           maxlength="100"
           placeholder="${t('landmarkPlaceholder')}"
           ${quota.isLimitReached ? 'disabled' : ''}
-          class="w-full px-4 py-3 bg-[var(--bg-card-subtle)] border border-[var(--border-color)] rounded-2xl text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-transparent transition disabled:opacity-50"
+          class="w-full px-3.5 py-2.5 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] focus:border-transparent transition disabled:opacity-50"
         />
       </div>
 
@@ -125,9 +123,9 @@ export function renderReportForm(container, options = {}) {
         id="btn-submit-report"
         type="button"
         ${quota.isLimitReached ? 'disabled' : ''}
-        class="w-full mt-2 py-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 active:scale-[0.98] text-slate-950 font-heading font-extrabold text-base sm:text-lg rounded-2xl shadow-pill transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="btn-primary w-full mt-2 py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <span id="submit-btn-spinner" class="hidden w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+        <span id="submit-btn-spinner" class="hidden w-4 h-4 border-2 border-[var(--accent-ink)] border-t-transparent rounded-full animate-spin"></span>
         <span id="submit-btn-text">${quota.isLimitReached ? t('dailyLimitReached') : t('submitBtn')}</span>
       </button>
     </div>
@@ -148,108 +146,107 @@ export function renderReportForm(container, options = {}) {
   const refreshGpsBtn = container.querySelector('#btn-refresh-gps');
   const gpsStatusText = container.querySelector('#gps-status-text');
   const gpsCoordsText = container.querySelector('#gps-coords-text');
-  const gpsIndicator = container.querySelector('#gps-indicator');
 
-  if (!quota.isLimitReached) {
-    dropzone?.addEventListener('click', () => fileInput?.click());
-  }
+  // Trigger file selection on dropzone click
+  dropzone?.addEventListener('click', () => {
+    if (!quota.isLimitReached) {
+      fileInput?.click();
+    }
+  });
 
-  // Image Processing Listener
+  // Handle Photo selection & compression
   fileInput?.addEventListener('change', async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    photoPlaceholder?.classList.add('hidden');
-    previewContainer?.classList.remove('hidden');
-    previewImg.src = '';
-    sizeBadge.innerText = t('photoCompressing');
-
     try {
-      processedImageData = await processPotholeImage(file);
-      previewImg.src = processedImageData.previewUrl;
-      sizeBadge.innerText = t('photoOptimized', { size: processedImageData.compressedSizeKb });
+      photoPlaceholder?.classList.add('opacity-50');
+      const processed = await processPotholeImage(file);
+      processedImageData = processed;
+
+      if (previewImg && previewContainer && sizeBadge && photoPlaceholder) {
+        previewImg.src = processed.previewUrl;
+        sizeBadge.textContent = t('photoOptimized', { size: processed.sizeKb });
+        photoPlaceholder.classList.add('hidden');
+        previewContainer.classList.remove('hidden');
+      }
     } catch (err) {
-      console.error('Image processing error:', err);
-      sizeBadge.innerText = t('photoError');
+      console.error('[ReportForm] Image processing error:', err);
+      alert(t('photoError'));
     }
   });
 
-  // Landmark character counter
+  // Character Counter
   landmarkInput?.addEventListener('input', (e) => {
-    const len = e.target.value.length;
-    charCounter.innerText = `${len}/100`;
+    const length = e.target.value.length;
+    if (charCounter) charCounter.textContent = `${length}/100`;
   });
 
-  // GPS Acquisition
-  const acquireLocation = () => {
-    gpsStatusText.innerText = t('gpsSearching');
-    gpsIndicator.className = 'w-3 h-3 rounded-full bg-amber-500 animate-ping';
-
-    if (!navigator.geolocation) {
-      gpsStatusText.innerText = t('gpsUnsupported');
-      return;
+  // GPS Refresh Handler
+  refreshGpsBtn?.addEventListener('click', () => {
+    if (gpsStatusText) gpsStatusText.textContent = t('gpsSearching');
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          currentCoordinates = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: pos.coords.accuracy
+          };
+          if (gpsStatusText) gpsStatusText.textContent = t('gpsLocked');
+          if (gpsCoordsText) {
+            gpsCoordsText.textContent = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+          }
+        },
+        (err) => {
+          console.warn('[ReportForm] Geolocation failed:', err);
+          if (gpsStatusText) gpsStatusText.textContent = t('locationDenied');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
     }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        currentCoordinates = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
-        gpsStatusText.innerText = t('gpsLocked');
-        gpsCoordsText.innerText = `${currentCoordinates.lat.toFixed(5)}, ${currentCoordinates.lng.toFixed(5)} (±${Math.round(pos.coords.accuracy)}m)`;
-        gpsIndicator.className = 'w-3 h-3 rounded-full bg-emerald-400';
-      },
-      (err) => {
-        gpsStatusText.innerText = t('locationDenied');
-        gpsIndicator.className = 'w-3 h-3 rounded-full bg-rose-500';
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-  };
-
-  refreshGpsBtn?.addEventListener('click', acquireLocation);
-  if (!currentCoordinates) {
-    acquireLocation();
-  } else {
-    gpsStatusText.innerText = t('gpsLocked');
-    gpsIndicator.className = 'w-3 h-3 rounded-full bg-emerald-400';
-  }
+  });
 
   // Submit Handler
   submitBtn?.addEventListener('click', async () => {
-    if (quota.isLimitReached) {
+    const honeypotVal = container.querySelector('#website_hp')?.value;
+    if (honeypotVal) {
+      console.warn('Bot submission blocked');
+      return;
+    }
+
+    const timeToSubmit = Date.now() - formOpenTime;
+    if (timeToSubmit < 800) {
+      console.warn('Submission too fast');
       return;
     }
 
     if (!currentCoordinates) {
       alert(t('gpsRequiredAlert'));
-      acquireLocation();
       return;
     }
 
+    const landmark = landmarkInput?.value?.trim() || t('defaultLandmark');
+
+    // UI Loading state
     submitBtn.disabled = true;
-    submitSpinner.classList.remove('hidden');
-    submitText.innerText = t('submitting');
+    submitSpinner?.classList.remove('hidden');
+    if (submitText) submitText.textContent = t('submitting');
 
-    const honeypotVal = container.querySelector('#website_hp')?.value || '';
-    const landmarkVal = landmarkInput.value;
-
-    const payload = {
-      latitude: currentCoordinates.lat,
-      longitude: currentCoordinates.lng,
-      landmark: landmarkVal,
-      website_hp: honeypotVal,
-      formOpenTime,
-      imageData: processedImageData
-    };
-
-    if (options.onSubmit) {
-      await options.onSubmit(payload);
+    try {
+      if (options.onSubmit) {
+        await options.onSubmit({
+          coordinates: currentCoordinates,
+          landmark,
+          imageData: processedImageData
+        });
+      }
+    } catch (err) {
+      console.error('[ReportForm] Submission error:', err);
+      alert(t('submitError'));
+      submitBtn.disabled = false;
+      submitSpinner?.classList.add('hidden');
+      if (submitText) submitText.textContent = t('submitBtn');
     }
-
-    submitBtn.disabled = false;
-    submitSpinner.classList.add('hidden');
-    submitText.innerText = t('submitBtn');
   });
 }

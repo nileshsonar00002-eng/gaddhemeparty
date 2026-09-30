@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import { t } from '../utils/i18n';
 import { modalManager } from '../utils/modalManager';
+import { getLucideIcon } from '../utils/icons';
 
 export async function openChaiTipModal(options = {}) {
   const container = document.getElementById('chai-modal-container');
@@ -22,41 +23,41 @@ export async function openChaiTipModal(options = {}) {
   modalManager.openModal('chai-tip-modal', () => closeModal(false));
 
   container.innerHTML = `
-    <div id="chai-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 animate-fade-in">
-      <div class="relative w-full max-w-sm bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-3xl shadow-2xl p-6 text-center space-y-4">
+    <div id="chai-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-xs z-[1100] flex items-center justify-center p-4 animate-fade-in">
+      <div class="relative w-full max-w-sm bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-xl p-6 text-center space-y-4">
         <!-- Close Button -->
-        <button id="btn-close-chai" class="absolute top-4 right-4 p-1.5 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button id="btn-close-chai" class="btn-secondary absolute top-4 right-4 p-1.5" aria-label="Close">
+          ${getLucideIcon('x', 'w-4 h-4')}
         </button>
 
         <!-- Icon & Header -->
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-3xl shadow-inner">
-          ☕
+        <div class="w-12 h-12 mx-auto rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)]">
+          ${getLucideIcon('coffee', 'w-6 h-6')}
         </div>
         <div>
-          <h3 class="text-lg font-black text-[var(--text-primary)] tracking-tight">${t('tipChaiModalTitle')}</h3>
-          <p class="text-xs text-[var(--text-muted)] mt-1">${t('tipChaiDesc')}</p>
+          <h3 class="text-base sm:text-lg font-heading font-bold text-[var(--text)] tracking-tight">${t('tipChaiModalTitle')}</h3>
+          <p class="text-xs text-[var(--muted)] mt-1">${t('tipChaiDesc')}</p>
         </div>
 
         <!-- Mobile: Direct UPI Deep Link -->
         <div class="pt-1">
           <a
             href="${upiDeepLink}"
-            class="w-full inline-flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-amber-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 active:scale-95 text-slate-950 font-black text-sm rounded-2xl shadow-lg transition"
+            class="btn-primary w-full py-2.5 px-4 text-sm font-semibold"
           >
-            <span>📱</span>
+            ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
             <span>${t('payViaUpi')}</span>
           </a>
         </div>
 
         <!-- Desktop QR Code Fallback -->
-        <div class="pt-2 border-t border-[var(--border-color)] space-y-2">
-          <p class="text-[11px] font-semibold text-[var(--text-muted)]">${t('scanQr')}</p>
-          <div class="bg-white p-3 rounded-2xl inline-block shadow-md">
-            <canvas id="upi-qr-canvas" class="w-36 h-36 mx-auto"></canvas>
+        <div class="pt-2 border-t border-[var(--border)] space-y-2">
+          <p class="text-[11px] font-medium text-[var(--muted)]">${t('scanQr')}</p>
+          <div class="bg-white p-2.5 rounded-xl inline-block shadow-xs border border-[var(--border)]">
+            <canvas id="upi-qr-canvas" class="w-32 h-32 mx-auto"></canvas>
           </div>
-          <div class="text-[10px] font-mono text-[var(--text-muted)]">
-            UPI: <span class="text-[var(--accent-amber-text)] font-bold">${upiId}</span>
+          <div class="text-[10px] font-mono text-[var(--muted)]">
+            UPI: <span class="text-[var(--text)] font-semibold">${upiId}</span>
           </div>
         </div>
       </div>
@@ -67,10 +68,10 @@ export async function openChaiTipModal(options = {}) {
   const canvas = document.getElementById('upi-qr-canvas');
   if (canvas) {
     QRCode.toCanvas(canvas, upiDeepLink, {
-      width: 144,
+      width: 128,
       margin: 1,
       color: {
-        dark: '#0B0F19',
+        dark: '#0B0F14',
         light: '#FFFFFF'
       }
     });

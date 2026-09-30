@@ -94,14 +94,14 @@ export function openPinDetailModal(pin) {
       <!-- Centered Card -->
       <div
         id="pin-modal-card"
-        class="relative w-full max-w-[360px] sm:max-w-[420px] max-h-[90dvh] bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
+        class="relative w-full max-w-[360px] sm:max-w-[420px] max-h-[90dvh] bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200"
         onclick="event.stopPropagation()"
       >
         <!-- Floating Close Button (Top Right) -->
         <button
           id="btn-close-pin-modal"
           type="button"
-          class="absolute top-3 right-3 w-9 h-9 rounded-full bg-[var(--bg-card-subtle)] hover:bg-rose-600 text-[var(--text-primary)] hover:text-white border border-[var(--border-color)] backdrop-blur-md flex items-center justify-center transition shadow-xl z-30 cursor-pointer active:scale-90"
+          class="absolute top-3 right-3 w-9 h-9 rounded-full bg-[var(--surface-2)] hover:bg-rose-600 text-[var(--text)] hover:text-white border border-[var(--border)] backdrop-blur-md flex items-center justify-center transition shadow-xl z-30 cursor-pointer active:scale-90"
           aria-label="Close"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@ export function openPinDetailModal(pin) {
           <!-- Photo Gallery / Carousel Section -->
           ${allImages.length > 0 ? `
             <div class="space-y-2">
-              <div id="gallery-main-container" class="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-[var(--bg-card-subtle)] border border-[var(--border-color)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
+              <div id="gallery-main-container" class="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
                 <img
                   id="gallery-main-img"
                   src="${allImages[0]}"
@@ -167,7 +167,7 @@ export function openPinDetailModal(pin) {
                     <button
                       type="button"
                       data-thumb-idx="${idx}"
-                      class="gallery-thumb-btn flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${idx === 0 ? 'border-amber-400 ring-2 ring-amber-400/40 scale-105' : 'border-[var(--border-color)] opacity-60 hover:opacity-100'}"
+                      class="gallery-thumb-btn flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${idx === 0 ? 'border-amber-400 ring-2 ring-amber-400/40 scale-105' : 'border-[var(--border)] opacity-60 hover:opacity-100'}"
                     >
                       <img src="${imgUrl}" alt="thumb ${idx + 1}" class="w-full h-full object-cover" />
                     </button>
@@ -176,7 +176,7 @@ export function openPinDetailModal(pin) {
               ` : ''}
             </div>
           ` : `
-            <div class="w-full h-28 rounded-2xl bg-[var(--bg-card-subtle)] border border-[var(--border-color)] flex flex-col items-center justify-center text-[var(--text-muted)] gap-1">
+            <div class="w-full h-28 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col items-center justify-center text-[var(--muted)] gap-1">
               <span class="text-3xl">🕳️</span>
               <span class="text-xs font-medium">${isHindi ? 'फ़ोटो उपलब्ध नहीं है' : 'No photo uploaded'}</span>
             </div>
@@ -185,28 +185,28 @@ export function openPinDetailModal(pin) {
           <!-- Header Badges: Severity + Time + City -->
           <div class="flex items-center justify-between gap-2 flex-wrap">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-extrabold ${isSevere ? 'bg-rose-500/20 text-rose-400 dark:text-rose-300 border border-rose-500/40' : 'bg-amber-500/20 text-[var(--accent-amber-text)] border border-amber-500/40'}">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-extrabold ${isSevere ? 'bg-rose-500/20 text-rose-400 dark:text-rose-300 border border-rose-500/40' : 'bg-amber-500/20 text-[var(--accent)] border border-amber-500/40'}">
                 <span class="w-2 h-2 rounded-full ${isSevere ? 'bg-rose-500 animate-pulse' : 'bg-amber-400'}"></span>
                 ${reportCount > 1 ? t('reportedByCount', { count: reportCount }) : t('reportedBySingle')}
               </span>
 
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] border border-[var(--border-color)]">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]">
                 📍 ${cityName}
               </span>
             </div>
 
-            <span class="text-[11px] text-[var(--text-muted)] font-mono font-medium">${timeStr}</span>
+            <span class="text-[11px] text-[var(--muted)] font-mono font-medium">${timeStr}</span>
           </div>
 
           <!-- Landmark & Location Description -->
-          <div class="bg-[var(--bg-card)] p-3 rounded-2xl border border-[var(--border-color)]">
-            <p class="text-xs sm:text-sm font-semibold text-[var(--text-primary)] leading-relaxed">
+          <div class="bg-[var(--surface)] p-3 rounded-2xl border border-[var(--border)]">
+            <p class="text-xs sm:text-sm font-semibold text-[var(--text)] leading-relaxed">
               ${safeLandmark}
             </p>
           </div>
 
           <!-- Actions: +1 Upvote & WhatsApp Share -->
-          <div class="pt-2 border-t border-[var(--border-color)] flex flex-col gap-2.5">
+          <div class="pt-2 border-t border-[var(--border)] flex flex-col gap-2.5">
             <!-- +1 Upvote Button -->
             ${hasUserReportedOrUpvoted(pin.id) ? `
               <button
@@ -237,7 +237,7 @@ export function openPinDetailModal(pin) {
               <button
                 id="pin-modal-add-photo-btn"
                 type="button"
-                class="flex-1 py-2.5 px-3 bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--accent-amber-text)] border border-amber-500/30 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-sm"
+                class="flex-1 py-2.5 px-3 bg-[var(--surface)] hover:bg-[var(--bg-card-hover)] text-[var(--accent)] border border-amber-500/30 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-sm"
               >
                 <span>📸</span>
                 <span>${isHindi ? '+ फ़ोटो जोड़ें' : '+ Add Photo'}</span>
@@ -259,7 +259,7 @@ export function openPinDetailModal(pin) {
                 id="pin-modal-flag-btn"
                 type="button"
                 title="${t('flagBtn')}"
-                class="p-2.5 text-[var(--text-muted)] hover:text-rose-500 bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] rounded-xl border border-[var(--border-color)] active:scale-95 transition cursor-pointer flex-shrink-0"
+                class="p-2.5 text-[var(--muted)] hover:text-rose-500 bg-[var(--surface)] hover:bg-[var(--bg-card-hover)] rounded-xl border border-[var(--border)] active:scale-95 transition cursor-pointer flex-shrink-0"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>

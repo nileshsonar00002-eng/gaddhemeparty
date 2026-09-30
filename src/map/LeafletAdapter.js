@@ -71,7 +71,7 @@ export class LeafletAdapter extends MapAdapter {
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         return L.divIcon({
-          html: `<div class="custom-cluster-orb"><span>${count}</span></div>`,
+          html: `<div class="custom-cluster-civic"><span>${count}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: L.point(40, 40)
         });
@@ -258,15 +258,15 @@ export class LeafletAdapter extends MapAdapter {
       const isSevere = reportCount >= 5 || upvotes >= 5 || photoCount >= 5;
       const isMedium = (reportCount >= 2 || upvotes >= 2 || photoCount >= 2) && !isSevere;
       
-      const orbTierClass = isSevere ? 'orb-red' : isMedium ? 'orb-orange' : 'orb-amber';
+      const orbTierClass = isSevere ? 'pin-tier-3' : isMedium ? 'pin-tier-2' : 'pin-tier-1';
       const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
       const badgeCount = Math.max(reportCount, photoCount);
 
       // Glowing Orb HTML ("Earth at Night / Glowing City Light Node") with Scale Wrapper
       const iconHtml = `
         <div class="pin-scale-wrapper">
-          <div class="glowing-orb-pin ${orbTierClass}" style="width: ${orbSize}px; height: ${orbSize}px;" title="${pin.landmark || 'Hazard'}">
-            ${badgeCount > 1 ? `<span class="orb-count-label">${badgeCount}</span>` : ''}
+          <div class="civic-pin ${orbTierClass}" style="width: ${orbSize}px; height: ${orbSize}px;" title="${pin.landmark || 'Hazard'}">
+            ${badgeCount > 1 ? `<span class="tabular-nums">${badgeCount}</span>` : ''}
           </div>
         </div>
       `;

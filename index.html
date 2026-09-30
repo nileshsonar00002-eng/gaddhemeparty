@@ -6,12 +6,18 @@
     <title>गड्ढे में पार्टी | "जहाँ गड्ढा, वहाँ पार्टी" - Road Pothole Tracker</title>
     
     <!-- Meta & SEO in Hindi & English -->
-    <meta name="description" content="गड्ढे में पार्टी - पूरे भारत में सड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें। 100% निःशुल्क नागरिक पहल।" />
-    <meta name="theme-color" content="#080C14" />
+    <meta name="description" content="गड्ढे में पार्टी - पूरे भारत में सड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें। 100% निःशुल्क नागरिक पहल।" />
+    <meta name="theme-color" content="#0B0F14" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <link rel="apple-touch-icon" href="/logo.svg" />
+
+    <!-- Preload Self-Hosted Fonts for Maximum Performance -->
+    <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/noto-sans-devanagari-devanagari-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/noto-sans-devanagari-devanagari-700-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Zero-FOUC Inline Theme Script (Executes BEFORE First Paint) -->
     <script>
@@ -29,7 +35,7 @@
             document.documentElement.classList.remove('dark');
           }
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', theme === 'dark' ? '#080C14' : '#F8FAFC');
+          if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0F14' : '#F7F7F4');
         } catch (e) {}
       })();
     </script>
@@ -37,136 +43,116 @@
     <!-- Open Graph / Social Cards -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="गड्ढे में पार्टी | जहाँ गड्ढा, वहाँ पार्टी" />
-    <meta property="og:description" content="सड़कों के गड्ढे रिपोर्ट करो, सुरक्षित भारत बनाओ। 100% Free & Open Citizen Tool." />
+    <meta property="og:description" content="सड़कों के गड्ढे रिपोर्ट करो, सुरक्षित भारत बनाओ। 100% Free & Open Citizen Tool." />
     <meta property="og:image" content="/og-image.svg" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="गड्ढे में पार्टी | जहाँ गड्ढा, वहाँ पार्टी" />
-    <meta name="twitter:description" content="सड़कों के गड्ढे रिपोर्ट करो, सुरक्षित भारत बनाओ।" />
+    <meta name="twitter:description" content="सड़कों के गड्ढे रिपोर्ट करो, सुरक्षित भारत बनाओ।" />
     <meta name="twitter:image" content="/og-image.svg" />
-    
-    <!-- Google Fonts with Preconnect & Display Swap -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
     
     <!-- Leaflet & Cluster CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   </head>
-  <body class="w-full bg-[var(--bg-primary)] font-sans antialiased text-[var(--text-primary)] overflow-x-hidden transition-colors duration-200">
+  <body class="w-full bg-[var(--bg)] font-sans antialiased text-[var(--text)] overflow-x-hidden transition-colors duration-200">
     <!-- Main Application Shell -->
-    <div id="app" class="relative w-full min-h-screen flex flex-col bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-200">
+    <div id="app" class="relative w-full min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-200">
       
-      <!-- 1. Sticky Glassmorphic Header -->
+      <!-- 1. Sticky Header -->
       <header id="navbar-container" class="sticky top-0 left-0 right-0 z-[1000] w-full"></header>
 
       <!-- Offline Status Banner -->
-      <div id="offline-banner" class="hidden sticky top-16 left-4 right-4 z-[998] mx-auto max-w-4xl my-2 bg-amber-500 text-slate-950 font-bold px-4 py-2.5 rounded-2xl text-center text-xs sm:text-sm shadow-xl border border-amber-300 flex items-center justify-center gap-2">
+      <div id="offline-banner" class="hidden sticky top-16 left-4 right-4 z-[998] mx-auto max-w-4xl my-2 bg-amber-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-center text-xs sm:text-sm shadow-md border border-amber-600/30 flex items-center justify-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-2.829-2.829m0 0l2.829-2.829M3 3l18 18"/></svg>
         <span data-i18n="offlineBanner">इंटरनेट बंद है। रिपोर्ट ऑफलाइन सेव रहेगी और वापस ऑनलाइन आते ही अपलोड हो जाएगी।</span>
       </div>
 
       <!-- Main Scrollable Content Container -->
-      <main class="w-full flex flex-col gap-6 sm:gap-8 pb-16 pt-6 sm:pt-8 max-w-full overflow-x-hidden">
+      <main class="w-full flex flex-col gap-6 sm:gap-8 pb-16 pt-4 sm:pt-6 max-w-full overflow-x-hidden">
 
         <!-- 2. Hero Section -->
         <section id="hero-section" class="relative w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="relative w-full rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] overflow-hidden shadow-xl p-6 sm:p-8 lg:p-12">
-            <!-- Animated Starfield Background Canvas -->
-            <canvas id="starfield-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-80"></canvas>
-            <!-- Atmosphere Horizon Glow -->
-            <div class="atmosphere-horizon pointer-events-none"></div>
-
+          <div class="relative w-full rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-6 sm:p-8 lg:p-10 shadow-sm">
             <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
               <!-- Left Column: Headline, Subtitle, Stats & CTA -->
               <div class="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3 sm:space-y-4">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] sm:text-xs font-heading font-bold shadow-sm backdrop-blur-sm">
-                  <span>🇮🇳</span>
-                  <span data-i18n="heroBadge">100% फ्री व ओपन सोर्स नागरिक प्लेटफॉर्म</span>
+                <!-- Small Neutral Badge Chip -->
+                <div class="chip-neutral">
+                  <span data-i18n="heroBadge">सड़क के गड्ढों की रिपोर्ट करें, बिना लॉगिन। सबके लिए मुफ़्त।</span>
                 </div>
 
-                <h1 id="hero-title" class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black text-[var(--text-primary)] tracking-tight leading-[1.15]" data-i18n-html="heroTitleHtml">
-                  "जहाँ गड्ढा, <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 bg-clip-text text-transparent">वहाँ पार्टी</span>"
+                <h1 id="hero-title" class="font-heading font-bold text-[var(--text)] tracking-tight leading-[1.1]" data-i18n-html="heroTitleHtml">
+                  "जहाँ गड्ढा, <span class="text-[var(--accent)] font-bold">वहाँ पार्टी</span>"
                 </h1>
 
-                <p class="text-xs sm:text-sm text-[var(--text-secondary)] max-w-[60ch] leading-relaxed font-medium" data-i18n="heroDescription">
-                  पूरे भारत में सड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें। पारदर्शी तकनीक से सड़कों को बेहतर बनाएं।
+                <p class="text-sm sm:text-base text-[var(--muted)] max-w-[60ch] leading-relaxed font-normal" data-i18n="heroDescription">
+                  पूरे भारत में सड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें। 100% निःशुल्क व खुली नागरिक पहल।
                 </p>
 
                 <!-- Real-time Stat Chips Container -->
                 <div id="stats-strip-container" class="pt-1 flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-2.5"></div>
               </div>
 
-              <!-- Right Column: Stylized "#gddp" Circular Badge -->
-              <div class="lg:col-span-4 flex justify-center items-center relative py-2 overflow-visible">
-                <div class="relative w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 aspect-square flex items-center justify-center">
-                  <!-- Glowing Aura Behind Badge (Controlled, non-clipped) -->
-                  <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500/25 via-orange-500/20 to-rose-500/20 blur-xl pointer-events-none animate-pulse"></div>
-                  <!-- Badge Core Circle -->
-                  <div class="relative w-full h-full rounded-full border-2 border-amber-500/40 bg-[var(--bg-card)] shadow-[0_0_35px_rgba(245,158,11,0.25)] flex items-center justify-center transition-transform hover:scale-105 duration-200 select-none">
-                    <span class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black italic tracking-wider bg-gradient-to-r from-amber-400 via-orange-400 to-rose-500 bg-clip-text text-transparent drop-shadow">#gddp</span>
-                  </div>
+              <!-- Right Column: Stylized Clean "#gddp" Circular Badge -->
+              <div class="lg:col-span-4 flex justify-center items-center py-2">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-full border border-[var(--border)] bg-[var(--surface-2)] shadow-sm flex items-center justify-center select-none">
+                  <span class="text-2xl sm:text-3xl font-heading font-black italic tracking-wider text-[var(--accent)]">#gddp</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 3. Contained Map Card (Rounded, Border, Soft Shadow) -->
+        <!-- 3. Contained Map Card -->
         <section id="map-section" class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div id="map-card-container" class="relative w-full h-[76dvh] sm:h-[80vh] lg:h-[85vh] max-h-[920px] rounded-3xl border border-[var(--border-color)] bg-[var(--bg-card)] shadow-2xl overflow-hidden map-card-glow transition-all duration-300">
+          <div id="map-card-container" class="relative w-full h-[76dvh] sm:h-[80vh] lg:h-[85vh] max-h-[920px] rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-md overflow-hidden transition-all duration-200">
             <!-- Map Canvas -->
             <div id="map" class="w-full h-full bg-[var(--map-bg)]"></div>
 
-            <!-- Cinematic Vignette Overlay -->
-            <div class="map-inner-vignette pointer-events-none"></div>
-
             <!-- Floating Map Controls (Zoom In, Zoom Out, Fullscreen) Inside Card -->
-            <div class="absolute top-4 right-4 z-[400] flex flex-col bg-[var(--bg-glass)] backdrop-blur-md rounded-2xl border border-[var(--border-color)] shadow-2xl overflow-hidden select-none">
+            <div class="absolute top-4 right-4 z-[400] flex flex-col bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-md overflow-hidden select-none">
               <!-- Zoom In Button -->
               <button
                 id="btn-zoom-in"
                 type="button"
-                class="w-10 h-10 flex items-center justify-center text-[var(--text-primary)] hover:text-amber-400 hover:bg-[var(--bg-card-hover)] active:scale-90 transition font-bold text-lg focus:outline-none cursor-pointer"
+                class="w-9 h-9 flex items-center justify-center text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--surface-2)] active:scale-95 transition font-bold text-base focus:outline-none cursor-pointer"
                 title="Zoom In (+)"
                 aria-label="Zoom In"
                 data-i18n-title="zoomInTooltip"
                 data-i18n-aria="zoomInTooltip"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
               </button>
-              <div class="h-[1px] bg-[var(--border-color)] mx-2"></div>
+              <div class="h-[1px] bg-[var(--border)] mx-1.5"></div>
               <!-- Zoom Out Button -->
               <button
                 id="btn-zoom-out"
                 type="button"
-                class="w-10 h-10 flex items-center justify-center text-[var(--text-primary)] hover:text-amber-400 hover:bg-[var(--bg-card-hover)] active:scale-90 transition font-bold text-lg focus:outline-none cursor-pointer"
+                class="w-9 h-9 flex items-center justify-center text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--surface-2)] active:scale-95 transition font-bold text-base focus:outline-none cursor-pointer"
                 title="Zoom Out (-)"
                 aria-label="Zoom Out"
                 data-i18n-title="zoomOutTooltip"
                 data-i18n-aria="zoomOutTooltip"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/></svg>
               </button>
-              <div class="h-[1px] bg-[var(--border-color)] mx-2"></div>
+              <div class="h-[1px] bg-[var(--border)] mx-1.5"></div>
               <!-- Fullscreen Toggle Button -->
               <button
                 id="btn-fullscreen-toggle"
                 type="button"
-                class="w-10 h-10 flex items-center justify-center text-[var(--text-primary)] hover:text-amber-400 hover:bg-[var(--bg-card-hover)] active:scale-90 transition font-bold focus:outline-none cursor-pointer"
+                class="w-9 h-9 flex items-center justify-center text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--surface-2)] active:scale-95 transition font-bold focus:outline-none cursor-pointer"
                 title="फुल स्क्रीन"
                 aria-label="Full Screen"
                 data-i18n-title="fullscreenTooltip"
                 data-i18n-aria="fullscreenTooltip"
               >
-                <!-- Enter Fullscreen Icon (Outward corners) -->
-                <svg id="icon-enter-fullscreen" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                <svg id="icon-enter-fullscreen" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
                 </svg>
-                <!-- Exit Fullscreen Icon (Inward corners) -->
-                <svg id="icon-exit-fullscreen" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 4v4m0 0H5m4 0L4 3m11 5h4m-4 0V4m0 4l5-5M9 20v-4m0 0H5m4 0l-5 5m11-5l5 5m-5-5v4m0-4h4"/>
+                <svg id="icon-exit-fullscreen" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 14h6v6m10-10h-6V4m0 6 7-7M3 21l7-7"/>
                 </svg>
               </button>
             </div>
@@ -174,28 +160,26 @@
             <!-- Floating Controls: Locate Me, Info & Primary Report Button (Anchored inside Card) -->
             <div class="absolute bottom-4 left-3 right-3 sm:left-6 sm:right-6 z-[400] flex items-center gap-2.5 sm:gap-3.5 pointer-events-none">
               <!-- Locate Me Button -->
-              <button id="btn-locate-me" type="button" class="pointer-events-auto bg-[var(--bg-glass)] hover:bg-[var(--bg-card-hover)] active:scale-95 text-[var(--text-primary)] p-3 sm:p-3.5 rounded-2xl shadow-xl backdrop-blur-md border border-[var(--border-color)] transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer" title="मेरी लोकेशन" aria-label="मेरी लोकेशन" data-i18n-title="locateMe" data-i18n-aria="locateMe">
-                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <button id="btn-locate-me" type="button" class="pointer-events-auto btn-secondary p-2.5 sm:p-3 bg-[var(--surface)] shadow-md" title="मेरी लोकेशन" aria-label="मेरी लोकेशन" data-i18n-title="locateMe" data-i18n-aria="locateMe">
+                <svg class="w-5 h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
               </button>
 
               <!-- About / Info Modal Button -->
-              <button id="btn-open-about" type="button" class="pointer-events-auto bg-[var(--bg-glass)] hover:bg-[var(--bg-card-hover)] active:scale-95 text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-3 sm:p-3.5 rounded-2xl shadow-xl backdrop-blur-md border border-[var(--border-color)] transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-amber-500/50 cursor-pointer" title="नागरिक पहल जानकारी" aria-label="About Gaddhe Me Party" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <button id="btn-open-about" type="button" class="pointer-events-auto btn-secondary p-2.5 sm:p-3 bg-[var(--surface)] shadow-md" title="नागरिक पहल जानकारी" aria-label="About Gaddhe Me Party" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
+                <svg class="w-5 h-5 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               </button>
 
               <!-- Primary Floating Pill Button: "खराब रास्ता रिपोर्ट करें" -->
-              <button id="btn-open-report" type="button" class="pointer-events-auto flex-1 group bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 hover:from-amber-400 hover:to-rose-500 active:scale-[0.98] text-slate-950 font-heading font-extrabold text-sm sm:text-base py-3 sm:py-3.5 px-4 sm:px-6 rounded-2xl shadow-pill transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-4 focus:ring-amber-500/30 cursor-pointer">
-                <span class="w-6 h-6 rounded-lg bg-slate-950/20 flex items-center justify-center text-slate-950">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                </span>
-                <span id="fab-text" class="tracking-wide text-slate-950" data-i18n="reportBtn">खराब रास्ता रिपोर्ट करें</span>
+              <button id="btn-open-report" type="button" class="pointer-events-auto flex-1 btn-primary py-3 sm:py-3.5 px-4 sm:px-6 shadow-md text-sm sm:text-base font-semibold">
+                <svg class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                <span id="fab-text" data-i18n="reportBtn">खराब रास्ता रिपोर्ट करें</span>
               </button>
             </div>
 
-            <!-- Bottom Sheet Drawer for Reporting (Mounted inside Map Container for Seamless Fullscreen Overlay) -->
+            <!-- Bottom Sheet Drawer for Reporting -->
             <div id="bottom-sheet-container" class="z-[1050]"></div>
 
-            <!-- Centered Pin Details Modal Container (Mounted inside Map Container for Seamless Fullscreen Overlay) -->
+            <!-- Centered Pin Details Modal Container -->
             <div id="pin-detail-modal-container" class="z-[1070]"></div>
 
             <!-- Chai Tip Modal Container -->
@@ -214,41 +198,41 @@
         <!-- 5. Our Mission Section (3 Pillars) -->
         <section id="mission" class="w-full max-w-6xl mx-auto px-4 content-auto reveal-on-scroll">
           <div class="text-center space-y-2 mb-8">
-            <span class="text-xs font-heading font-bold text-[var(--accent-amber-text)] tracking-wider uppercase" data-i18n="missionBadge">Mission & Impact</span>
-            <h2 class="text-2xl sm:text-3xl font-heading font-extrabold text-[var(--text-primary)]" data-i18n="missionTitle">हमारा उद्देश्य (Our Mission)</h2>
-            <p class="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mx-auto" data-i18n="missionSubtitle">नागरिक शक्ति और पारदर्शी तकनीक से भारतीय सड़कों को सुरक्षित बनाना</p>
+            <span class="text-xs font-semibold text-[var(--accent)] tracking-wider uppercase" data-i18n="missionBadge">Mission & Impact</span>
+            <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--text)]" data-i18n="missionTitle">हमारा उद्देश्य (Our Mission)</h2>
+            <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-i18n="missionSubtitle">नागरिक शक्ति और पारदर्शी तकनीक से भारतीय सड़कों को सुरक्षित बनाना</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <!-- Pillar 1 -->
-            <div class="p-6 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] hover:border-amber-500/40 transition-all duration-200 shadow-lg group">
-              <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition transform">
-                👁️
+            <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] transition-all duration-200 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
               </div>
-              <h3 class="font-heading font-bold text-lg text-[var(--text-primary)] mb-2" data-i18n="pillar1Title">१. गड्ढों को दृश्यमान बनाना</h3>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed" data-i18n="pillar1Desc">
+              <h3 class="font-heading font-bold text-base text-[var(--text)] mb-2" data-i18n="pillar1Title">१. गड्ढों को दृश्यमान बनाना</h3>
+              <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed" data-i18n="pillar1Desc">
                 अक्सर खराब सड़कों की अनदेखी की जाती है। हमारा ओपन मैप हर गड्ढे को वास्तविक GPS लोकेशन और फोटो के साथ सार्वजनिक रूप से उजागर करता है।
               </p>
             </div>
 
             <!-- Pillar 2 -->
-            <div class="p-6 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] hover:border-amber-500/40 transition-all duration-200 shadow-lg group">
-              <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition transform">
-                📢
+            <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] transition-all duration-200 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
-              <h3 class="font-heading font-bold text-lg text-[var(--text-primary)] mb-2" data-i18n="pillar2Title">२. नागरिकों को सीधी आवाज़</h3>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed" data-i18n="pillar2Desc">
+              <h3 class="font-heading font-bold text-base text-[var(--text)] mb-2" data-i18n="pillar2Title">२. नागरिकों को सीधी आवाज़</h3>
+              <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed" data-i18n="pillar2Desc">
                 बिना किसी जटिल ऐप या सरकारी लॉगिन के, हर भारतीय केवल ३० सेकंड में अपने इलाके की सड़क समस्या दर्ज और वोट कर सकता है।
               </p>
             </div>
 
             <!-- Pillar 3 -->
-            <div class="p-6 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] hover:border-amber-500/40 transition-all duration-200 shadow-lg group">
-              <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition transform">
-                🛠️
+            <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] transition-all duration-200 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
               </div>
-              <h3 class="font-heading font-bold text-lg text-[var(--text-primary)] mb-2" data-i18n="pillar3Title">३. सड़कों को जल्द ठीक कराना</h3>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed" data-i18n="pillar3Desc">
+              <h3 class="font-heading font-bold text-base text-[var(--text)] mb-2" data-i18n="pillar3Title">३. सड़कों को जल्द ठीक कराना</h3>
+              <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed" data-i18n="pillar3Desc">
                 जब गड्ढे सोशल मीडिया और लीडरबोर्ड पर ट्रेंड करते हैं, तो नगर निगम और पीडब्ल्यूडी प्रशासन पर त्वरित मरम्मत का सकारात्मक दबाव बनता है।
               </p>
             </div>
@@ -258,63 +242,63 @@
         <!-- 6. How It Works & FAQs Section -->
         <section id="how" class="w-full max-w-6xl mx-auto px-4 content-auto reveal-on-scroll">
           <div class="text-center space-y-2 mb-8">
-            <span class="text-xs font-heading font-bold text-[var(--accent-amber-text)] tracking-wider uppercase" data-i18n="howItWorksBadge">Simple & Transparent</span>
-            <h2 class="text-2xl sm:text-3xl font-heading font-extrabold text-[var(--text-primary)]" data-i18n="howItWorksTitle">कैसे काम करता है? (How It Works)</h2>
-            <p class="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mx-auto" data-i18n="howItWorksSubtitle">३ आसान चरणों में किसी भी खराब सड़क की रिपोर्ट दर्ज करें</p>
+            <span class="text-xs font-semibold text-[var(--accent)] tracking-wider uppercase" data-i18n="howItWorksBadge">Simple & Transparent</span>
+            <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--text)]" data-i18n="howItWorksTitle">कैसे काम करता है? (How It Works)</h2>
+            <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-i18n="howItWorksSubtitle">३ आसान चरणों में किसी भी खराब सड़क की रिपोर्ट दर्ज करें</p>
           </div>
 
           <!-- 3 Steps -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
-            <div class="p-5 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-center space-y-2.5 shadow-md">
-              <span class="w-10 h-10 mx-auto rounded-xl bg-amber-500 text-slate-950 font-mono font-black text-sm flex items-center justify-center">1</span>
-              <h3 class="font-heading font-bold text-base text-[var(--text-primary)]" data-i18n="hwStep1Title">📸 फोटो खींचें</h3>
-              <p class="text-xs text-[var(--text-secondary)]" data-i18n="hwStep1Desc">खराब सड़क या गड्ढे की फोटो लें। फोन पर ही EXIF प्राइवेसी सुरक्षित हो जाती है।</p>
+            <div class="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-2.5 shadow-sm">
+              <span class="w-8 h-8 mx-auto rounded-lg bg-[var(--accent)] text-[var(--accent-ink)] font-mono font-bold text-sm flex items-center justify-center">1</span>
+              <h3 class="font-heading font-bold text-base text-[var(--text)]" data-i18n="hwStep1Title">फोटो खींचें</h3>
+              <p class="text-xs text-[var(--muted)]" data-i18n="hwStep1Desc">खराब सड़क या गड्ढे की फोटो लें। फोन पर ही EXIF प्राइवेसी सुरक्षित हो जाती है।</p>
             </div>
-            <div class="p-5 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-center space-y-2.5 shadow-md">
-              <span class="w-10 h-10 mx-auto rounded-xl bg-amber-500 text-slate-950 font-mono font-black text-sm flex items-center justify-center">2</span>
-              <h3 class="font-heading font-bold text-base text-[var(--text-primary)]" data-i18n="hwStep2Title">📍 GPS लोकेशन लॉक</h3>
-              <p class="text-xs text-[var(--text-secondary)]" data-i18n="hwStep2Desc">सिस्टम सटीक GPS लोकेशन लेता है और 20m के दायरे में डुप्लीकेट को रोकता है।</p>
+            <div class="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-2.5 shadow-sm">
+              <span class="w-8 h-8 mx-auto rounded-lg bg-[var(--accent)] text-[var(--accent-ink)] font-mono font-bold text-sm flex items-center justify-center">2</span>
+              <h3 class="font-heading font-bold text-base text-[var(--text)]" data-i18n="hwStep2Title">GPS लोकेशन लॉक</h3>
+              <p class="text-xs text-[var(--muted)]" data-i18n="hwStep2Desc">सिस्टम सटीक GPS लोकेशन लेता है और 5m के दायरे में डुप्लीकेट को रोकता है।</p>
             </div>
-            <div class="p-5 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] text-center space-y-2.5 shadow-md">
-              <span class="w-10 h-10 mx-auto rounded-xl bg-amber-500 text-slate-950 font-mono font-black text-sm flex items-center justify-center">3</span>
-              <h3 class="font-heading font-bold text-base text-[var(--text-primary)]" data-i18n="hwStep3Title">🚀 तुरंत लाइव रिपोर्ट</h3>
-              <p class="text-xs text-[var(--text-secondary)]" data-i18n="hwStep3Desc">पिन लाइव मैप और लीडरबोर्ड पर आ जाता है, जहाँ अन्य नागरिक पुष्टि कर सकते हैं।</p>
+            <div class="p-5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-2.5 shadow-sm">
+              <span class="w-8 h-8 mx-auto rounded-lg bg-[var(--accent)] text-[var(--accent-ink)] font-mono font-bold text-sm flex items-center justify-center">3</span>
+              <h3 class="font-heading font-bold text-base text-[var(--text)]" data-i18n="hwStep3Title">तुरंत लाइव रिपोर्ट</h3>
+              <p class="text-xs text-[var(--muted)]" data-i18n="hwStep3Desc">पिन लाइव मैप और लीडरबोर्ड पर आ जाता है, जहाँ अन्य नागरिक पुष्टि कर सकते हैं।</p>
             </div>
           </div>
 
           <!-- FAQ Accordion -->
           <div class="max-w-3xl mx-auto space-y-3">
-            <h3 class="font-heading font-bold text-lg text-[var(--text-primary)] mb-4 text-center" data-i18n="faqTitle">अक्सर पूछे जाने वाले सवाल (FAQ)</h3>
+            <h3 class="font-heading font-bold text-lg text-[var(--text)] mb-4 text-center" data-i18n="faqTitle">अक्सर पूछे जाने वाले सवाल (FAQ)</h3>
 
             <!-- FAQ Item 1 -->
-            <details class="group rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 open:bg-[var(--bg-card)] transition shadow-sm">
-              <summary class="font-heading font-bold text-sm text-[var(--text-primary)] cursor-pointer list-none flex items-center justify-between">
+            <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-sm">
+              <summary class="font-heading font-bold text-sm text-[var(--text)] cursor-pointer list-none flex items-center justify-between">
                 <span data-i18n="faq1Q">क्या मुझे रिपोर्ट करने के लिए लॉगिन या साइन अप करना होगा?</span>
-                <span class="text-amber-500 group-open:rotate-180 transition transform">▼</span>
+                <span class="text-[var(--muted)] group-open:rotate-180 transition transform">▼</span>
               </summary>
-              <p class="text-xs text-[var(--text-secondary)] mt-2.5 leading-relaxed" data-i18n="faq1A">
+              <p class="text-xs text-[var(--muted)] mt-2.5 leading-relaxed" data-i18n="faq1A">
                 बिल्कुल नहीं! गड्ढे में पार्टी 100% ज़ीरो-लॉगिन है। आप बिना किसी खाते, पासवर्ड या मोबाइल नंबर के सीधे रिपोर्ट और वोट कर सकते हैं।
               </p>
             </details>
 
             <!-- FAQ Item 2 -->
-            <details class="group rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 open:bg-[var(--bg-card)] transition shadow-sm">
-              <summary class="font-heading font-bold text-sm text-[var(--text-primary)] cursor-pointer list-none flex items-center justify-between">
+            <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-sm">
+              <summary class="font-heading font-bold text-sm text-[var(--text)] cursor-pointer list-none flex items-center justify-between">
                 <span data-i18n="faq2Q">क्या मेरा व्यक्तिगत डेटा या लोकेशन ट्रैक होती है?</span>
-                <span class="text-amber-500 group-open:rotate-180 transition transform">▼</span>
+                <span class="text-[var(--muted)] group-open:rotate-180 transition transform">▼</span>
               </summary>
-              <p class="text-xs text-[var(--text-secondary)] mt-2.5 leading-relaxed" data-i18n="faq2A">
+              <p class="text-xs text-[var(--muted)] mt-2.5 leading-relaxed" data-i18n="faq2A">
                 नहीं। अपलोड की जाने वाली फोटो से EXIF व डिवाइस मेटाडेटा आपके फ़ोन में ही हटा दिया जाता है। हम केवल सड़क के गड्ढे का GPS बिंदु सुरक्षित रखते हैं।
               </p>
             </details>
 
             <!-- FAQ Item 3 -->
-            <details class="group rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-color)] p-4 open:bg-[var(--bg-card)] transition shadow-sm">
-              <summary class="font-heading font-bold text-sm text-[var(--text-primary)] cursor-pointer list-none flex items-center justify-between">
+            <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-sm">
+              <summary class="font-heading font-bold text-sm text-[var(--text)] cursor-pointer list-none flex items-center justify-between">
                 <span data-i18n="faq3Q">मेरी फोटो कौन देख सकता है और क्या नियम हैं?</span>
-                <span class="text-amber-500 group-open:rotate-180 transition transform">▼</span>
+                <span class="text-[var(--muted)] group-open:rotate-180 transition transform">▼</span>
               </summary>
-              <p class="text-xs text-[var(--text-secondary)] mt-2.5 leading-relaxed" data-i18n="faq3A">
+              <p class="text-xs text-[var(--muted)] mt-2.5 leading-relaxed" data-i18n="faq3A">
                 फोटो सार्वजनिक रूप से मैप पर दिखती है ताकि अन्य नागरिक और प्रशासन उसे देख सकें। कृपया केवल सड़क/गड्ढे की फोटो अपलोड करें; चेहरे या वाहन की नंबर प्लेट वर्जित हैं।
               </p>
             </details>
@@ -323,29 +307,28 @@
 
         <!-- 7. About Us Section -->
         <section id="about" class="w-full max-w-6xl mx-auto px-4 content-auto reveal-on-scroll">
-          <div class="p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] shadow-xl space-y-5">
+          <div class="p-6 sm:p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-5">
             <div class="flex items-center gap-3">
-              <img src="/logo.svg" alt="Gaddhe Me Party Logo" class="w-12 h-12 rounded-2xl" />
+              <img src="/logo.svg" alt="Gaddhe Me Party Logo" class="w-10 h-10 rounded-xl" />
               <div>
-                <h2 class="text-xl sm:text-2xl font-heading font-extrabold text-[var(--text-primary)]" data-i18n="aboutTitle">हमारे बारे में (About Us)</h2>
-                <p class="text-xs text-[var(--accent-amber-text)] font-semibold" data-i18n="aboutSubtitle">100% स्वतंत्र व नागरिक-संचालित मंच</p>
+                <h2 class="text-xl sm:text-2xl font-heading font-bold text-[var(--text)]" data-i18n="aboutTitle">हमारे बारे में (About Us)</h2>
+                <p class="text-xs text-[var(--accent)] font-semibold" data-i18n="aboutSubtitle">100% स्वतंत्र व नागरिक-संचालित मंच</p>
               </div>
             </div>
 
-            <p class="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed" data-i18n="aboutStory">
+            <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed" data-i18n="aboutStory">
               गड्ढे में पार्टी की शुरुआत भारत के जागरूक नागरिकों द्वारा की गई एक स्वतंत्र नागरिक पहल है। इसका उद्देश्य व्यंग्य और तकनीक के माध्यम से हमारी सड़कों की दुर्दशा पर ध्यान आकर्षित करना और प्रशासन को जवाबदेह बनाना है।
             </p>
 
             <!-- Prominent Civic Disclaimer Box -->
-            <div class="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-[var(--text-primary)] space-y-1">
-              <h4 class="font-heading font-extrabold text-sm flex items-center gap-1.5 text-[var(--accent-amber-text)]">
-                <span>📢</span>
+            <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] space-y-1">
+              <h4 class="font-heading font-bold text-sm flex items-center gap-1.5 text-[var(--accent)]">
                 <span data-i18n="aboutDisclaimerTitle">महत्वपूर्ण सूचना (Disclaimer):</span>
               </h4>
-              <p class="text-xs sm:text-sm font-semibold text-[var(--text-primary)]" data-i18n="aboutDisclaimerHindi">
+              <p class="text-xs sm:text-sm font-medium text-[var(--text)]" data-i18n="aboutDisclaimerHindi">
                 • "यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।"
               </p>
-              <p class="text-xs font-sans text-[var(--text-secondary)]" data-i18n="aboutDisclaimerEnglish">
+              <p class="text-xs font-sans text-[var(--muted)]" data-i18n="aboutDisclaimerEnglish">
                 • "This is a citizen initiative, not a political party."
               </p>
             </div>
@@ -353,9 +336,8 @@
             <div class="flex items-center gap-3 pt-2 flex-wrap">
               <a
                 href="mailto:contact@gaddhemeparty.in"
-                class="px-4 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--text-primary)] font-heading font-bold text-xs flex items-center gap-2 border border-[var(--border-color)] transition shadow-sm"
+                class="btn-secondary text-xs"
               >
-                <span>📧</span>
                 <span data-i18n="aboutContactBtn">संपर्क करें (contact@gaddhemeparty.in)</span>
               </a>
             </div>
@@ -364,35 +346,35 @@
 
         <!-- 8. Terms of Use & Privacy Policy Section -->
         <section id="terms" class="w-full max-w-6xl mx-auto px-4 content-auto reveal-on-scroll space-y-6">
-          <div class="p-6 sm:p-8 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-color)] shadow-xl space-y-6">
+          <div class="p-6 sm:p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm space-y-6">
             <div>
-              <span class="text-xs font-heading font-bold text-[var(--accent-amber-text)] uppercase tracking-wider" data-i18n="termsBadge">Legal & Transparency</span>
-              <h2 class="text-xl sm:text-2xl font-heading font-extrabold text-[var(--text-primary)] mt-1" data-i18n="termsTitle">नियम व शर्तें एवं गोपनीयता नीति (Terms & Privacy)</h2>
-              <p class="text-xs text-[var(--text-secondary)] mt-1" data-i18n="termsSubtitle">इस प्लेटफ़ॉर्म का उपयोग करके आप निम्नलिखित नियमों और गोपनीयता नीतियों से सहमत होते हैं।</p>
+              <span class="text-xs font-semibold text-[var(--accent)] uppercase tracking-wider" data-i18n="termsBadge">Legal & Transparency</span>
+              <h2 class="text-xl sm:text-2xl font-heading font-bold text-[var(--text)] mt-1" data-i18n="termsTitle">नियम व शर्तें एवं गोपनीयता नीति (Terms & Privacy)</h2>
+              <p class="text-xs text-[var(--muted)] mt-1" data-i18n="termsSubtitle">इस प्लेटफ़ॉर्म का उपयोग करके आप निम्नलिखित नियमों और गोपनीयता नीतियों से सहमत होते हैं।</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs text-[var(--text-secondary)] leading-relaxed">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs text-[var(--muted)] leading-relaxed">
               <!-- Clause 1 -->
-              <div class="p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2 shadow-sm">
-                <h4 class="font-heading font-bold text-[var(--text-primary)] text-sm" data-i18n="legalDisclaimerHeader">१. मरम्मत की कोई गारंटी नहीं (No Repair Guarantee)</h4>
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalDisclaimerHeader">१. मरम्मत की कोई गारंटी नहीं (No Repair Guarantee)</h4>
                 <p data-i18n="legalDisclaimerText">गड्ढे में पार्टी एक क्राउड-सोर्स्ड नागरिक मैपिंग टूल है। हम केवल डेटा एकत्र और सार्वजनिक करते हैं; हम किसी भी गड्ढे की मरम्मत करने या सरकारी कार्यवाई की गारंटी नहीं देते।</p>
               </div>
 
               <!-- Clause 2 -->
-              <div class="p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2 shadow-sm">
-                <h4 class="font-heading font-bold text-[var(--text-primary)] text-sm" data-i18n="legalContentRulesHeader">२. यूज़र सामग्री नियम (Content Rules)</h4>
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalContentRulesHeader">२. यूज़र सामग्री नियम (Content Rules)</h4>
                 <p data-i18n="legalContentRulesText">उपयोगकर्ता केवल सड़क के गड्ढों और सड़क क्षति की प्रामाणिक तस्वीरें ही अपलोड करें। किसी भी व्यक्ति का चेहरा, निजी संपत्ति, वाहन की नंबर प्लेट, या आपत्तिजनक सामग्री पोस्ट करना सख्त मना है।</p>
               </div>
 
               <!-- Clause 3 -->
-              <div class="p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2 shadow-sm">
-                <h4 class="font-heading font-bold text-[var(--text-primary)] text-sm" data-i18n="legalDataRetentionHeader">३. डेटा संग्रह और प्राइवेसी (What We Collect)</h4>
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalDataRetentionHeader">३. डेटा संग्रह और प्राइवेसी (What We Collect)</h4>
                 <p data-i18n="legalDataRetentionText">हम कोई व्यक्तिगत नाम या ईमेल स्टोर नहीं करते। केवल फोटो, गड्ढे के GPS निर्देशांक, सुरक्षा के लिए हैशेड IP और अनाम सेशन आईडी दर्ज की जाती है।</p>
               </div>
 
               <!-- Clause 4 -->
-              <div class="p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] space-y-2 shadow-sm">
-                <h4 class="font-heading font-bold text-[var(--text-primary)] text-sm" data-i18n="legalRemovalHeader">४. सामग्री हटाने का अनुरोध (Removal Requests)</h4>
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalRemovalHeader">४. सामग्री हटाने का अनुरोध (Removal Requests)</h4>
                 <p data-i18n="legalRemovalText">यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या contact@gaddhemeparty.in पर हटाए जाने का अनुरोध भेज सकते हैं।</p>
               </div>
             </div>
@@ -406,39 +388,39 @@
       </section>
 
       <!-- 9. Footer -->
-      <footer class="w-full border-t border-[var(--border-color)] bg-[var(--bg-surface)] py-10 px-4 transition-colors duration-200">
+      <footer class="w-full border-t border-[var(--border)] bg-[var(--surface)] py-8 px-4 transition-colors duration-200">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div class="flex items-center gap-3">
-            <img src="/logo.svg" alt="Logo" class="w-10 h-10 rounded-xl" />
+            <img src="/logo.svg" alt="Logo" class="w-8 h-8 rounded-lg" />
             <div>
-              <p class="font-heading font-extrabold text-base text-[var(--text-primary)]" data-i18n="appNameHindi">गड्ढे में पार्टी</p>
-              <p class="text-xs text-[var(--accent-amber-text)] font-heading">"<span data-i18n="tagline">जहाँ गड्ढा, वहाँ पार्टी</span>"</p>
+              <p class="font-heading font-bold text-sm text-[var(--text)]" data-i18n="appNameHindi">गड्ढे में पार्टी</p>
+              <p class="text-xs text-[var(--accent)] font-medium">"<span data-i18n="tagline">जहाँ गड्ढा, वहाँ पार्टी</span>"</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-4 text-xs font-semibold text-[var(--text-secondary)] flex-wrap justify-center">
-            <a href="#map-section" class="hover:text-amber-500 transition" data-i18n="footerMap">नक्शा</a>
-            <a href="#/leaderboard" class="hover:text-amber-500 transition" data-i18n="footerLeaderboard">लीडरबोर्ड</a>
-            <a href="#/mission" class="hover:text-amber-500 transition" data-i18n="footerMission">उद्देश्य</a>
-            <a href="#/how" class="hover:text-amber-500 transition" data-i18n="footerFaq">FAQ</a>
-            <a href="#/about" class="hover:text-amber-500 transition" data-i18n="footerAbout">हमारे बारे में</a>
-            <a href="#/terms" class="hover:text-amber-500 transition" data-i18n="footerTerms">नियम व प्राइवेसी</a>
+          <div class="flex items-center gap-4 text-xs font-medium text-[var(--muted)] flex-wrap justify-center">
+            <a href="#map-section" class="hover:text-[var(--text)] transition" data-i18n="footerMap">नक्शा</a>
+            <a href="#/leaderboard" class="hover:text-[var(--text)] transition" data-i18n="footerLeaderboard">लीडरबोर्ड</a>
+            <a href="#/mission" class="hover:text-[var(--text)] transition" data-i18n="footerMission">उद्देश्य</a>
+            <a href="#/how" class="hover:text-[var(--text)] transition" data-i18n="footerFaq">FAQ</a>
+            <a href="#/about" class="hover:text-[var(--text)] transition" data-i18n="footerAbout">हमारे बारे में</a>
+            <a href="#/terms" class="hover:text-[var(--text)] transition" data-i18n="footerTerms">नियम व प्राइवेसी</a>
           </div>
 
-          <div class="text-xs text-[var(--text-muted)] font-medium" data-i18n="footerCopyright">
+          <div class="text-xs text-[var(--muted)] font-normal" data-i18n="footerCopyright">
             © 2026 गड्ढे में पार्टी • 100% Free Civic Tech
           </div>
         </div>
       </footer>
 
-      <!-- Sticky Bottom Mobile CTA (Appears when map is scrolled out of viewport) -->
-      <div id="sticky-mobile-cta" class="fixed bottom-4 left-4 right-4 z-[990] hidden md:hidden transition-all duration-300 pointer-events-auto">
+      <!-- Sticky Bottom Mobile CTA -->
+      <div id="sticky-mobile-cta" class="fixed bottom-4 left-4 right-4 z-[990] hidden md:hidden transition-all duration-200 pointer-events-auto">
         <button
           id="btn-sticky-report"
           type="button"
-          class="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 active:scale-[0.98] text-slate-950 font-heading font-extrabold text-sm py-3 px-5 rounded-2xl shadow-2xl flex items-center justify-center gap-2 border border-amber-300/40 cursor-pointer"
+          class="btn-primary w-full py-3 px-5 shadow-lg text-sm font-semibold"
         >
-          <span class="w-5 h-5 rounded-md bg-slate-950/20 flex items-center justify-center text-slate-950 font-bold">+</span>
+          <svg class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
           <span data-i18n="reportBtn">खराब रास्ता रिपोर्ट करें</span>
         </button>
       </div>
@@ -457,4 +439,3 @@
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
-

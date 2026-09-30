@@ -8,28 +8,43 @@ export default {
   theme: {
     extend: {
       colors: {
+        bg: 'var(--bg)',
+        surface: 'var(--surface)',
+        'surface-2': 'var(--surface-2)',
+        border: 'var(--border)',
+        text: 'var(--text)',
+        muted: 'var(--muted)',
+        accent: 'var(--accent)',
+        'accent-ink': 'var(--accent-ink)',
+        danger: 'var(--danger)',
+        success: 'var(--success)',
         brand: {
-          navy: '#080C14',
-          slate: '#0F172A',
-          card: '#131C2E',
+          navy: '#0B0F14',
+          slate: '#12171E',
+          card: '#182028',
           cardLight: '#FFFFFF',
-          border: '#1E293B',
-          borderLight: '#E2E8F0',
-          amber: '#F59E0B',
+          border: '#232B36',
+          borderLight: '#E3E3DC',
+          amber: '#F5B301',
           amberHover: '#D97706',
-          rose: '#EF4444',
-          roseHover: '#DC2626',
-          emerald: '#10B981',
-          chai: '#E07A5F'
+          rose: '#E5484D',
+          roseHover: '#C5282E',
+          emerald: '#30A46C',
+          chai: '#F5B301'
         }
       },
       fontFamily: {
-        heading: ['"Baloo 2"', '"Noto Sans Devanagari"', 'cursive', 'sans-serif'],
-        sans: ['"Poppins"', '"Inter"', '"Noto Sans Devanagari"', 'sans-serif']
+        heading: ['"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+      },
+      borderRadius: {
+        'btn': '12px',
+        'card': '16px',
+        'chip': '8px'
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        'pill': '0 10px 25px -5px rgba(245, 158, 11, 0.4), 0 8px 10px -6px rgba(245, 158, 11, 0.2)'
+        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+        'dropdown': '0 4px 12px 0 rgba(0, 0, 0, 0.15)'
       }
     },
   },
