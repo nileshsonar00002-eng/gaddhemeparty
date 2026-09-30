@@ -400,20 +400,14 @@ export class LeafletAdapter extends MapAdapter {
       iconAnchor: [0, 0]
     });
 
-    if (!this.map.getPane('confirmMarkerPane')) {
-      const p = this.map.createPane('confirmMarkerPane');
-      p.style.zIndex = '999995';
-    }
-
     this.confirmMarker = L.marker([lat, lng], {
       draggable: true,
       icon: pinIcon,
-      pane: 'confirmMarkerPane',
       zIndexOffset: 100000
     }).addTo(this.map);
 
     if (this.confirmMarker._icon) {
-      this.confirmMarker._icon.style.zIndex = '999995';
+      this.confirmMarker._icon.style.zIndex = '999999';
     }
 
     this.confirmMarker.on('drag', () => {
