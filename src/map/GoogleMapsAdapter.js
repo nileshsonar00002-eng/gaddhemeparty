@@ -180,6 +180,15 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.isGestureActive = false;
   }
 
+  getCenter() {
+    if (!this.map) return { lat: 18.5204, lng: 73.8567 };
+    const center = this.map.getCenter();
+    return {
+      lat: typeof center?.lat === 'function' ? center.lat() : (center?.lat || 18.5204),
+      lng: typeof center?.lng === 'function' ? center.lng() : (center?.lng || 73.8567)
+    };
+  }
+
   async loadGoogleMapsScript(apiKey) {
     if (window.google && window.google.maps) {
       return window.google.maps;

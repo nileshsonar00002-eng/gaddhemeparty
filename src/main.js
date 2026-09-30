@@ -78,6 +78,18 @@ class KhaddaApp {
     const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
     if (provider === 'google' && googleKey) {
+      window.gm_authFailure = () => {
+        console.warn('[Map] Google Maps API key authentication error. Switching to Leaflet...');
+        if (this.mapAdapter && !(this.mapAdapter instanceof LeafletAdapter)) {
+          try { this.mapAdapter.destroy?.(); } catch (_) {}
+          const mapEl = document.getElementById('map');
+          if (mapEl) mapEl.innerHTML = '';
+          this.mapAdapter = new LeafletAdapter();
+          this.mapAdapter.init('map', { theme: this.mapTheme });
+          this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+        }
+      };
+
       try {
         console.log('[Map] Initializing Google Maps JS API with region=IN...');
         this.mapAdapter = new GoogleMapsAdapter();

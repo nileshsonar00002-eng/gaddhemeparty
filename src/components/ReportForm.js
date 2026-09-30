@@ -5,6 +5,7 @@ import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
 import { INDIAN_CITIES } from '../utils/cities';
+import { DARK_MAP_STYLE, LIGHT_MAP_STYLE } from '../map/GoogleMapsAdapter';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
@@ -22,8 +23,10 @@ export function renderReportForm(container, options = {}) {
   let processedImageData = null;
   const quota = getActionQuota();
 
-  let miniMap = null;
-  let miniMarker = null;
+  let googleMiniMap = null;
+  let googleMiniMarker = null;
+  let leafletMiniMap = null;
+  let leafletMiniMarker = null;
 
   const formatCoords = (coords) => {
     if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return '18.62980, 73.79970';
@@ -245,7 +248,7 @@ export function renderReportForm(container, options = {}) {
   const confirmSpotOverlay = container.querySelector('#confirm-spot-overlay');
   const confirmSpotBtn = container.querySelector('#btn-confirm-spot');
 
-  // Draggable Pin Icon definition
+  // Draggable Pin Icon definition for Leaflet fallback
   const pinIcon = L.divIcon({
     className: 'custom-report-pin',
     html: `
@@ -308,59 +311,114 @@ export function renderReportForm(container, options = {}) {
 
   const initMiniMap = () => {
     const mapMount = container.querySelector('#report-mini-map');
-    if (!mapMount || miniMap) return;
+    if (!mapMount || googleMiniMap || leafletMiniMap) return;
 
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-    const tileUrl = currentTheme === 'light'
-      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
 
-    miniMap = L.map(mapMount, {
-      center: [currentCoordinates.lat, currentCoordinates.lng],
-      zoom: 16,
-      zoomControl: true,
-      attributionControl: false,
-      scrollWheelZoom: true,
-      dragging: true,
-      touchZoom: true
-    });
+    // 1. Prefer Google Maps if JS API is loaded and available
+    if (window.google && window.google.maps && typeof window.google.maps.Map === 'function') {
+      try {
+        const gCenter = { lat: currentCoordinates.lat, lng: currentCoordinates.lng };
+        googleMiniMap = new google.maps.Map(mapMount, {
+          center: gCenter,
+          zoom: 16,
+          disableDefaultUI: true,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          clickableIcons: false,
+          styles: isDark ? DARK_MAP_STYLE : LIGHT_MAP_STYLE
+        });
 
-    L.tileLayer(tileUrl, {
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(miniMap);
+        googleMiniMarker = new google.maps.Marker({
+          position: gCenter,
+          map: googleMiniMap,
+          draggable: true,
+          title: isHindi ? 'गड्ढे का स्थान (खींचें)' : 'Pothole Location (Drag)'
+        });
 
-    miniMarker = L.marker([currentCoordinates.lat, currentCoordinates.lng], {
-      draggable: true,
-      icon: pinIcon
-    }).addTo(miniMap);
+        googleMiniMarker.addListener('dragend', (e) => {
+          if (!e.latLng) return;
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
+          currentCoordinates.lat = lat;
+          currentCoordinates.lng = lng;
+          currentCoordinates.accuracy = 5;
+          markLocationConfirmed(true);
+          updateGpsUI(currentCoordinates, false);
+        });
 
-    // Marker drag events
-    miniMarker.on('dragend', () => {
-      const pos = miniMarker.getLatLng();
-      currentCoordinates.lat = pos.lat;
-      currentCoordinates.lng = pos.lng;
-      currentCoordinates.accuracy = 5;
-      markLocationConfirmed(true);
-      updateGpsUI(currentCoordinates, false);
-    });
+        googleMiniMap.addListener('click', (e) => {
+          if (!e.latLng) return;
+          googleMiniMarker?.setPosition(e.latLng);
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
+          currentCoordinates.lat = lat;
+          currentCoordinates.lng = lng;
+          currentCoordinates.accuracy = 5;
+          markLocationConfirmed(true);
+          updateGpsUI(currentCoordinates, false);
+        });
 
-    // Map click moves pin
-    miniMap.on('click', (e) => {
-      miniMarker.setLatLng(e.latlng);
-      currentCoordinates.lat = e.latlng.lat;
-      currentCoordinates.lng = e.latlng.lng;
-      currentCoordinates.accuracy = 5;
-      markLocationConfirmed(true);
-      updateGpsUI(currentCoordinates, false);
-    });
+        return;
+      } catch (gErr) {
+        console.warn('[ReportForm] Google Maps mini-map fallback to Leaflet:', gErr);
+      }
+    }
 
-    setTimeout(() => {
-      miniMap?.invalidateSize();
-    }, 250);
+    // 2. Leaflet Fallback (100% Free Carto/OSM tiles without API key requirements)
+    try {
+      const tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+      leafletMiniMap = L.map(mapMount, {
+        center: [currentCoordinates.lat, currentCoordinates.lng],
+        zoom: 16,
+        zoomControl: true,
+        attributionControl: false,
+        scrollWheelZoom: true,
+        dragging: true,
+        touchZoom: true
+      });
+
+      L.tileLayer(tileUrl, {
+        subdomains: 'abcd',
+        maxZoom: 19
+      }).addTo(leafletMiniMap);
+
+      leafletMiniMarker = L.marker([currentCoordinates.lat, currentCoordinates.lng], {
+        draggable: true,
+        icon: pinIcon
+      }).addTo(leafletMiniMap);
+
+      leafletMiniMarker.on('dragend', () => {
+        const pos = leafletMiniMarker.getLatLng();
+        currentCoordinates.lat = pos.lat;
+        currentCoordinates.lng = pos.lng;
+        currentCoordinates.accuracy = 5;
+        markLocationConfirmed(true);
+        updateGpsUI(currentCoordinates, false);
+      });
+
+      leafletMiniMap.on('click', (e) => {
+        leafletMiniMarker.setLatLng(e.latlng);
+        currentCoordinates.lat = e.latlng.lat;
+        currentCoordinates.lng = e.latlng.lng;
+        currentCoordinates.accuracy = 5;
+        markLocationConfirmed(true);
+        updateGpsUI(currentCoordinates, false);
+      });
+
+      setTimeout(() => {
+        leafletMiniMap?.invalidateSize();
+      }, 250);
+    } catch (lErr) {
+      console.warn('[ReportForm] Leaflet mini-map init error:', lErr);
+    }
   };
 
-  // Initialize mini-map after DOM is appended
+  // Initialize mini-map after DOM is mounted
   setTimeout(() => {
     initMiniMap();
   }, 50);
@@ -419,10 +477,17 @@ export function renderReportForm(container, options = {}) {
       gpsCoordsText.textContent = formatCoords(coords);
     }
 
-    // Update mini-map and marker if initialized
-    if (miniMap && miniMarker) {
-      miniMarker.setLatLng([coords.lat, coords.lng]);
-      miniMap.setView([coords.lat, coords.lng], 16, { animate: true });
+    // Update Google Maps mini-map if active
+    if (googleMiniMap && googleMiniMarker) {
+      const gPos = { lat: coords.lat, lng: coords.lng };
+      googleMiniMarker.setPosition(gPos);
+      googleMiniMap.panTo(gPos);
+    }
+
+    // Update Leaflet mini-map if active
+    if (leafletMiniMap && leafletMiniMarker) {
+      leafletMiniMarker.setLatLng([coords.lat, coords.lng]);
+      leafletMiniMap.setView([coords.lat, coords.lng], 16, { animate: true });
     }
   };
 
