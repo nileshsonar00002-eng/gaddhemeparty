@@ -594,28 +594,45 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.clearConfirmLocationMarker();
     if (!this.map || !window.google || !window.google.maps) return;
 
-    // Pulsing / Blinking aura overlay behind the manual draggable pin
-    const pulseHtml = `
-      <div class="confirm-pin-pulse-dot relative flex items-center justify-center pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
-        <div class="absolute w-12 h-12 bg-red-500 rounded-full animate-ping opacity-75"></div>
-        <div class="absolute w-8 h-8 bg-red-500/40 rounded-full animate-pulse"></div>
+    // Visual Red Pin & Pulsing Live Aura in floatPane (Always renders on top of all pothole clusters & pins)
+    const pinOverlayHtml = `
+      <div class="custom-draggable-report-pin relative flex flex-col items-center transform -translate-x-1/2 -translate-y-full pointer-events-none select-none" style="z-index: 999995;">
+        <!-- Live Blinking / Pulsing Aura -->
+        <div class="absolute -top-1.5 -left-1.5 w-13 h-13 bg-red-500 rounded-full animate-ping opacity-75"></div>
+        <div class="absolute -top-1 -left-1 w-12 h-12 bg-red-500/40 rounded-full animate-pulse"></div>
+
+        <!-- Red Pin Body -->
+        <div class="relative w-10 h-10 rounded-full bg-red-600 text-white shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-red-900/40">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+        </div>
+
+        <!-- Base Ground Pulsing Dot -->
+        <div class="relative flex items-center justify-center mt-0.5">
+          <div class="absolute w-6 h-6 bg-red-500/60 rounded-full animate-ping"></div>
+          <div class="w-3.5 h-1.5 bg-black/50 rounded-full blur-[1px]"></div>
+        </div>
       </div>
     `;
 
     this.confirmPulseOverlay = new HTMLMarkerOverlay(
       this.map,
       { lat, lng },
-      pulseHtml,
+      pinOverlayHtml,
       null,
-      999998
+      999995,
+      'floatPane'
     );
 
+    // Draggable marker for Google Maps native drag interaction
     const pinSvg = {
       path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
       fillColor: '#DC2626',
-      fillOpacity: 1,
+      fillOpacity: 0.01,
       strokeColor: '#FFFFFF',
-      strokeWeight: 2,
+      strokeOpacity: 0.01,
+      strokeWeight: 1,
       scale: 1.8,
       anchor: new google.maps.Point(12, 22)
     };
