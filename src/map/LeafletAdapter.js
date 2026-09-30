@@ -383,9 +383,15 @@ export class LeafletAdapter extends MapAdapter {
       iconAnchor: [0, 0]
     });
 
+    if (!this.map.getPane('confirmMarkerPane')) {
+      const pane = this.map.createPane('confirmMarkerPane');
+      pane.style.zIndex = '999999';
+    }
+
     this.confirmMarker = L.marker([lat, lng], {
       draggable: true,
       icon: pinIcon,
+      pane: 'confirmMarkerPane',
       zIndexOffset: 100000
     }).addTo(this.map);
 

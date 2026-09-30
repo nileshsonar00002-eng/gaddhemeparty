@@ -97,12 +97,13 @@ export const LIGHT_MAP_STYLE = [
 
 // Custom Overlay to render animated HTML pins on Google Maps
 class HTMLMarkerOverlay {
-  constructor(map, position, htmlContent, onClick, zIndex = 10) {
+  constructor(map, position, htmlContent, onClick, zIndex = 10, paneName = 'overlayMouseTarget') {
     this.map = map;
     this.position = new google.maps.LatLng(position.lat, position.lng);
     this.htmlContent = htmlContent;
     this.onClick = onClick;
     this.zIndex = zIndex;
+    this.paneName = paneName;
     this.div = null;
 
     this.overlay = new google.maps.OverlayView();
@@ -116,7 +117,6 @@ class HTMLMarkerOverlay {
       self.div.style.height = '0px';
       self.div.style.margin = '0px';
       self.div.style.padding = '0px';
-      self.div.style.pointerEvents = 'none';
       self.div.style.userSelect = 'none';
       self.div.style.zIndex = String(self.zIndex || 10);
       self.div.innerHTML = self.htmlContent;
@@ -129,8 +129,9 @@ class HTMLMarkerOverlay {
       }
 
       const panes = this.getPanes();
-      if (panes && panes.overlayMouseTarget) {
-        panes.overlayMouseTarget.appendChild(self.div);
+      const targetPane = (panes && panes[self.paneName]) ? panes[self.paneName] : (panes ? panes.overlayMouseTarget : null);
+      if (targetPane) {
+        targetPane.appendChild(self.div);
       }
     };
 
@@ -591,97 +592,144 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.clearConfirmLocationMarker();
     if (!this.map || !window.google || !window.google.maps) return;
 
-    // Pulsing / Blinking aura overlay behind the manual draggable pin
-    const pulseHtml = `
-      <div class="confirm-pin-pulse-dot relative flex items-center justify-center pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
-        <div class="absolute w-12 h-12 bg-red-500 rounded-full animate-ping opacity-75"></div>
-        <div class="absolute w-8 h-8 bg-red-500/40 rounded-full animate-pulse"></div>
+    this.confirmMarkerPos = { lat, lng };
+
+    const pinHtml = `
+      <div id="gmap-draggable-confirm-pin" class="custom-draggable-report-pin relative flex flex-col items-center cursor-grab active:cursor-grabbing transform -translate-x-1/2 -translate-y-full hover:scale-105 transition duration-150 select-none" style="z-index: 999999; pointer-events: auto; touch-action: none;">
+        <!-- Live Blinking / Pulsing Aura -->
+        <div class="absolute -top-1.5 -left-1.5 w-13 h-13 bg-red-500 rounded-full animate-ping opacity-75 pointer-events-none"></div>
+        <div class="absolute -top-1 -left-1 w-12 h-12 bg-red-500/40 rounded-full animate-pulse pointer-events-none"></div>
+
+        <!-- Red Pin Body -->
+        <div class="relative w-10 h-10 rounded-full bg-red-600 text-white shadow-2xl flex items-center justify-center border-2 border-white ring-2 ring-red-900/40 pointer-events-none">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+        </div>
+
+        <!-- Base Ground Pulsing Dot -->
+        <div class="relative flex items-center justify-center mt-0.5 pointer-events-none">
+          <div class="absolute w-6 h-6 bg-red-500/60 rounded-full animate-ping pointer-events-none"></div>
+          <div class="w-3.5 h-1.5 bg-black/50 rounded-full blur-[1px]"></div>
+        </div>
       </div>
     `;
 
-    this.confirmPulseOverlay = new HTMLMarkerOverlay(
+    this.confirmOverlay = new HTMLMarkerOverlay(
       this.map,
       { lat, lng },
-      pulseHtml,
+      pinHtml,
       null,
-      999998
+      999999,
+      'floatPane'
     );
 
-    const pinSvg = {
-      path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
-      fillColor: '#DC2626',
-      fillOpacity: 1,
-      strokeColor: '#FFFFFF',
-      strokeWeight: 2,
-      scale: 1.8,
-      anchor: new google.maps.Point(12, 22)
-    };
-
-    this.confirmMarker = new google.maps.Marker({
-      position: { lat, lng },
-      map: this.map,
-      draggable: true,
-      icon: pinSvg,
-      zIndex: 999999,
-      animation: google.maps.Animation.DROP,
-      title: 'गड्ढे का स्थान (ड्रैग करें)'
-    });
-
-    const notifyPos = (isDragEnd = false) => {
-      const pos = this.confirmMarker?.getPosition();
-      if (pos) {
-        const coords = { lat: pos.lat(), lng: pos.lng() };
-        if (this.confirmPulseOverlay) {
-          this.confirmPulseOverlay.setPosition(coords);
-        }
-        if (onPositionChange) {
-          onPositionChange(coords, isDragEnd);
-        }
+    // Setup Drag and Pointer event handlers for Google Maps
+    const setupDrag = () => {
+      const pinEl = document.getElementById('gmap-draggable-confirm-pin');
+      if (!pinEl) {
+        setTimeout(setupDrag, 40);
+        return;
       }
+
+      let isDragging = false;
+      const mapContainer = this.map.getDiv();
+
+      const onPointerDown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        isDragging = true;
+        pinEl.style.cursor = 'grabbing';
+        this.map.setOptions({ gestureHandling: 'none', draggable: false });
+
+        window.addEventListener('pointermove', onPointerMove, { passive: false });
+        window.addEventListener('pointerup', onPointerUp, { passive: false });
+        window.addEventListener('pointercancel', onPointerUp, { passive: false });
+        window.addEventListener('touchmove', onPointerMove, { passive: false });
+        window.addEventListener('touchend', onPointerUp, { passive: false });
+        window.addEventListener('mousemove', onPointerMove, { passive: false });
+        window.addEventListener('mouseup', onPointerUp, { passive: false });
+      };
+
+      const onPointerMove = (e) => {
+        if (!isDragging || !this.confirmOverlay || !this.confirmOverlay.overlay) return;
+        e.stopPropagation();
+        e.preventDefault();
+
+        const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
+        const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
+
+        const rect = mapContainer.getBoundingClientRect();
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        const projection = this.confirmOverlay.overlay.getProjection();
+        if (!projection) return;
+
+        const latLng = projection.fromContainerPixelToLatLng(new google.maps.Point(x, y));
+        if (latLng) {
+          this.confirmMarkerPos = { lat: latLng.lat(), lng: latLng.lng() };
+          this.confirmOverlay.setPosition(this.confirmMarkerPos);
+          if (onPositionChange) {
+            onPositionChange(this.confirmMarkerPos, false);
+          }
+        }
+      };
+
+      const onPointerUp = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        pinEl.style.cursor = 'grab';
+        this.map.setOptions({ gestureHandling: 'cooperative', draggable: true });
+
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+        window.removeEventListener('touchmove', onPointerMove);
+        window.removeEventListener('touchend', onPointerUp);
+        window.removeEventListener('mousemove', onPointerMove);
+        window.removeEventListener('mouseup', onPointerUp);
+
+        if (this.confirmMarkerPos && onPositionChange) {
+          onPositionChange(this.confirmMarkerPos, true);
+        }
+      };
+
+      pinEl.addEventListener('pointerdown', onPointerDown);
+      pinEl.addEventListener('touchstart', onPointerDown, { passive: false });
+      pinEl.addEventListener('mousedown', onPointerDown);
     };
 
-    this.confirmMarker.addListener('drag', () => notifyPos(false));
-    this.confirmMarker.addListener('dragend', () => notifyPos(true));
+    setupDrag();
 
     // Map click jumps draggable pin
     this.confirmMapClickListener = this.map.addListener('click', (e) => {
-      if (!e.latLng || !this.confirmMarker) return;
-      this.confirmMarker.setPosition(e.latLng);
-      this.confirmMarker.setZIndex(999999);
-      notifyPos(true);
+      if (!e.latLng || !this.confirmOverlay) return;
+      this.confirmMarkerPos = { lat: e.latLng.lat(), lng: e.latLng.lng() };
+      this.confirmOverlay.setPosition(this.confirmMarkerPos);
+      if (onPositionChange) {
+        onPositionChange(this.confirmMarkerPos, true);
+      }
     });
   }
 
   setConfirmMarkerPosition(lat, lng) {
-    if (this.confirmMarker && window.google && window.google.maps) {
-      const pos = new google.maps.LatLng(lat, lng);
-      this.confirmMarker.setPosition(pos);
-      this.confirmMarker.setZIndex(999999);
-      if (this.confirmPulseOverlay) {
-        this.confirmPulseOverlay.setPosition(pos);
-      }
+    this.confirmMarkerPos = { lat, lng };
+    if (this.confirmOverlay) {
+      this.confirmOverlay.setPosition({ lat, lng });
     }
   }
 
   getConfirmLocationPosition() {
-    if (this.confirmMarker) {
-      const pos = this.confirmMarker.getPosition();
-      if (pos) {
-        return { lat: pos.lat(), lng: pos.lng() };
-      }
-    }
-    return null;
+    return this.confirmMarkerPos || null;
   }
 
   clearConfirmLocationMarker() {
-    if (this.confirmMarker) {
-      this.confirmMarker.setMap(null);
-      this.confirmMarker = null;
+    if (this.confirmOverlay) {
+      this.confirmOverlay.setMap(null);
+      this.confirmOverlay = null;
     }
-    if (this.confirmPulseOverlay) {
-      this.confirmPulseOverlay.setMap(null);
-      this.confirmPulseOverlay = null;
-    }
+    this.confirmMarkerPos = null;
     if (this.confirmMapClickListener && window.google && window.google.maps) {
       google.maps.event.removeListener(this.confirmMapClickListener);
       this.confirmMapClickListener = null;
