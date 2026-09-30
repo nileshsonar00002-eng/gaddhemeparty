@@ -100,7 +100,7 @@
   }
 
   body {
-    font-family: 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Noto Sans Devanagari', 'Poppins', system-ui, -apple-system, sans-serif;
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 400;
@@ -155,7 +155,7 @@
   }
 
   h1, h2, h3, .font-heading {
-    font-family: 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    font-family: 'Baloo 2', 'Noto Sans Devanagari', cursive, sans-serif;
   }
 }
 
