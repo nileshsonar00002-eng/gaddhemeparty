@@ -736,3 +736,11 @@ html, body {
 .confirm-pin-pulse-dot * {
   z-index: 999998 !important;
 }
+
+/* User Live Blinking GPS Marker - Always on top of all pothole pins and clusters */
+.user-location-icon,
+.user-location-icon *,
+.user-live-gps-dot,
+.user-live-gps-dot * {
+  z-index: 999990 !important;
+}

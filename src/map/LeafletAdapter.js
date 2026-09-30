@@ -314,13 +314,22 @@ export class LeafletAdapter extends MapAdapter {
   setUserLocationMarker(lat, lng) {
     if (!this.map) return;
 
+    if (!this.map.getPane('userLocationPane')) {
+      const p = this.map.createPane('userLocationPane');
+      p.style.zIndex = '999990';
+    }
+
     if (this.userMarker) {
       this.userMarker.setLatLng([lat, lng]);
+      this.userMarker.setZIndexOffset(100000);
+      if (this.userMarker._icon) {
+        this.userMarker._icon.style.zIndex = '999990';
+      }
     } else {
       const userIcon = L.divIcon({
         className: 'user-location-icon',
         html: `
-          <div class="relative flex items-center justify-center w-8 h-8">
+          <div class="relative flex items-center justify-center w-8 h-8" style="z-index: 999990;">
             <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
             <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
             <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-lg"></div>
@@ -330,7 +339,15 @@ export class LeafletAdapter extends MapAdapter {
         iconAnchor: [16, 16]
       });
 
-      this.userMarker = L.marker([lat, lng], { icon: userIcon, zIndexOffset: 1000 }).addTo(this.map);
+      this.userMarker = L.marker([lat, lng], { 
+        icon: userIcon, 
+        pane: 'userLocationPane',
+        zIndexOffset: 100000 
+      }).addTo(this.map);
+
+      if (this.userMarker._icon) {
+        this.userMarker._icon.style.zIndex = '999990';
+      }
     }
   }
 

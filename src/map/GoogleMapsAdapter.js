@@ -97,12 +97,13 @@ export const LIGHT_MAP_STYLE = [
 
 // Custom Overlay to render animated HTML pins on Google Maps
 class HTMLMarkerOverlay {
-  constructor(map, position, htmlContent, onClick, zIndex = 10) {
+  constructor(map, position, htmlContent, onClick, zIndex = 10, paneName = 'overlayMouseTarget') {
     this.map = map;
     this.position = new google.maps.LatLng(position.lat, position.lng);
     this.htmlContent = htmlContent;
     this.onClick = onClick;
     this.zIndex = zIndex;
+    this.paneName = paneName;
     this.div = null;
 
     this.overlay = new google.maps.OverlayView();
@@ -129,8 +130,9 @@ class HTMLMarkerOverlay {
       }
 
       const panes = this.getPanes();
-      if (panes && panes.overlayMouseTarget) {
-        panes.overlayMouseTarget.appendChild(self.div);
+      const targetPane = (panes && panes[self.paneName]) ? panes[self.paneName] : (panes ? panes.overlayMouseTarget : null);
+      if (targetPane) {
+        targetPane.appendChild(self.div);
       }
     };
 
@@ -544,24 +546,25 @@ export class GoogleMapsAdapter extends MapAdapter {
     if (!this.map) return;
 
     if (this.userMarker) {
-      this.userMarker.setMap(null);
-      this.userMarker = null;
+      this.userMarker.setPosition({ lat, lng });
+    } else {
+      const htmlContent = `
+        <div class="user-live-gps-dot relative flex items-center justify-center w-8 h-8 pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="z-index: 999990;">
+          <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
+          <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
+          <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-xl"></div>
+        </div>
+      `;
+
+      this.userMarker = new HTMLMarkerOverlay(
+        this.map,
+        { lat, lng },
+        htmlContent,
+        null,
+        999990,
+        'floatPane'
+      );
     }
-
-    const htmlContent = `
-      <div class="user-live-gps-dot relative flex items-center justify-center w-8 h-8 pointer-events-none transform -translate-x-1/2 -translate-y-1/2">
-        <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
-        <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
-        <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-xl"></div>
-      </div>
-    `;
-
-    this.userMarker = new HTMLMarkerOverlay(
-      this.map,
-      { lat, lng },
-      htmlContent,
-      null
-    );
   }
 
   setAccuracyCircle(lat, lng, radius = 20000) {
