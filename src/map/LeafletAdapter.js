@@ -329,14 +329,19 @@ export class LeafletAdapter extends MapAdapter {
       const userIcon = L.divIcon({
         className: 'user-location-icon',
         html: `
-          <div class="relative flex items-center justify-center w-8 h-8" style="z-index: 999990;">
-            <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
-            <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
-            <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-lg"></div>
+          <div class="relative flex flex-col items-center justify-center pointer-events-none select-none transform -translate-x-1/2 -translate-y-1/2" style="z-index: 999990;">
+            <div class="mb-1 px-1.5 py-0.5 text-[9px] font-black tracking-wider uppercase rounded-full bg-cyan-400 text-slate-950 shadow-md border border-white whitespace-nowrap leading-none flex items-center justify-center">
+              YOU
+            </div>
+            <div class="relative flex items-center justify-center w-8 h-8">
+              <div class="absolute w-8 h-8 bg-cyan-500 rounded-full animate-ping opacity-75"></div>
+              <div class="absolute w-5 h-5 bg-cyan-400/40 rounded-full animate-pulse"></div>
+              <div class="relative w-4 h-4 bg-cyan-400 border-2 border-white rounded-full shadow-lg"></div>
+            </div>
           </div>
         `,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
       });
 
       this.userMarker = L.marker([lat, lng], { 
