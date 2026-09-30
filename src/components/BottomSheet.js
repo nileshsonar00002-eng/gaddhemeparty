@@ -1,109 +1,196 @@
-// Touch-draggable Mobile Bottom Sheet Drawer Component
+// Responsive Report Drawer / Bottom Sheet Component
+// Desktop (>= 768px): Right-side docked non-modal panel (440px wide, no backdrop, map interactive)
+// Mobile (< 768px): Modal Bottom Sheet (max-h 85dvh, backdrop, drag handle, swipe-to-close)
+
 import { modalManager } from '../utils/modalManager';
 
 export class BottomSheet {
   constructor(containerId = 'bottom-sheet-container') {
+    this.containerId = containerId;
     this.container = document.getElementById(containerId);
     this.isOpen = false;
     this.onCloseCallbacks = [];
+    this.onOpenCallbacks = [];
+    this.lastFocusedElement = null;
+    this.touchStartY = 0;
+    this.touchCurrentY = 0;
+    this.isDragging = false;
     this.init();
   }
 
   init() {
-    if (!this.container) return;
+    if (!this.container) {
+      let root = document.getElementById(this.containerId);
+      if (!root) {
+        root = document.createElement('div');
+        root.id = this.containerId;
+        root.className = 'z-[1050]';
+        document.body.appendChild(root);
+      }
+      this.container = root;
+    }
+
     this.container.innerHTML = `
-      <div id="sheet-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1040] opacity-0 pointer-events-none transition-opacity duration-300"></div>
-      <div id="sheet-drawer" class="fixed bottom-0 left-0 right-0 z-[1050] max-h-[90dvh] bg-[var(--bg-surface)] border-t border-[var(--border-color)] rounded-t-3xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out flex flex-col overflow-hidden pb-[env(safe-area-inset-bottom,16px)]">
-        <!-- Top Center Drag Handle & Close Button -->
-        <div class="w-full pt-2.5 pb-1.5 flex items-center justify-center relative select-none">
-          <button
-            id="sheet-top-close-btn"
-            type="button"
-            class="group flex items-center gap-1.5 px-4 py-1 rounded-full bg-[var(--bg-card-hover)] hover:bg-amber-500/20 active:scale-95 text-[var(--text-secondary)] hover:text-amber-400 border border-[var(--border-color)] hover:border-amber-500/40 shadow-sm transition-all duration-150 cursor-pointer focus:outline-none"
-            title="बंद करें (Close)"
-            aria-label="Close Report Window"
-          >
-            <svg class="w-4 h-4 text-amber-500 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
-            </svg>
-            <span class="text-xs font-heading font-bold tracking-wide">बंद करें / Close</span>
-          </button>
+      <!-- Modal Backdrop (Active ONLY on Mobile < 768px; md:hidden keeps desktop non-modal) -->
+      <div
+        id="sheet-backdrop"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1040] md:hidden opacity-0 pointer-events-none transition-opacity duration-250 ease-out"
+        aria-hidden="true"
+      ></div>
+
+      <!-- Drawer / Panel Container -->
+      <div
+        id="sheet-drawer"
+        role="dialog"
+        aria-modal="false"
+        aria-labelledby="report-panel-title"
+        class="fixed z-[1050] bg-[var(--surface)] text-[var(--text)] border-[var(--border)] shadow-2xl flex flex-col transition-transform duration-250 ease-out pointer-events-none
+               /* Mobile: Bottom Sheet */
+               bottom-0 left-0 right-0 max-h-[85dvh] rounded-t-3xl border-t translate-y-full pb-[env(safe-area-inset-bottom,12px)]
+               /* Desktop / Tablet (>= 768px): Right Docked Panel */
+               md:top-16 md:right-0 md:bottom-0 md:left-auto md:w-[440px] md:max-w-[440px] md:h-[calc(100dvh-4rem)] md:max-h-none md:rounded-none md:border-t-0 md:border-r-0 md:border-b-0 md:border-l md:translate-y-0 md:translate-x-full md:pb-0"
+      >
+        <!-- Mobile Top Drag Handle Bar -->
+        <div id="sheet-drag-handle" class="md:hidden w-full pt-2.5 pb-1 flex items-center justify-center cursor-grab active:cursor-grabbing select-none flex-shrink-0">
+          <div class="w-10 h-1.5 rounded-full bg-[var(--border)] opacity-80"></div>
         </div>
-        <!-- Content Container -->
-        <div id="sheet-content" class="px-5 pb-6 overflow-y-auto max-h-[82dvh] overscroll-contain"></div>
+
+        <!-- Scrollable Content Mount -->
+        <div id="sheet-content" class="flex-1 flex flex-col min-h-0 overflow-hidden w-full max-w-[460px] mx-auto"></div>
       </div>
     `;
 
     this.backdrop = document.getElementById('sheet-backdrop');
     this.drawer = document.getElementById('sheet-drawer');
     this.content = document.getElementById('sheet-content');
+    this.dragHandle = document.getElementById('sheet-drag-handle');
 
-    // Top center close button click
-    document.getElementById('sheet-top-close-btn')?.addEventListener('click', () => this.close());
-
-    // Click outside to close
+    // Click backdrop to close (mobile only)
     this.backdrop?.addEventListener('click', () => this.close());
 
-    // Touch Swipe down gesture support
-    let startY = 0;
-    let currentY = 0;
+    // Setup Mobile Swipe Down Gestures
+    this.setupMobileSwipe();
 
-    this.drawer?.addEventListener('touchstart', (e) => {
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-
-    this.drawer?.addEventListener('touchmove', (e) => {
-      currentY = e.touches[0].clientY;
-      const diff = currentY - startY;
-      if (diff > 0) {
-        // Dragging down
-        this.drawer.style.transform = `translateY(${diff}px)`;
-      }
-    }, { passive: true });
-
-    this.drawer?.addEventListener('touchend', () => {
-      const diff = currentY - startY;
-      if (diff > 120) {
+    // Setup Global Escape Key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.isOpen) {
+        e.preventDefault();
         this.close();
-      } else {
-        this.drawer.style.transform = 'translateY(0)';
       }
-      startY = 0;
-      currentY = 0;
+    });
+
+    // Handle screen resize to sync modal / non-modal states
+    window.addEventListener('resize', () => {
+      if (this.isOpen) {
+        const isDesktop = window.innerWidth >= 768;
+        this.drawer?.setAttribute('aria-modal', isDesktop ? 'false' : 'true');
+        if (isDesktop) {
+          this.backdrop?.classList.remove('opacity-100', 'pointer-events-auto');
+          this.backdrop?.classList.add('opacity-0', 'pointer-events-none');
+        } else {
+          this.backdrop?.classList.remove('opacity-0', 'pointer-events-none');
+          this.backdrop?.classList.add('opacity-100', 'pointer-events-auto');
+        }
+      }
     });
   }
 
-  open(htmlContent) {
-    if (!this.drawer || !this.backdrop) return;
-    this.content.innerHTML = htmlContent;
+  setupMobileSwipe() {
+    if (!this.drawer) return;
+
+    const handleTouchStart = (e) => {
+      if (window.innerWidth >= 768) return;
+      this.touchStartY = e.touches[0].clientY;
+      this.touchCurrentY = this.touchStartY;
+      this.isDragging = true;
+    };
+
+    const handleTouchMove = (e) => {
+      if (!this.isDragging || window.innerWidth >= 768) return;
+      this.touchCurrentY = e.touches[0].clientY;
+      const deltaY = this.touchCurrentY - this.touchStartY;
+      if (deltaY > 0) {
+        this.drawer.style.transform = `translateY(${deltaY}px)`;
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (!this.isDragging || window.innerWidth >= 768) return;
+      this.isDragging = false;
+      const deltaY = this.touchCurrentY - this.touchStartY;
+      if (deltaY > 100) {
+        this.close();
+      } else {
+        this.drawer.style.transform = '';
+      }
+      this.touchStartY = 0;
+      this.touchCurrentY = 0;
+    };
+
+    this.dragHandle?.addEventListener('touchstart', handleTouchStart, { passive: true });
+    this.dragHandle?.addEventListener('touchmove', handleTouchMove, { passive: true });
+    this.dragHandle?.addEventListener('touchend', handleTouchEnd);
+  }
+
+  open(htmlContent = '') {
+    if (!this.drawer) return;
+    if (htmlContent && this.content) {
+      this.content.innerHTML = htmlContent;
+    }
+
     this.isOpen = true;
+    this.lastFocusedElement = document.activeElement;
 
-    modalManager.openModal('report-bottom-sheet', () => this.close(false));
+    const isDesktop = window.innerWidth >= 768;
+    this.drawer.setAttribute('aria-modal', isDesktop ? 'false' : 'true');
 
-    this.backdrop.classList.remove('opacity-0', 'pointer-events-none');
-    this.backdrop.classList.add('opacity-100', 'pointer-events-auto');
+    // On mobile, register with modalManager for back-button & focus management
+    if (!isDesktop) {
+      modalManager.openModal('report-bottom-sheet', () => this.close(false));
+      this.backdrop?.classList.remove('opacity-0', 'pointer-events-none');
+      this.backdrop?.classList.add('opacity-100', 'pointer-events-auto');
+    } else {
+      this.backdrop?.classList.remove('opacity-100', 'pointer-events-auto');
+      this.backdrop?.classList.add('opacity-0', 'pointer-events-none');
+    }
 
-    this.drawer.classList.remove('translate-y-full');
-    this.drawer.style.transform = 'translateY(0)';
+    // Open Animation
+    this.drawer.classList.remove('pointer-events-none', 'translate-y-full', 'md:translate-x-full');
+    this.drawer.classList.add('pointer-events-auto', 'translate-y-0', 'md:translate-x-0');
+    this.drawer.style.transform = '';
+
+    this.onOpenCallbacks.forEach((fn) => fn());
   }
 
   close(notifyManager = true) {
-    if (!this.drawer || !this.backdrop) return;
+    if (!this.isOpen && !this.drawer) return;
     this.isOpen = false;
 
-    if (notifyManager) {
+    const isDesktop = window.innerWidth >= 768;
+
+    if (notifyManager && !isDesktop) {
       modalManager.closeActiveModal();
     } else {
       modalManager.notifyClosed('report-bottom-sheet');
     }
 
-    this.backdrop.classList.remove('opacity-100', 'pointer-events-auto');
-    this.backdrop.classList.add('opacity-0', 'pointer-events-none');
+    this.backdrop?.classList.remove('opacity-100', 'pointer-events-auto');
+    this.backdrop?.classList.add('opacity-0', 'pointer-events-none');
 
-    this.drawer.classList.add('translate-y-full');
-    this.drawer.style.transform = 'translateY(100%)';
+    // Close Animation
+    this.drawer.classList.remove('pointer-events-auto', 'translate-y-0', 'md:translate-x-0');
+    this.drawer.classList.add('pointer-events-none', 'translate-y-full', 'md:translate-x-full');
+    this.drawer.style.transform = '';
+
+    if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') {
+      try { this.lastFocusedElement.focus(); } catch (_) {}
+    }
 
     this.onCloseCallbacks.forEach((fn) => fn());
+  }
+
+  onOpen(cb) {
+    this.onOpenCallbacks.push(cb);
   }
 
   onClose(cb) {

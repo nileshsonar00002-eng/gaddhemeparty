@@ -341,6 +341,12 @@ export class GoogleMapsAdapter extends MapAdapter {
     return next;
   }
 
+  panBy(x, y) {
+    if (this.map && typeof this.map.panBy === 'function') {
+      this.map.panBy(x, y);
+    }
+  }
+
   setView(lat, lng, zoom = 16) {
     if (!this.map) return;
     this.map.panTo({ lat, lng });

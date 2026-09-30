@@ -51,11 +51,19 @@ class KhaddaApp {
     this.nightGlobe = null;
     this.hasFlownIn = false;
     this.knownPinIds = new Set();
+    this.isMapShiftedForReport = false;
     this.statsData = {
       totalReports: 0,
       todayReports: 0,
       topCity: '-'
     };
+
+    this.bottomSheet.onClose(() => {
+      if (this.isMapShiftedForReport) {
+        this.isMapShiftedForReport = false;
+        this.mapAdapter?.panBy?.(-200, 0);
+      }
+    });
   }
 
   async init() {
@@ -830,7 +838,14 @@ class KhaddaApp {
       showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
     }
 
-    this.bottomSheet.open('<div id="report-form-mount"></div>');
+    this.bottomSheet.open('<div id="report-form-mount" class="h-full"></div>');
+
+    // On Desktop / Tablet (>= 768px), shift map center so the pin stays visible in the remaining viewport
+    if (window.innerWidth >= 768 && !this.isMapShiftedForReport) {
+      this.isMapShiftedForReport = true;
+      this.mapAdapter?.panBy?.(200, 0);
+    }
+
     const mountPoint = document.getElementById('report-form-mount');
     if (!mountPoint) return;
 

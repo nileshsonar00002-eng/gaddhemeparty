@@ -210,6 +210,12 @@ export class LeafletAdapter extends MapAdapter {
     this.setView(this.defaultCenter[0], this.defaultCenter[1], this.defaultZoom);
   }
 
+  panBy(x, y) {
+    if (this.map && typeof this.map.panBy === 'function') {
+      this.map.panBy([x, y], { animate: true, duration: 0.25 });
+    }
+  }
+
   resize() {
     if (this.map) {
       this.map.invalidateSize();
