@@ -34,6 +34,7 @@ import { NightGlobe } from './components/NightGlobe';
 import { PanelManager } from './components/PanelManager';
 import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimation';
 import { router } from './utils/router';
+import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from './utils/geo';
 
 // Real Live Data Store
 class KhaddaApp {
@@ -43,7 +44,7 @@ class KhaddaApp {
     this.panelManager = null;
     this.leaderboardSection = new LeaderboardSection('leaderboard-mount');
     this.currentPins = [];
-    this.userCoords = null;
+    this.userCoords = getCachedUserLocation();
     this.mapTheme = 'dark';
     this.activeNav = 'map';
     this.starfield = null;
@@ -602,43 +603,34 @@ class KhaddaApp {
   }
 
   detectInitialLocation() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          this.userCoords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude
-          };
-          this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
-        },
-        () => {},
-        { timeout: 5000 }
-      );
-    }
+    getLiveUserLocation({ enableHighAccuracy: true, timeout: 8000, fallbackToCache: true })
+      .then((coords) => {
+        if (coords && coords.lat && coords.lng) {
+          this.userCoords = coords;
+          if (this.mapAdapter && this.mapAdapter.setUserLocationMarker) {
+            this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log('[App] Initial location background notice:', err.message);
+      });
   }
 
-  locateUserAndCenter() {
+  async locateUserAndCenter() {
     showToast(t('locating'), 'info', 2000);
-    if (!navigator.geolocation) {
-      showToast(t('gpsUnsupported'), 'error');
-      return;
+    try {
+      const coords = await getLiveUserLocation({ enableHighAccuracy: true, timeout: 12000, fallbackToCache: false });
+      this.userCoords = coords;
+      if (this.mapAdapter) {
+        this.mapAdapter.setUserLocationMarker(coords.lat, coords.lng);
+        this.mapAdapter.setView(coords.lat, coords.lng, 16);
+      }
+      showToast(t('locationFound'), 'success');
+    } catch (err) {
+      console.warn('[App] Locate user failed:', err);
+      showToast(t('locationDenied'), 'warning');
     }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        this.userCoords = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
-        this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
-        this.mapAdapter.setView(this.userCoords.lat, this.userCoords.lng, 16);
-        showToast(t('locationFound'), 'success');
-      },
-      () => {
-        showToast(t('locationDenied'), 'warning');
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
   }
 
   openReportDrawer() {
@@ -652,7 +644,7 @@ class KhaddaApp {
     if (!mountPoint) return;
 
     renderReportForm(mountPoint, {
-      currentCoordinates: this.userCoords,
+      currentCoordinates: this.userCoords || getCachedUserLocation(),
       onClose: () => this.bottomSheet.close(),
       onSubmit: async (formData) => {
         await this.handleReportSubmit(formData);
@@ -668,12 +660,23 @@ class KhaddaApp {
       return;
     }
 
+    const latitude = Number(formData.latitude ?? formData.coordinates?.lat ?? this.userCoords?.lat);
+    const longitude = Number(formData.longitude ?? formData.coordinates?.lng ?? this.userCoords?.lng);
+
+    if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+      showToast(t('gpsRequiredAlert'), 'error');
+      return;
+    }
+
+    this.userCoords = { lat: latitude, lng: longitude };
+    setCachedUserLocation(this.userCoords);
+
     const isOnline = navigator.onLine;
 
     if (!isOnline) {
       await saveReportOffline({
-        latitude: formData.latitude,
-        longitude: formData.longitude,
+        latitude,
+        longitude,
         landmark: formData.landmark,
         formOpenTime: formData.formOpenTime
       });
@@ -704,8 +707,8 @@ class KhaddaApp {
       }
 
       const reportPayload = {
-        latitude: formData.latitude,
-        longitude: formData.longitude,
+        latitude,
+        longitude,
         landmark: formData.landmark,
         imageUrl,
         thumbnailUrl,
@@ -721,54 +724,52 @@ class KhaddaApp {
         showToast(result.message || t('submitSuccess'), 'success', 5000);
       }
 
-      const nearestCity = getNearestIndianCity(formData.latitude, formData.longitude);
+      const nearestCity = getNearestIndianCity(latitude, longitude);
       let targetPin = null;
 
       if (result.deduplicated && result.pinId) {
         targetPin = this.currentPins.find((p) => p.id === result.pinId);
         if (targetPin) {
           targetPin.reportCount = (targetPin.reportCount || 1) + 1;
-          if (!Array.isArray(targetPin.images)) {
-            targetPin.images = targetPin.imageUrl ? [targetPin.imageUrl] : [];
-          }
-          if (imageUrl && !targetPin.images.includes(imageUrl)) {
+          if (imageUrl && targetPin.images) {
             targetPin.images.unshift(imageUrl);
           }
-          targetPin.imageUrl = imageUrl || targetPin.imageUrl;
-          targetPin.thumbnailUrl = thumbnailUrl || targetPin.thumbnailUrl;
         }
-      }
-
-      if (!targetPin) {
+      } else if (result.pinId) {
         targetPin = {
-          id: result.pinId || ('pin_' + Date.now()),
-          latitude: formData.latitude,
-          longitude: formData.longitude,
+          id: result.pinId,
+          latitude,
+          longitude,
           landmark: formData.landmark || t('defaultLandmark'),
           cityNameHindi: result.cityNameHindi || nearestCity.nameHindi,
           cityNameEnglish: result.cityNameEnglish || nearestCity.nameEnglish,
-          cityState: nearestCity.state,
-          reportCount: result.deduplicated ? 2 : 1,
+          imageUrl,
+          thumbnailUrl,
+          images: imageUrl ? [imageUrl] : [],
+          reportCount: 1,
           upvotes: 0,
-          daysOpen: 1,
-          createdAt: new Date(),
-          imageUrl: imageUrl || '',
-          thumbnailUrl: thumbnailUrl || imageUrl || '',
-          images: imageUrl ? [imageUrl] : []
+          status: 'active',
+          createdAt: new Date()
         };
         this.currentPins.unshift(targetPin);
       }
 
-      this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
-      this.mapAdapter.setView(formData.latitude, formData.longitude, 16);
+      // Re-render pins on map & center on new report
+      if (this.mapAdapter) {
+        this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+        this.mapAdapter.setView(latitude, longitude, 17);
+      }
 
+      // Close bottom sheet
       this.bottomSheet.close();
-      setTimeout(() => {
-        openPinDetailModal(targetPin);
-      }, 300);
-    } catch (error) {
-      console.error('Submit error:', error);
-      showToast(error.message || t('submitError'), 'error');
+
+      // Trigger celebratory animation
+      if (window.__khaddaTriggerPartyExplosion) {
+        window.__khaddaTriggerPartyExplosion();
+      }
+    } catch (err) {
+      console.error('[App] Report submission error:', err);
+      showToast(err.message || t('submitError'), 'error');
     }
   }
 

@@ -2,12 +2,16 @@ import { t } from '../utils/i18n';
 import { processPotholeImage } from '../utils/imageProcessor';
 import { getActionQuota } from '../utils/upvoteStorage';
 import { getLucideIcon } from '../utils/icons';
+import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation } from '../utils/geo';
 
 export function renderReportForm(container, options = {}) {
   const formOpenTime = Date.now();
-  let currentCoordinates = options.currentCoordinates || null;
+  let currentCoordinates = options.currentCoordinates || getCachedUserLocation() || null;
+  let isGpsAcquiring = false;
   let processedImageData = null;
   const quota = getActionQuota();
+
+  const isInitialLocked = Boolean(currentCoordinates && currentCoordinates.lat && currentCoordinates.lng);
 
   container.innerHTML = `
     <div class="space-y-4 text-[var(--text)]">
@@ -74,21 +78,21 @@ export function renderReportForm(container, options = {}) {
         </div>
       </div>
 
-      <!-- GPS Location Status Chip -->
-      <div class="bg-[var(--surface-2)] border border-[var(--border)] rounded-xl p-3">
+      <!-- GPS Location Status Chip (Auto-Locking & Live Status) -->
+      <div id="gps-status-card" class="bg-[var(--surface-2)] border ${isInitialLocked ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-[var(--border)]'} rounded-xl p-3 transition-colors duration-200">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-[var(--accent)]"></span>
-            <div>
-              <div id="gps-status-text" class="text-xs font-semibold text-[var(--text)]">
-                ${t('gpsSearching')}
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span id="gps-dot-indicator" class="w-2.5 h-2.5 rounded-full ${isInitialLocked ? 'bg-emerald-500' : 'bg-[var(--accent)] animate-ping'} shrink-0"></span>
+            <div class="min-w-0">
+              <div id="gps-status-text" class="text-xs font-semibold ${isInitialLocked ? 'text-emerald-500 dark:text-emerald-400' : 'text-[var(--text)]'} truncate">
+                ${isInitialLocked ? t('gpsLocked') : t('gpsSearching')}
               </div>
-              <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)]">
-                ${currentCoordinates ? `${currentCoordinates.lat.toFixed(5)}, ${currentCoordinates.lng.toFixed(5)}` : t('gpsSearching')}
+              <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)] truncate">
+                ${isInitialLocked ? `${currentCoordinates.lat.toFixed(5)}, ${currentCoordinates.lng.toFixed(5)}` : t('gpsSearching')}
               </div>
             </div>
           </div>
-          <button id="btn-refresh-gps" type="button" class="btn-secondary p-1.5 text-xs" title="${t('gpsRetry')}">
+          <button id="btn-refresh-gps" type="button" class="btn-secondary p-2 text-xs shrink-0 rounded-lg" title="${t('gpsRetry')}" aria-label="${t('gpsRetry')}">
             ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
           </button>
         </div>
@@ -144,6 +148,8 @@ export function renderReportForm(container, options = {}) {
   const submitSpinner = container.querySelector('#submit-btn-spinner');
   const submitText = container.querySelector('#submit-btn-text');
   const refreshGpsBtn = container.querySelector('#btn-refresh-gps');
+  const gpsStatusCard = container.querySelector('#gps-status-card');
+  const gpsDotIndicator = container.querySelector('#gps-dot-indicator');
   const gpsStatusText = container.querySelector('#gps-status-text');
   const gpsCoordsText = container.querySelector('#gps-coords-text');
 
@@ -182,29 +188,75 @@ export function renderReportForm(container, options = {}) {
     if (charCounter) charCounter.textContent = `${length}/100`;
   });
 
-  // GPS Refresh Handler
-  refreshGpsBtn?.addEventListener('click', () => {
-    if (gpsStatusText) gpsStatusText.textContent = t('gpsSearching');
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          currentCoordinates = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: pos.coords.accuracy
-          };
-          if (gpsStatusText) gpsStatusText.textContent = t('gpsLocked');
-          if (gpsCoordsText) {
-            gpsCoordsText.textContent = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-          }
-        },
-        (err) => {
-          console.warn('[ReportForm] Geolocation failed:', err);
-          if (gpsStatusText) gpsStatusText.textContent = t('locationDenied');
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
+  // Function to acquire and update GPS state smoothly
+  const acquireGps = async (forceRefresh = false) => {
+    if (isGpsAcquiring) return;
+    isGpsAcquiring = true;
+
+    if (!currentCoordinates || forceRefresh) {
+      if (gpsStatusText) {
+        gpsStatusText.textContent = t('gpsSearching');
+        gpsStatusText.className = 'text-xs font-semibold text-[var(--text)] truncate';
+      }
+      if (gpsDotIndicator) {
+        gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-[var(--accent)] animate-ping shrink-0';
+      }
     }
+
+    try {
+      const coords = await getLiveUserLocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: forceRefresh ? 0 : 30000,
+        fallbackToCache: !forceRefresh
+      });
+
+      if (coords && coords.lat && coords.lng) {
+        currentCoordinates = coords;
+        setCachedUserLocation(coords);
+
+        if (gpsStatusCard) {
+          gpsStatusCard.className = 'bg-[var(--surface-2)] border border-emerald-500/30 bg-emerald-500/5 rounded-xl p-3 transition-colors duration-200';
+        }
+        if (gpsDotIndicator) {
+          gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0';
+        }
+        if (gpsStatusText) {
+          gpsStatusText.textContent = t('gpsLocked');
+          gpsStatusText.className = 'text-xs font-semibold text-emerald-500 dark:text-emerald-400 truncate';
+        }
+        if (gpsCoordsText) {
+          gpsCoordsText.textContent = `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
+        }
+      }
+    } catch (err) {
+      console.warn('[ReportForm] Live GPS error:', err);
+      if (!currentCoordinates) {
+        if (gpsStatusCard) {
+          gpsStatusCard.className = 'bg-[var(--surface-2)] border border-rose-500/30 bg-rose-500/5 rounded-xl p-3 transition-colors duration-200';
+        }
+        if (gpsDotIndicator) {
+          gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0';
+        }
+        if (gpsStatusText) {
+          gpsStatusText.textContent = t('locationDenied');
+          gpsStatusText.className = 'text-xs font-semibold text-[var(--danger)] truncate';
+        }
+        if (gpsCoordsText) {
+          gpsCoordsText.textContent = 'GPS permission needed';
+        }
+      }
+    } finally {
+      isGpsAcquiring = false;
+    }
+  };
+
+  // Automatically acquire fresh GPS immediately on mount
+  acquireGps(false);
+
+  // Manual GPS Refresh Button Handler
+  refreshGpsBtn?.addEventListener('click', () => {
+    acquireGps(true);
   });
 
   // Submit Handler
@@ -221,9 +273,23 @@ export function renderReportForm(container, options = {}) {
       return;
     }
 
+    // If coordinates are still acquiring, wait up to 4s for GPS to resolve
     if (!currentCoordinates) {
-      alert(t('gpsRequiredAlert'));
-      return;
+      submitBtn.disabled = true;
+      submitSpinner?.classList.remove('hidden');
+      if (submitText) submitText.textContent = t('gpsSearching');
+
+      try {
+        await acquireGps(true);
+      } catch (e) {}
+
+      if (!currentCoordinates) {
+        submitBtn.disabled = false;
+        submitSpinner?.classList.add('hidden');
+        if (submitText) submitText.textContent = t('submitBtn');
+        alert(t('gpsRequiredAlert'));
+        return;
+      }
     }
 
     const landmark = landmarkInput?.value?.trim() || t('defaultLandmark');
@@ -236,9 +302,13 @@ export function renderReportForm(container, options = {}) {
     try {
       if (options.onSubmit) {
         await options.onSubmit({
+          latitude: currentCoordinates.lat,
+          longitude: currentCoordinates.lng,
           coordinates: currentCoordinates,
           landmark,
-          imageData: processedImageData
+          imageData: processedImageData,
+          formOpenTime,
+          website_hp: honeypotVal
         });
       }
     } catch (err) {

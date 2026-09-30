@@ -192,7 +192,7 @@ export async function callSubmitReport(reportPayload) {
         const d = docSnap.data();
         if (d.latitude && d.longitude) {
           const dist = haversineDistanceMeters(reportPayload.latitude, reportPayload.longitude, d.latitude, d.longitude);
-          if (dist <= 20) {
+          if (dist <= 5) {
             existingPinDoc = { id: docSnap.id, ref: docSnap.ref, data: d };
             break;
           }
@@ -238,7 +238,7 @@ export async function callSubmitReport(reportPayload) {
         cityNameEnglish: existingPinDoc.data.cityNameEnglish || cityInfo.nameEnglish,
         images: existingImages,
         thumbnails: existingThumbs,
-        message: 'Aapke paas pehle se report kiya hua gaddha mila (20m range). Nayi photo add kar di gayi hai!'
+        message: 'Aapke paas pehle se report kiya hua gaddha mila (5m range). Nayi photo add kar di gayi hai!'
       };
     }
 
