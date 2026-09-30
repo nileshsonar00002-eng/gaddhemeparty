@@ -191,7 +191,7 @@ export function renderReportForm(container, options = {}) {
       <button
         id="btn-submit-report"
         type="button"
-        ${quota.isLimitReached || (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100) ? 'disabled' : ''}
+        ${quota.isLimitReached || (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100) || !processedImageData ? 'disabled' : ''}
         class="btn-primary w-full mt-2 py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         <span id="submit-btn-spinner" class="hidden w-4 h-4 border-2 border-[var(--accent-ink)] border-t-transparent rounded-full animate-spin"></span>
@@ -201,6 +201,8 @@ export function renderReportForm(container, options = {}) {
               ? t('dailyLimitReached')
               : (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100)
               ? (isHindi ? 'पहले मैप पर लोकेशन कन्फर्म करें' : 'Confirm Location on Map First')
+              : !processedImageData
+              ? t('photoRequiredBtn')
               : t('submitBtn')
           }
         </span>
@@ -229,6 +231,30 @@ export function renderReportForm(container, options = {}) {
   const gpsCoordsText = container.querySelector('#gps-coords-text');
   const pinConfirmBadge = container.querySelector('#pin-confirm-badge');
   const weakGpsWarning = container.querySelector('#weak-gps-warning');
+
+  const updateSubmitButtonState = () => {
+    if (!submitBtn) return;
+    if (quota.isLimitReached) {
+      submitBtn.disabled = true;
+      if (submitText) submitText.textContent = t('dailyLimitReached');
+      return;
+    }
+
+    if (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100) {
+      submitBtn.disabled = true;
+      if (submitText) submitText.textContent = isHindi ? 'पहले मैप पर लोकेशन कन्फर्म करें' : 'Confirm Location on Map First';
+      return;
+    }
+
+    if (!processedImageData) {
+      submitBtn.disabled = true;
+      if (submitText) submitText.textContent = t('photoRequiredBtn');
+      return;
+    }
+
+    submitBtn.disabled = false;
+    if (submitText) submitText.textContent = t('submitBtn');
+  };
 
   const markLocationConfirmed = (confirmed = true) => {
     isLocationConfirmed = confirmed;
@@ -266,15 +292,7 @@ export function renderReportForm(container, options = {}) {
       }
     }
 
-    if (submitBtn && !quota.isLimitReached) {
-      if (confirmed || (currentCoordinates.accuracy || 0) <= 100) {
-        submitBtn.disabled = false;
-        if (submitText) submitText.textContent = t('submitBtn');
-      } else {
-        submitBtn.disabled = true;
-        if (submitText) submitText.textContent = isHindi ? 'पहले मैप पर लोकेशन कन्फर्म करें' : 'Confirm Location on Map First';
-      }
-    }
+    updateSubmitButtonState();
   };
 
   // Trigger file selection on dropzone click
@@ -301,9 +319,11 @@ export function renderReportForm(container, options = {}) {
         previewContainer.classList.remove('hidden');
         previewContainer.classList.add('flex');
       }
+      updateSubmitButtonState();
     } catch (err) {
       console.error('[ReportForm] Image processing error:', err);
       alert(t('photoError'));
+      updateSubmitButtonState();
     }
   });
 
@@ -422,8 +442,25 @@ export function renderReportForm(container, options = {}) {
       return;
     }
 
-    if (!currentCoordinates || typeof currentCoordinates.lat !== 'number' || typeof currentCoordinates.lng !== 'number') {
-      currentCoordinates = fallbackCoords;
+    // Strict Validation: Image is Mandatory
+    if (!processedImageData) {
+      if (dropzone) {
+        dropzone.classList.add('ring-2', 'ring-rose-500', 'border-rose-500');
+        dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          dropzone.classList.remove('ring-2', 'ring-rose-500', 'border-rose-500');
+        }, 2500);
+      }
+      alert(t('photoRequiredAlert'));
+      updateSubmitButtonState();
+      return;
+    }
+
+    // Strict Validation: Location must be confirmed if weak
+    if (!isLocationConfirmed && (currentCoordinates.accuracy || 0) > 100) {
+      alert(isHindi ? 'कृपया पहले मैप पर सही स्थान चुनें।' : 'Please confirm location on map first.');
+      startMapPinConfirm();
+      return;
     }
 
     const landmark = landmarkInput?.value?.trim() || t('defaultLandmark');

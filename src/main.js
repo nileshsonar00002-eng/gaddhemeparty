@@ -799,16 +799,25 @@ class KhaddaApp {
       return;
     }
 
+    if (!formData.imageData && !formData.imageUrl) {
+      showToast(t('photoRequiredAlert'), 'warning');
+      return;
+    }
+
     this.userCoords = { lat: latitude, lng: longitude };
     setCachedUserLocation(this.userCoords);
 
     const isOnline = navigator.onLine;
 
     if (!isOnline) {
+      const offlineImgUrl = formData.imageData?.mainDataUrl || null;
+      const offlineThumbUrl = formData.imageData?.thumbDataUrl || null;
       await saveReportOffline({
         latitude,
         longitude,
         landmark: formData.landmark,
+        imageUrl: offlineImgUrl,
+        thumbnailUrl: offlineThumbUrl,
         formOpenTime: formData.formOpenTime
       });
       showToast(t('offlineAlert'), 'warning', 6000);
@@ -925,6 +934,8 @@ class KhaddaApp {
                 latitude: item.latitude,
                 longitude: item.longitude,
                 landmark: item.landmark,
+                imageUrl: item.imageUrl || null,
+                thumbnailUrl: item.thumbnailUrl || null,
                 website_hp: '',
                 formOpenTime: item.formOpenTime || (Date.now() - 5000)
               });
