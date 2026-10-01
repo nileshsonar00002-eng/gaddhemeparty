@@ -26,7 +26,7 @@ export function createNavbar(options = {}) {
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
     container.innerHTML = `
-    <div class="w-full h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--band)] border-b border-[var(--band-ink)]/20 relative z-50 transition-colors duration-200 flex-nowrap overflow-hidden text-[var(--band-ink)]">
+    <div class="w-full h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--band)]/88 backdrop-blur-md border-b border-[var(--band-ink)]/15 relative z-50 transition-colors duration-200 flex-nowrap overflow-hidden text-[var(--band-ink)]">
       
       <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
       <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
@@ -45,7 +45,7 @@ export function createNavbar(options = {}) {
       </div>
 
       <!-- Center Nav Links (Desktop >= 1024px) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/70 p-1 rounded-xl border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
+      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/60 backdrop-blur-xs p-1 rounded-xl border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
         <button
           type="button"
           data-nav-panel="map"

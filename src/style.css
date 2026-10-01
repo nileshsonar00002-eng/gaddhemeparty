@@ -45,7 +45,7 @@
   --bg-card: var(--surface);
   --bg-card-subtle: var(--surface-2);
   --bg-card-hover: var(--surface-2);
-  --bg-nav: var(--band);
+  --bg-nav: rgba(82, 31, 23, 0.88);
   --bg-glass: rgba(249, 242, 232, 0.96);
   --text-primary: var(--text);
   --text-secondary: var(--muted);
@@ -461,7 +461,9 @@
   box-sizing: border-box;
   height: var(--header-h);
   background-color: var(--bg-nav);
-  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(249, 242, 232, 0.15);
 }
 
 #navbar-container.is-scrolled > div {
