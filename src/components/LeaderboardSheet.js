@@ -29,6 +29,33 @@ export class LeaderboardSection {
     const heroPin = top3Rankings[0] || null;
     const runnerUps = top3Rankings.slice(1, 3);
 
+    const getCleanLabels = (pin) => {
+      if (!pin) return { title: '', city: '' };
+      const city = resolvePinCity(pin, isHindi);
+      const rawLandmark = (pin.landmark || '').trim();
+      const genericList = [
+        'सड़क पर गहरा गड्ढा',
+        'सड़क का गड्ढा',
+        'सड़क पर गंभीर गड्ढा',
+        'सड़क पर गड्ढा',
+        'सड़क गड्ढा',
+        'गड्ढा',
+        'damaged road / pothole',
+        'damaged road pothole',
+        'damaged road',
+        'pothole road',
+        'pothole',
+        'road pothole'
+      ];
+      const isGeneric = !rawLandmark || genericList.includes(rawLandmark.toLowerCase());
+      if (isGeneric) {
+        return { title: `📍 ${city}`, city };
+      }
+      return { title: rawLandmark, city };
+    };
+
+    const heroLabels = heroPin ? getCleanLabels(heroPin) : { title: '', city: '' };
+
     this.container.innerHTML = `
       <div class="max-w-5xl mx-auto space-y-6">
         <!-- Section Header with View Full Leaderboard Button -->
@@ -81,12 +108,12 @@ export class LeaderboardSection {
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
                   <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-white border border-white/20 shadow-xs">
-                    📍 ${resolvePinCity(heroPin, isHindi)}
+                    📍 ${heroLabels.city}
                   </div>
                 </div>
 
                 <h3 class="font-heading font-bold text-base text-[var(--text)] line-clamp-2 leading-snug">
-                  ${heroPin.landmark || t('defaultLandmark')}
+                  ${heroLabels.title}
                 </h3>
 
                 <div class="flex items-center gap-2 mt-2 text-xs tabular-nums font-mono text-[var(--muted)] flex-wrap">
@@ -118,7 +145,9 @@ export class LeaderboardSection {
 
           <!-- #2 and #3 Runner-Ups (5 Cols) -->
           <div class="lg:col-span-5 flex flex-col justify-start gap-3.5">
-            ${runnerUps.length > 0 ? runnerUps.map((pin, idx) => `
+            ${runnerUps.length > 0 ? runnerUps.map((pin, idx) => {
+              const pinLabels = getCleanLabels(pin);
+              return `
               <div
                 onclick="window.__khaddaFlyToPin('${pin.id}')"
                 class="card-lime tilt-card flex-1 p-4 flex items-center gap-3.5 cursor-pointer group"
@@ -137,10 +166,10 @@ export class LeaderboardSection {
 
                 <div class="flex-1 min-w-0">
                   <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] truncate group-hover:text-[var(--primary)] transition">
-                    ${pin.landmark || t('defaultLandmark')}
+                    ${pinLabels.title}
                   </h4>
                   <p class="text-[11px] text-[var(--muted)] mt-0.5 truncate">
-                    📍 ${resolvePinCity(pin, isHindi)}
+                    📍 ${pinLabels.city}
                   </p>
                   <div class="flex items-center gap-2 mt-1 text-[10px] tabular-nums font-mono text-[var(--primary)]">
                     <span>🚨 ${pin.reportCount || 1} reps</span>
@@ -148,7 +177,8 @@ export class LeaderboardSection {
                   </div>
                 </div>
               </div>
-            `).join('') : ''}
+            `;
+            }).join('') : ''}
           </div>
         </div>
       </div>

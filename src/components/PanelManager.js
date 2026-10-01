@@ -434,10 +434,43 @@ export class PanelManager {
       </div>
     `;
 
+    const getPinLabels = (pin) => {
+      if (!pin) return { title: '', subtitle: '' };
+      const cityName = isHindi 
+        ? (pin.cityNameHindi || pin.cityNameEnglish || 'भारत') 
+        : (pin.cityNameEnglish || pin.cityNameHindi || 'India');
+      const rawLandmark = (pin.landmark || '').trim();
+      const genericList = [
+        'सड़क पर गहरा गड्ढा',
+        'सड़क का गड्ढा',
+        'सड़क पर गंभीर गड्ढा',
+        'सड़क पर गड्ढा',
+        'सड़क गड्ढा',
+        'गड्ढा',
+        'damaged road / pothole',
+        'damaged road pothole',
+        'damaged road',
+        'pothole road',
+        'pothole',
+        'road pothole'
+      ];
+      const isGeneric = !rawLandmark || genericList.includes(rawLandmark.toLowerCase());
+      if (isGeneric) {
+        return {
+          title: `📍 ${cityName}`,
+          subtitle: `${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}`
+        };
+      }
+      return {
+        title: rawLandmark,
+        subtitle: `📍 ${cityName} • ${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}`
+      };
+    };
+
     let heroCardHtml = '';
     const hasHeroCard = Boolean(heroPin && this.leaderboardTab === 'week');
     if (hasHeroCard) {
-      const cityName = isHindi ? (heroPin.cityNameHindi || heroPin.cityNameEnglish || 'भारत') : (heroPin.cityNameEnglish || heroPin.cityNameHindi || 'India');
+      const heroLabels = getPinLabels(heroPin);
       heroCardHtml = `
         <div class="p-4.5 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-500/25 via-amber-500/10 to-transparent border-2 border-amber-500/40 space-y-3 relative overflow-hidden group shadow-md ring-1 ring-amber-500/20">
           <div class="flex items-center justify-between">
@@ -453,8 +486,8 @@ export class PanelManager {
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 flex items-center justify-center text-3xl flex-shrink-0">🕳️</div>
             `}
             <div class="min-w-0 flex-1">
-              <h3 class="font-heading font-extrabold text-sm sm:text-base text-[var(--text)] truncate leading-tight">${heroPin.landmark || 'सड़क का गड्ढा'}</h3>
-              <p class="text-xs text-[var(--muted)] mt-0.5">📍 ${cityName}</p>
+              <h3 class="font-heading font-extrabold text-sm sm:text-base text-[var(--text)] truncate leading-tight">${heroLabels.title}</h3>
+              <p class="text-xs text-[var(--muted)] mt-0.5">${heroLabels.subtitle}</p>
               <div class="flex gap-2.5 text-xs text-[var(--muted)] mt-1.5 tabular-nums font-mono font-medium">
                 <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">📢 ${heroPin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'Reports'}</span>
                 <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">👍 ${heroPin.upvotes || 0} ${isHindi ? 'वोट' : 'Votes'}</span>
@@ -528,7 +561,7 @@ export class PanelManager {
         listHtml = pins.map((pin, idx) => {
           const rankNumber = startRank + idx;
           const isTop3 = rankNumber <= 3;
-          const cityName = isHindi ? (pin.cityNameHindi || pin.cityNameEnglish || 'भारत') : (pin.cityNameEnglish || pin.cityNameHindi || 'India');
+          const pinLabels = getPinLabels(pin);
 
           const badgeClass = rankNumber === 1 
             ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-black text-sm shadow-sm ring-1 ring-amber-500/50' 
@@ -565,8 +598,8 @@ export class PanelManager {
                 `}
 
                 <div class="min-w-0">
-                  <h4 class="font-heading ${isTop3 ? 'font-extrabold text-sm sm:text-base' : 'font-bold text-xs sm:text-sm'} text-[var(--text)] truncate group-hover:text-amber-500 transition">${pin.landmark || 'सड़क का गड्ढा'}</h4>
-                  <p class="text-[11px] text-[var(--muted)] truncate">📍 ${cityName} • ${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}</p>
+                  <h4 class="font-heading ${isTop3 ? 'font-extrabold text-sm sm:text-base' : 'font-bold text-xs sm:text-sm'} text-[var(--text)] truncate group-hover:text-amber-500 transition">${pinLabels.title}</h4>
+                  <p class="text-[11px] text-[var(--muted)] truncate">${pinLabels.subtitle}</p>
                 </div>
               </div>
 
