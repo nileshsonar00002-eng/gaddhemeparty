@@ -39,6 +39,10 @@ function formatRelativeTime(timestamp) {
 
 export function openPinDetailModal(pin) {
   if (!pin) return;
+  if (window.innerWidth < 1024 && window.__khaddaClosePanels) {
+    window.__khaddaClosePanels();
+  }
+
   let container = document.getElementById('pin-detail-modal-container');
   if (!container) {
     container = document.createElement('div');

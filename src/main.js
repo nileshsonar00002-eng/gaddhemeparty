@@ -386,8 +386,18 @@ class KhaddaApp {
       return null;
     };
 
+    window.__khaddaClosePanels = () => {
+      if (this.panelManager) {
+        this.panelManager.close();
+      }
+    };
+
     window.__khaddaFocusPinOnMap = (pin, rank = null) => {
       if (!pin || !pin.latitude || !pin.longitude) return;
+
+      if (this.panelManager && window.innerWidth < 1024) {
+        this.panelManager.close();
+      }
 
       const mapEl = document.getElementById('map-section');
       if (mapEl) {
@@ -395,10 +405,6 @@ class KhaddaApp {
       }
 
       const pinRank = rank || pin.rank || window.__khaddaGetPinRank(pin.id);
-
-      if (this.panelManager && window.innerWidth < 1024) {
-        this.panelManager.setMobilePeek(true);
-      }
 
       if (this.mapAdapter) {
         this.mapAdapter.setView(pin.latitude, pin.longitude, 18);
@@ -418,6 +424,10 @@ class KhaddaApp {
         const pinRank = rank || pin.rank || window.__khaddaGetPinRank(pinId);
         if (pinRank) pin.rank = pinRank;
 
+        if (this.panelManager && window.innerWidth < 1024) {
+          this.panelManager.close();
+        }
+
         const mapEl = document.getElementById('map-section');
         if (mapEl) {
           mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -436,6 +446,9 @@ class KhaddaApp {
     };
 
     window.__khaddaOpenPinModal = (pin) => {
+      if (this.panelManager && window.innerWidth < 1024) {
+        this.panelManager.close();
+      }
       if (pin) openPinDetailModal(pin);
     };
 

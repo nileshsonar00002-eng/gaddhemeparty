@@ -563,10 +563,10 @@ export class PanelManager {
         if (pin) {
           const rank = pinIdx !== -1 ? (pinIdx + 1) : (data.heroPotholeOfWeek?.id === pinId ? 1 : null);
           if (rank) pin.rank = rank;
-          this.onSelectPin(pin);
           if (window.innerWidth < 1024) {
-            this.setMobilePeek(true);
+            this.close();
           }
+          this.onSelectPin(pin);
         }
       });
     });
