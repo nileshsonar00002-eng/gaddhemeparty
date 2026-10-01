@@ -6,7 +6,7 @@
 
 :root {
   color-scheme: light;
-  --header-h: 64px;
+  --header-h: 77px;
   --gap-desktop: 32px;
   --gap-mobile: 24px;
   --scroll-offset: calc(var(--header-h) + 16px);
@@ -63,7 +63,7 @@
 
 @media (max-width: 640px) {
   :root {
-    --header-h: 56px;
+    --header-h: 67px;
     --scroll-offset: calc(var(--header-h) + 12px);
   }
 }
