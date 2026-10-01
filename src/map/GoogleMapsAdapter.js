@@ -71,28 +71,28 @@ export const DARK_MAP_STYLE = [
 
 // Clean Light Map Styling (High-contrast roads & clear labels, POIs hidden)
 export const LIGHT_MAP_STYLE = [
-  { elementType: 'geometry', stylers: [{ color: '#E4EFCB' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#1F4A39' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#EBFAC0' }, { weight: 3 }] },
+  { elementType: 'geometry', stylers: [{ color: '#EFE5D6' }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#4A2C25' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#F9F2E8' }, { weight: 3 }] },
   { featureType: 'poi', stylers: [{ visibility: 'off' }] },
   { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#D5E8B5' }, { visibility: 'simplified' }] },
+  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#DDE3C8' }, { visibility: 'simplified' }] },
   { featureType: 'transit', stylers: [{ visibility: 'off' }] },
   { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
   { featureType: 'landscape.man_made', stylers: [{ visibility: 'off' }] },
-  { featureType: 'landscape.natural', elementType: 'geometry', stylers: [{ color: '#E4EFCB' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#BFD8D0' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#1F4A39' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#FFFFFF' }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#C8D5AE' }, { weight: 1 }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#FFFFFF' }] },
-  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#C8D5AE' }, { weight: 1.2 }] },
-  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#FFFFFF' }] },
-  { featureType: 'road.arterial', elementType: 'geometry.stroke', stylers: [{ color: '#C8D5AE' }, { weight: 1 }] },
-  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#1F4A39' }] },
-  { featureType: 'road', elementType: 'labels.text.stroke', stylers: [{ color: '#EBFAC0' }, { weight: 3 }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#1F4A39' }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.stroke', stylers: [{ color: '#EBFAC0' }, { weight: 4 }] }
+  { featureType: 'landscape.natural', elementType: 'geometry', stylers: [{ color: '#EFE5D6' }] },
+  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#C9D6D8' }] },
+  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#4A2C25' }] },
+  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#FBF7F0' }] },
+  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#DCCFBF' }, { weight: 1 }] },
+  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#FBF7F0' }] },
+  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#DCCFBF' }, { weight: 1.2 }] },
+  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#FBF7F0' }] },
+  { featureType: 'road.arterial', elementType: 'geometry.stroke', stylers: [{ color: '#DCCFBF' }, { weight: 1 }] },
+  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#4A2C25' }] },
+  { featureType: 'road', elementType: 'labels.text.stroke', stylers: [{ color: '#F9F2E8' }, { weight: 3 }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#4A2C25' }] },
+  { featureType: 'administrative.locality', elementType: 'labels.text.stroke', stylers: [{ color: '#F9F2E8' }, { weight: 4 }] }
 ];
 
 // Custom Overlay to render animated HTML pins on Google Maps

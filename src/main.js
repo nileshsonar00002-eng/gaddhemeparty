@@ -261,7 +261,7 @@ class KhaddaApp {
 
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', '#EBFAC0');
+      meta.setAttribute('content', '#521F17');
     }
 
     if (this.mapAdapter && this.mapAdapter.applyTheme) {

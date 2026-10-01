@@ -25,8 +25,8 @@ export function createNavbar(options = {}) {
     : `🚗💥 *Gaddhe Me Party*\n"Jaha Gaddha, Waha Party"\n\nReport & track road hazards without login across India! Check live pothole map:\n👉 ${shareUrl}`;
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
-  container.innerHTML = `
-    <div class="w-full h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--bg-nav)] border-b border-[var(--border)] relative z-50 transition-colors duration-200 flex-nowrap overflow-hidden">
+    container.innerHTML = `
+    <div class="w-full h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--band)] border-b border-[var(--band-ink)]/20 relative z-50 transition-colors duration-200 flex-nowrap overflow-hidden text-[var(--band-ink)]">
       
       <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
       <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
@@ -35,21 +35,21 @@ export function createNavbar(options = {}) {
         </button>
 
         <div class="flex flex-col justify-center min-w-0 overflow-hidden">
-          <span class="font-heading font-semibold text-sm sm:text-base text-[var(--text)] tracking-tight leading-tight whitespace-nowrap truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
+          <span class="font-heading font-bold text-sm sm:text-base text-[var(--band-ink)] tracking-tight leading-tight whitespace-nowrap truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
             ${t('appNameHindi')}
           </span>
-          <p class="hidden sm:block font-medium text-[11px] sm:text-xs text-[var(--muted)] tracking-normal leading-none mt-0.5 whitespace-nowrap truncate">
+          <p class="hidden sm:block font-medium text-[11px] sm:text-xs text-[var(--band-ink)]/80 tracking-normal leading-none mt-0.5 whitespace-nowrap truncate">
             "${t('tagline')}"
           </p>
         </div>
       </div>
 
       <!-- Center Nav Links (Desktop >= 1024px) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)] select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
+      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/70 p-1 rounded-xl border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
         <button
           type="button"
           data-nav-panel="map"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('map', 'w-3.5 h-3.5')}
           <span>${t('navMap')}</span>
@@ -58,7 +58,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="leaderboard"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('trophy', 'w-3.5 h-3.5')}
           <span>${t('navLeaderboard')}</span>
@@ -67,7 +67,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="mission"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('target', 'w-3.5 h-3.5')}
           <span>${t('navMission')}</span>
@@ -76,7 +76,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="how"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('zap', 'w-3.5 h-3.5')}
           <span>${t('navHowItWorks')}</span>
@@ -85,7 +85,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="about"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('info', 'w-3.5 h-3.5')}
           <span>${t('navAbout')}</span>
@@ -94,18 +94,18 @@ export function createNavbar(options = {}) {
 
       <!-- Desktop Right Controls (>= 1024px) -->
       <div class="hidden lg:flex items-center gap-2 shrink-0">
-        <div class="flex items-center bg-[var(--surface-2)] p-0.5 rounded-xl border border-[var(--border)]">
+        <div class="flex items-center bg-[var(--band)]/70 p-0.5 rounded-xl border border-[var(--band-ink)]/25">
           <button
             id="btn-lang-hi-desktop"
             type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
           >
             हिंदी
           </button>
           <button
             id="btn-lang-en-desktop"
             type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
           >
             EN
           </button>
@@ -114,24 +114,24 @@ export function createNavbar(options = {}) {
         <button
           id="btn-chai-tip-desktop"
           type="button"
-          class="btn-secondary px-3 py-2 text-xs min-h-[40px] chai-tip-spark"
+          class="inline-flex items-center gap-1.5 px-3 py-2 text-xs min-h-[40px] rounded-xl border border-[var(--band-ink)]/35 bg-transparent hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all cursor-pointer chai-tip-spark font-medium"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
-          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--accent)]')}
-          <span class="font-medium">${t('tipChai')}</span>
+          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--band-ink)]')}
+          <span>${t('tipChai')}</span>
         </button>
 
         <a
           href="${whatsappShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          class="btn-secondary px-3 py-2 text-xs min-h-[40px]"
+          class="inline-flex items-center gap-1.5 px-3 py-2 text-xs min-h-[40px] rounded-xl border border-[var(--band-ink)]/35 bg-transparent hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all cursor-pointer font-medium"
           title="Share on WhatsApp"
           aria-label="Share on WhatsApp"
         >
           ${getLucideIcon('share', 'w-4 h-4 text-[#25D366]')}
-          <span class="font-medium">Share</span>
+          <span>Share</span>
         </a>
       </div>
 
@@ -140,20 +140,20 @@ export function createNavbar(options = {}) {
         <button
           id="btn-chai-tip-mobile"
           type="button"
-          class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl shrink-0 cursor-pointer chai-tip-spark"
+          class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer chai-tip-spark"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
-          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--accent)]')}
+          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--band-ink)]')}
         </button>
 
         <button
           id="btn-mobile-menu-toggle"
           type="button"
-          class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl shrink-0 cursor-pointer"
+          class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer"
           aria-label="Open navigation menu"
         >
-          ${getLucideIcon('menu', 'w-4 h-4 text-[var(--text)]')}
+          ${getLucideIcon('menu', 'w-4 h-4 text-[var(--band-ink)]')}
         </button>
       </div>
     </div>
