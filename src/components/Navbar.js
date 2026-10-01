@@ -44,7 +44,7 @@ export function createNavbar(options = {}) {
       </div>
 
       <!-- Center Nav Links (Desktop >= 1024px) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)] select-none shrink-0">
+      <nav class="hidden lg:flex items-center gap-1 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)] select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
         <button
           type="button"
           data-nav-panel="map"
