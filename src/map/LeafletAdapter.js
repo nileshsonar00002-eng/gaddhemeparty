@@ -13,7 +13,7 @@ export class LeafletAdapter extends MapAdapter {
     this.userMarker = null;
     this.defaultCenter = [22.5937, 78.9629]; // Center of India
     this.defaultZoom = 5;
-    this.theme = 'dark';
+    this.theme = 'light';
     this.lastGestureEndTime = 0;
     this.isGestureActive = false;
     this.gestureTimeout = null;
@@ -29,7 +29,7 @@ export class LeafletAdapter extends MapAdapter {
   }
 
   init(containerId, options = {}) {
-    this.theme = options.theme || 'dark';
+    this.theme = options.theme || 'light';
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     this.map = L.map(containerId, {

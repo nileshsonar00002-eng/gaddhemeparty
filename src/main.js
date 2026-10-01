@@ -235,46 +235,35 @@ class KhaddaApp {
   }
 
   initTheme() {
-    const saved = localStorage.getItem('khadda_theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    this.mapTheme = saved || (prefersDark ? 'dark' : 'light');
-    this.applyGlobalTheme(this.mapTheme, false);
-
-    // Auto-listen to system color scheme changes if user hasn't explicitly set a preference
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localStorage.getItem('khadda_theme')) {
-          this.applyGlobalTheme(e.matches ? 'dark' : 'light', false);
-        }
-      });
-    }
+    this.mapTheme = 'light';
+    this.applyGlobalTheme('light', true);
   }
 
-  applyGlobalTheme(theme, persist = true) {
-    this.mapTheme = theme;
+  applyGlobalTheme(theme = 'light', persist = true) {
+    this.mapTheme = 'light';
     if (persist) {
-      localStorage.setItem('khadda_theme', theme);
+      localStorage.setItem('khadda_theme', 'light');
     }
 
-    document.documentElement.setAttribute('data-theme', theme);
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    document.documentElement.classList.toggle('light', theme === 'light');
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
 
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', theme === 'dark' ? '#080C14' : '#F8FAFC');
+      meta.setAttribute('content', '#0F172A');
     }
 
     if (this.mapAdapter && this.mapAdapter.applyTheme) {
-      this.mapAdapter.applyTheme(theme);
+      this.mapAdapter.applyTheme('light');
     }
 
     if (this.nightGlobe && this.nightGlobe.applyTheme) {
-      this.nightGlobe.applyTheme(theme);
+      this.nightGlobe.applyTheme('light');
     }
 
     if (this.starfield && this.starfield.applyTheme) {
-      this.starfield.applyTheme(theme);
+      this.starfield.applyTheme('light');
     }
 
     this.renderHeaderAndStats();
@@ -283,9 +272,7 @@ class KhaddaApp {
   renderHeaderAndStats() {
     createNavbar({
       onChaiTipClick: () => openChaiTipModal(),
-      onToggleMapTheme: () => this.toggleMapTheme(),
-      onSetTheme: (theme) => this.applyGlobalTheme(theme, true),
-      currentTheme: this.mapTheme,
+      currentTheme: 'light',
       activeNav: this.activeNav
     });
 
@@ -296,8 +283,7 @@ class KhaddaApp {
   }
 
   toggleMapTheme() {
-    const nextTheme = this.mapTheme === 'dark' ? 'light' : 'dark';
-    this.applyGlobalTheme(nextTheme, true);
+    this.applyGlobalTheme('light', true);
   }
 
   setupEventListeners() {

@@ -19,21 +19,14 @@
     <link rel="preload" href="/fonts/noto-sans-devanagari-devanagari-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/noto-sans-devanagari-devanagari-700-normal.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- Zero-FOUC Inline Theme Script -->
+    <!-- Zero-FOUC Inline Theme Script (Light Theme) -->
     <script>
       (function() {
         try {
-          var saved = localStorage.getItem('khadda_theme');
-          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = saved || (prefersDark ? 'dark' : 'light');
-          document.documentElement.setAttribute('data-theme', theme);
-          if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-          } else {
-            document.documentElement.classList.add('light');
-            document.documentElement.classList.remove('dark');
-          }
+          localStorage.setItem('khadda_theme', 'light');
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
           var meta = document.querySelector('meta[name="theme-color"]');
           if (meta) meta.setAttribute('content', '#0F172A');
         } catch (e) {}

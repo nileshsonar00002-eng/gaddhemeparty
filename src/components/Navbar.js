@@ -94,16 +94,6 @@ export function createNavbar(options = {}) {
 
       <!-- Desktop Right Controls (>= 1024px) -->
       <div class="hidden lg:flex items-center gap-2 shrink-0">
-        <button
-          id="btn-theme-toggle-desktop"
-          type="button"
-          class="btn-secondary p-2 text-xs min-w-[40px] min-h-[40px]"
-          title="${currentTheme === 'dark' ? t('switchToLightMode') : t('switchToDarkMode')}"
-          aria-label="${currentTheme === 'dark' ? t('switchToLightMode') : t('switchToDarkMode')}"
-        >
-          ${currentTheme === 'dark' ? getLucideIcon('sun', 'w-4 h-4 text-amber-400') : getLucideIcon('moon', 'w-4 h-4 text-slate-700')}
-        </button>
-
         <div class="flex items-center bg-[var(--surface-2)] p-0.5 rounded-xl border border-[var(--border)]">
           <button
             id="btn-lang-hi-desktop"
@@ -214,7 +204,7 @@ export function createNavbar(options = {}) {
           <!-- Divider -->
           <div class="h-px bg-[var(--border)] my-1"></div>
 
-          <!-- Controls Section: Language + Theme in Drawer -->
+          <!-- Controls Section: Language in Drawer -->
           <div class="space-y-3 pt-1">
             <!-- Segmented Language Switcher -->
             <div class="flex flex-col gap-1.5">
@@ -233,29 +223,6 @@ export function createNavbar(options = {}) {
                   class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${!isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
                 >
                   English
-                </button>
-              </div>
-            </div>
-
-            <!-- Segmented Theme Switcher -->
-            <div class="flex flex-col gap-1.5">
-              <span class="text-xs font-medium text-[var(--muted)]">Theme / थीम</span>
-              <div class="grid grid-cols-2 gap-1.5 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)]">
-                <button
-                  id="btn-theme-light-drawer"
-                  type="button"
-                  class="h-10 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${currentTheme === 'light' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
-                >
-                  ${getLucideIcon('sun', 'w-4 h-4')}
-                  <span>${isHindi ? 'लाइट' : 'Light'}</span>
-                </button>
-                <button
-                  id="btn-theme-dark-drawer"
-                  type="button"
-                  class="h-10 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${currentTheme === 'dark' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
-                >
-                  ${getLucideIcon('moon', 'w-4 h-4')}
-                  <span>${isHindi ? 'डार्क' : 'Dark'}</span>
                 </button>
               </div>
             </div>
@@ -312,34 +279,6 @@ export function createNavbar(options = {}) {
   });
   document.getElementById('btn-lang-en-drawer')?.addEventListener('click', () => {
     if (getLanguage() !== 'english') setLanguage('english');
-    closeDrawer();
-  });
-
-  // Theme Handlers
-  const handleToggleTheme = () => {
-    if (onToggleMapTheme) onToggleMapTheme();
-  };
-  const handleSetTheme = (theme) => {
-    if (onSetTheme) {
-      onSetTheme(theme);
-    } else if (onToggleMapTheme && theme !== currentTheme) {
-      onToggleMapTheme();
-    }
-  };
-
-  document.getElementById('btn-theme-toggle-desktop')?.addEventListener('click', handleToggleTheme);
-  
-  document.getElementById('btn-theme-light-drawer')?.addEventListener('click', () => {
-    if (currentTheme !== 'light') {
-      handleSetTheme('light');
-    }
-    closeDrawer();
-  });
-
-  document.getElementById('btn-theme-dark-drawer')?.addEventListener('click', () => {
-    if (currentTheme !== 'dark') {
-      handleSetTheme('dark');
-    }
     closeDrawer();
   });
 

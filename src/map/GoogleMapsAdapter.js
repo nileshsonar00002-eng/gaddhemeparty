@@ -191,7 +191,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.userMarker = null;
     this.defaultCenter = { lat: 22.5937, lng: 78.9629 };
     this.defaultZoom = 5;
-    this.theme = 'dark';
+    this.theme = 'light';
     this.lastGestureEndTime = 0;
     this.isGestureActive = false;
   }
@@ -224,7 +224,7 @@ export class GoogleMapsAdapter extends MapAdapter {
   async init(containerId, options = {}) {
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     const mapId = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || null;
-    this.theme = options.theme || 'dark';
+    this.theme = options.theme || 'light';
 
     try {
       await this.loadGoogleMapsScript(apiKey);
@@ -246,7 +246,7 @@ export class GoogleMapsAdapter extends MapAdapter {
       fullscreenControl: false,
       clickableIcons: false, // Strictly prevents POIs from intercepting clicks
       gestureHandling: 'cooperative', // 2-finger pan on mobile, Ctrl+scroll on desktop
-      backgroundColor: '#080C14',
+      backgroundColor: '#F8FAFC',
       minZoom: 4,
       maxZoom: 19,
       restriction: {
@@ -263,7 +263,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     if (mapId) {
       mapOptions.mapId = mapId;
     } else {
-      mapOptions.styles = this.theme === 'dark' ? DARK_MAP_STYLE : LIGHT_MAP_STYLE;
+      mapOptions.styles = LIGHT_MAP_STYLE;
     }
 
     this.map = new google.maps.Map(container, mapOptions);
