@@ -4,7 +4,6 @@ export default {
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -14,7 +13,11 @@ export default {
         border: 'var(--border)',
         text: 'var(--text)',
         muted: 'var(--muted)',
-        ink: 'var(--ink)',
+        heading: 'var(--heading)',
+        primary: 'var(--primary)',
+        'primary-ink': 'var(--primary-ink)',
+        band: 'var(--band)',
+        'band-ink': 'var(--band-ink)',
         accent: 'var(--accent)',
         'accent-ink': 'var(--accent-ink)',
         danger: 'var(--danger)',
@@ -30,9 +33,9 @@ export default {
         'chip': '8px'
       },
       boxShadow: {
-        'soft': '0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06)',
+        'soft': '0 1px 3px rgba(41, 96, 74, 0.08), 0 8px 24px rgba(41, 96, 74, 0.06)',
         'card': 'var(--shadow-card)',
-        'dropdown': '0 4px 12px 0 rgba(0, 0, 0, 0.15)'
+        'dropdown': '0 4px 12px 0 rgba(41, 96, 74, 0.15)'
       }
     },
   },

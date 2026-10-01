@@ -49,7 +49,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="map"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
         >
           ${getLucideIcon('map', 'w-3.5 h-3.5')}
           <span>${t('navMap')}</span>
@@ -58,7 +58,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="leaderboard"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
         >
           ${getLucideIcon('trophy', 'w-3.5 h-3.5')}
           <span>${t('navLeaderboard')}</span>
@@ -67,7 +67,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="mission"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
         >
           ${getLucideIcon('target', 'w-3.5 h-3.5')}
           <span>${t('navMission')}</span>
@@ -76,7 +76,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="how"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
         >
           ${getLucideIcon('zap', 'w-3.5 h-3.5')}
           <span>${t('navHowItWorks')}</span>
@@ -85,7 +85,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="about"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface)]'}"
         >
           ${getLucideIcon('info', 'w-3.5 h-3.5')}
           <span>${t('navAbout')}</span>
@@ -98,14 +98,14 @@ export function createNavbar(options = {}) {
           <button
             id="btn-lang-hi-desktop"
             type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
           >
             हिंदी
           </button>
           <button
             id="btn-lang-en-desktop"
             type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
           >
             EN
           </button>
@@ -181,22 +181,22 @@ export function createNavbar(options = {}) {
 
           <!-- Drawer Navigation Rows (Large 48px tap targets with icons) -->
           <nav class="flex flex-col gap-1">
-            <button type="button" data-nav-panel="map" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'map' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+            <button type="button" data-nav-panel="map" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'map' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('map', 'w-5 h-5 shrink-0')} <span>${t('navMap')}</span>
             </button>
-            <button type="button" data-nav-panel="leaderboard" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+            <button type="button" data-nav-panel="leaderboard" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('trophy', 'w-5 h-5 shrink-0')} <span>${t('navLeaderboard')}</span>
             </button>
-            <button type="button" data-nav-panel="mission" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+            <button type="button" data-nav-panel="mission" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('target', 'w-5 h-5 shrink-0')} <span>${t('navMission')}</span>
             </button>
-            <button type="button" data-nav-panel="how" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+            <button type="button" data-nav-panel="how" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('zap', 'w-5 h-5 shrink-0')} <span>${t('navHowItWorks')}</span>
             </button>
-            <button type="button" data-nav-panel="about" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'about' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+            <button type="button" data-nav-panel="about" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'about' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('info', 'w-5 h-5 shrink-0')} <span>${t('navAbout')}</span>
             </button>
-            <button type="button" data-nav-panel="terms" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'terms' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
+            <button type="button" data-nav-panel="terms" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'terms' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('flag', 'w-5 h-5 shrink-0')} <span>${t('navTerms')}</span>
             </button>
           </nav>
@@ -213,14 +213,14 @@ export function createNavbar(options = {}) {
                 <button
                   id="btn-lang-hi-drawer"
                   type="button"
-                  class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+                  class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${isHindi ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
                 >
                   हिंदी
                 </button>
                 <button
                   id="btn-lang-en-drawer"
                   type="button"
-                  class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${!isHindi ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+                  class="h-10 flex items-center justify-center text-sm font-medium rounded-lg transition-all ${!isHindi ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
                 >
                   English
                 </button>

@@ -63,13 +63,13 @@ export class LeaderboardSection {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <!-- #1 Rank Hero Card (7 Cols) -->
           ${heroPin ? `
-            <div class="lg:col-span-7 rounded-2xl bg-[var(--surface)] border-2 border-amber-500/50 p-4 sm:p-5 shadow-xl flex flex-col justify-between group">
+            <div class="lg:col-span-7 rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 shadow-soft flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-3">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-black bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-md">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs">
                     ${t('heroBadgeRank')}
                   </span>
-                  <span class="text-xs tabular-nums font-mono font-bold text-[var(--accent)] bg-amber-500/20 px-2.5 py-0.5 rounded-lg border border-amber-500/30">
+                  <span class="text-xs tabular-nums font-mono font-bold text-[var(--primary)] bg-[var(--surface-2)] px-2.5 py-0.5 rounded-lg border border-[var(--border)]">
                     👑 #1 RANK
                   </span>
                 </div>
@@ -80,7 +80,7 @@ export class LeaderboardSection {
                     alt="Hero Pothole"
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
-                  <div class="absolute bottom-2 left-2 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-amber-300 border border-slate-700">
+                  <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-white border border-white/20">
                     📍 ${resolvePinCity(heroPin, isHindi)}
                   </div>
                 </div>
@@ -90,10 +90,10 @@ export class LeaderboardSection {
                 </h3>
 
                 <div class="flex items-center gap-2 mt-2 text-xs tabular-nums font-mono text-[var(--muted)] flex-wrap">
-                  <span class="bg-rose-500/20 text-rose-500 dark:text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-lg">
+                  <span class="bg-[#D93025]/15 text-[#D93025] border border-[#D93025]/30 px-2 py-0.5 rounded-lg font-bold">
                     ${t('rankRowReports', { n: heroPin.reportCount || 1 })}
                   </span>
-                  <span class="bg-amber-500/20 text-[var(--accent)] border border-amber-500/30 px-2 py-0.5 rounded-lg">
+                  <span class="bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] px-2 py-0.5 rounded-lg">
                     ${t('daysOpenText', { n: heroPin.daysOpen || 1 })}
                   </span>
                 </div>
@@ -103,7 +103,7 @@ export class LeaderboardSection {
                 <button
                   type="button"
                   onclick="window.__khaddaFlyToPin('${heroPin.id}')"
-                  class="flex-1 py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-[var(--accent)] border border-amber-500/40 font-heading font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+                  class="btn-primary flex-1 py-2.5 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs cursor-pointer font-bold"
                 >
                   <span>📍</span>
                   <span>${t('tapToViewOnMap')}</span>
@@ -121,9 +121,9 @@ export class LeaderboardSection {
             ${runnerUps.length > 0 ? runnerUps.map((pin, idx) => `
               <div
                 onclick="window.__khaddaFlyToPin('${pin.id}')"
-                class="flex-1 p-4 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-amber-500/40 transition flex items-center gap-3.5 cursor-pointer group shadow-sm"
+                class="flex-1 p-4 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition flex items-center gap-3.5 cursor-pointer group shadow-soft"
               >
-                <div class="w-9 h-9 rounded-2xl ${idx === 0 ? 'bg-slate-300 text-slate-950 font-black' : 'bg-amber-700 text-white font-black'} tabular-nums font-mono text-xs flex items-center justify-center flex-shrink-0">
+                <div class="w-9 h-9 rounded-2xl bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] font-bold tabular-nums font-mono text-xs flex items-center justify-center flex-shrink-0">
                   #${idx + 2}
                 </div>
 
@@ -224,14 +224,14 @@ export class LeaderboardSheet {
             <button
               id="tab-btn-week"
               type="button"
-              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'week' ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'week' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
             >
               ${t('tabPotholeOfWeek')}
             </button>
             <button
               id="tab-btn-cities"
               type="button"
-              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'cities' ? 'bg-amber-500 text-slate-950 font-extrabold shadow-sm' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+              class="flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg transition-all text-center ${this.activeTab === 'cities' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
             >
               ${t('tabTopCities')}
             </button>
@@ -314,9 +314,9 @@ export class LeaderboardSheet {
       const btn = document.getElementById(`tab-btn-${tKey}`);
       if (btn) {
         if (tKey === tab) {
-          btn.className = 'flex-1 py-1.5 px-2 text-[11px] font-heading font-extrabold rounded-lg bg-amber-500 text-slate-950 shadow-sm transition-all text-center';
+          btn.className = 'flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs transition-all text-center';
         } else {
-          btn.className = 'flex-1 py-1.5 px-2 text-[11px] font-heading font-bold rounded-lg text-slate-400 hover:text-slate-200 transition-all text-center';
+          btn.className = 'flex-1 py-1.5 px-2 text-[11px] font-heading font-medium rounded-lg text-[var(--muted)] hover:text-[var(--text)] transition-all text-center';
         }
       }
     });
@@ -365,13 +365,13 @@ export class LeaderboardSheet {
       const whatsappHref = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
 
       html += `
-        <div class="relative overflow-hidden rounded-2xl bg-[var(--surface)] border-2 border-amber-500/50 p-3.5 shadow-lg group">
+        <div class="relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-3.5 shadow-sm group">
           <!-- Hero Badge -->
           <div class="flex items-center justify-between mb-2">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-sm">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-heading font-bold bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs">
               ${t('heroBadgeRank')}
             </span>
-            <span class="text-[11px] tabular-nums font-mono font-bold text-[var(--accent)] bg-amber-500/20 px-2 py-0.5 rounded-md border border-amber-500/30">
+            <span class="text-[11px] tabular-nums font-mono font-bold text-[var(--primary)] bg-[var(--surface-2)] px-2 py-0.5 rounded-md border border-[var(--border)]">
               #1 RANK
             </span>
           </div>
@@ -387,16 +387,16 @@ export class LeaderboardSheet {
                 <p class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] line-clamp-2 leading-snug">
                   ${area}
                 </p>
-                <p class="text-[11px] text-[var(--accent)] font-semibold mt-0.5">
+                <p class="text-[11px] text-[var(--primary)] font-semibold mt-0.5">
                   📍 ${city}
                 </p>
               </div>
 
               <div class="flex items-center gap-2 text-[10px] tabular-nums font-mono text-[var(--muted)] mt-1">
-                <span class="bg-rose-500/20 text-rose-500 dark:text-rose-300 border border-rose-500/30 px-1.5 py-0.5 rounded">
+                <span class="bg-[#D93025]/15 text-[#D93025] border border-[#D93025]/30 px-1.5 py-0.5 rounded">
                   ${t('rankRowReports', { n: reports })}
                 </span>
-                <span class="bg-amber-500/20 text-[var(--accent)] border border-amber-500/30 px-1.5 py-0.5 rounded">
+                <span class="bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] px-1.5 py-0.5 rounded">
                   ${t('daysOpenText', { n: days })}
                 </span>
               </div>
@@ -408,7 +408,7 @@ export class LeaderboardSheet {
             <button
               type="button"
               onclick="window.__khaddaFlyToPin('${heroPin.id}', 1)"
-              class="flex-1 py-2 px-3 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-heading font-extrabold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
+              class="btn-primary flex-1 py-2 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs cursor-pointer font-bold"
             >
               <span>📍</span>
               <span>${t('tapToViewOnMap')}</span>
@@ -418,7 +418,7 @@ export class LeaderboardSheet {
               href="${whatsappHref}"
               target="_blank"
               rel="noopener noreferrer"
-              class="py-2 px-3 bg-[#25D366]/20 hover:bg-[#25D366]/30 text-[#25D366] border border-[#25D366]/40 font-heading font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 active:scale-95"
+              class="btn-secondary py-2 px-3 text-xs rounded-xl flex items-center justify-center gap-1 active:scale-95 cursor-pointer font-medium"
             >
               <span>💬</span>
               <span class="hidden xs:inline">${t('shareHeroWhatsapp')}</span>

@@ -51,17 +51,17 @@ export function renderReportForm(container, options = {}) {
     }
     if (acc <= 100) {
       return {
-        level: 'amber',
-        dotClass: 'bg-amber-500',
-        cardClass: 'bg-amber-500/5 border-amber-500/30 text-amber-600 dark:text-amber-400',
+        level: 'moderate',
+        dotClass: 'bg-[var(--primary)]',
+        cardClass: 'bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]',
         statusText: t('gpsModerateStatus', { acc }),
         accText: `±${acc}m`
       };
     }
     return {
       level: 'red',
-      dotClass: 'bg-rose-500',
-      cardClass: 'bg-rose-500/5 border-rose-500/30 text-rose-600 dark:text-rose-400',
+      dotClass: 'bg-[var(--danger)]',
+      cardClass: 'bg-[var(--danger)]/10 border-[var(--danger)]/30 text-[var(--danger)]',
       statusText: t('gpsWeakStatus'),
       accText: ''
     };
@@ -81,8 +81,8 @@ export function renderReportForm(container, options = {}) {
           <!-- Quota Chip -->
           <span class="tabular-nums text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${
             quota.isLimitReached
-              ? 'bg-rose-500/15 text-rose-500 border border-rose-500/30'
-              : 'bg-amber-500/15 text-amber-500 border border-amber-500/30'
+              ? 'bg-[var(--danger)]/15 text-[var(--danger)] border border-[var(--danger)]/30'
+              : 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
           }">
             ${t('reportsRemainingBadge', { count: quota.remaining })}
           </span>
@@ -109,7 +109,7 @@ export function renderReportForm(container, options = {}) {
           quota.isLimitReached
             ? `
           <!-- Limit Reached Notice Banner -->
-          <div class="bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-rose-600 dark:text-rose-400">
+          <div class="bg-[var(--danger)]/10 border border-[var(--danger)]/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-[var(--danger)]">
             ${getLucideIcon('alert', 'w-4 h-4 shrink-0 mt-0.5')}
             <div>
               <div class="font-bold">${t('dailyLimitReached')}</div>
@@ -126,9 +126,9 @@ export function renderReportForm(container, options = {}) {
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <label class="flex items-center gap-1.5 text-[13px] font-medium text-[var(--muted)]">
-              <span class="w-5 h-5 rounded-full bg-amber-500/15 text-amber-500 font-mono font-bold text-xs flex items-center justify-center">1</span>
+              <span class="w-5 h-5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] font-mono font-bold text-xs flex items-center justify-center">1</span>
               <span>${t('step1Title')}</span>
-              <span class="text-rose-500 font-bold">*</span>
+              <span class="text-[var(--danger)] font-bold">*</span>
             </label>
           </div>
 
@@ -136,11 +136,11 @@ export function renderReportForm(container, options = {}) {
 
           <div
             id="photo-dropzone"
-            class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border)] hover:border-amber-500/60 rounded-xl p-3 bg-[var(--surface-2)] transition-all flex flex-col items-center justify-center min-h-[120px] max-h-[130px] overflow-hidden"
+            class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-3 bg-[var(--surface-2)] transition-all flex flex-col items-center justify-center min-h-[120px] max-h-[130px] overflow-hidden"
           >
             <!-- Empty Placeholder -->
             <div id="photo-placeholder" class="${processedImageData ? 'hidden' : 'flex'} flex-col items-center justify-center gap-1.5 text-center">
-              <div class="w-9 h-9 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-amber-500 group-hover:scale-105 transition shadow-xs">
+              <div class="w-9 h-9 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--primary)] group-hover:scale-105 transition shadow-xs">
                 ${getLucideIcon('camera', 'w-4 h-4')}
               </div>
               <div class="text-xs font-semibold text-[var(--text)]">
@@ -152,7 +152,7 @@ export function renderReportForm(container, options = {}) {
             <div id="photo-preview-container" class="${processedImageData ? 'flex' : 'hidden'} w-full items-center gap-3">
               <img id="photo-preview-img" src="${processedImageData?.previewUrl || ''}" class="w-18 h-18 sm:w-20 sm:h-20 object-cover rounded-xl border border-[var(--border)] shadow-xs shrink-0" alt="Pothole preview" />
               <div class="min-w-0 flex-1 space-y-1.5">
-                <div id="photo-size-badge" class="inline-flex items-center gap-1 tabular-nums text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-bold">
+                <div id="photo-size-badge" class="inline-flex items-center gap-1 tabular-nums text-[11px] font-mono px-2 py-0.5 rounded-md bg-[var(--success)]/15 text-[var(--success)] border border-[var(--success)]/30 font-bold">
                   <span>✓</span>
                   <span>${processedImageData ? t('photoOptimized', { size: processedImageData.compressedSizeKb || processedImageData.sizeKb || 120 }) : ''}</span>
                 </div>
@@ -160,7 +160,7 @@ export function renderReportForm(container, options = {}) {
                   <button
                     id="btn-change-photo"
                     type="button"
-                    class="text-xs text-amber-500 hover:text-amber-400 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+                    class="text-xs text-[var(--primary)] hover:underline font-bold flex items-center gap-1 cursor-pointer"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     <span>${t('changePhotoBtn')}</span>
@@ -175,9 +175,9 @@ export function renderReportForm(container, options = {}) {
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <label class="flex items-center gap-1.5 text-[13px] font-medium text-[var(--muted)]">
-              <span class="w-5 h-5 rounded-full bg-amber-500/15 text-amber-500 font-mono font-bold text-xs flex items-center justify-center">2</span>
+              <span class="w-5 h-5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] font-mono font-bold text-xs flex items-center justify-center">2</span>
               <span>${t('step2Title')}</span>
-              <span class="text-rose-500 font-bold">*</span>
+              <span class="text-[var(--danger)] font-bold">*</span>
             </label>
           </div>
 
@@ -213,9 +213,9 @@ export function renderReportForm(container, options = {}) {
             <button
               id="btn-open-map-picker"
               type="button"
-              class="btn-secondary w-full py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 border-[var(--border)] hover:border-amber-500 hover:text-amber-500 transition cursor-pointer"
+              class="btn-secondary w-full py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 border-[var(--border)] hover:border-[var(--primary)] transition cursor-pointer"
             >
-              <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
               </svg>
               <span>${t('adjustOnMapBtn')}</span>
@@ -239,7 +239,7 @@ export function renderReportForm(container, options = {}) {
             value="${options.landmark || ''}"
             placeholder="${t('landmarkPlaceholder')}"
             ${quota.isLimitReached ? 'disabled' : ''}
-            class="w-full px-3.5 py-2.5 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-transparent transition disabled:opacity-50"
+            class="w-full px-3.5 py-2.5 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent transition disabled:opacity-50"
           />
         </div>
 
@@ -250,14 +250,14 @@ export function renderReportForm(container, options = {}) {
         </div>
       </div>
 
-      <!-- 3. Sticky Footer: Primary Amber Submit Button with Missing Reason Helper -->
+      <!-- 3. Sticky Footer: Primary Solid Submit Button with Missing Reason Helper -->
       <div class="flex-shrink-0 p-4 sm:px-5 sm:py-4 border-t border-[var(--border)] bg-[var(--surface)] z-10 space-y-1.5">
         <button
           id="btn-submit-report"
           type="button"
-          class="w-full py-3.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-heading font-extrabold text-sm shadow-md transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          class="btn-primary w-full py-3.5 rounded-xl text-sm shadow-md font-bold transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
-          <span id="submit-btn-spinner" class="hidden w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+          <span id="submit-btn-spinner" class="hidden w-4 h-4 border-2 border-[var(--primary-ink)] border-t-transparent rounded-full animate-spin"></span>
           <span id="submit-btn-text"></span>
         </button>
         <!-- Helper text explaining missing items -->
@@ -449,7 +449,7 @@ export function renderReportForm(container, options = {}) {
         gpsStatusText.textContent = t('gpsSearching');
       }
       if (gpsDotIndicator) {
-        gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0';
+        gpsDotIndicator.className = 'w-2.5 h-2.5 rounded-full bg-[var(--primary)] animate-ping shrink-0';
       }
     }
 
