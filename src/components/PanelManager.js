@@ -676,22 +676,22 @@ export class PanelManager {
   renderAboutBody() {
     this.bodyContainer.innerHTML = `
       <div class="space-y-4 text-[var(--text)]">
-        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm">
-          <img src="/logo.svg" alt="Gaddhe Me Party Logo" class="w-12 h-12 rounded-2xl flex-shrink-0" />
+        <div class="flex flex-col items-center text-center p-4 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm">
+          <img src="/logo.svg" alt="Gaddhe Me Party Logo" class="w-12 h-12 rounded-2xl mb-2" />
           <div>
             <h3 class="font-heading font-bold text-sm text-[var(--text)]">${t('appNameHindi')}</h3>
-            <p class="text-xs text-[var(--accent)] font-semibold">${t('aboutSubtitle')}</p>
+            <p class="text-xs text-[var(--accent)] font-semibold mt-0.5">${t('aboutSubtitle')}</p>
           </div>
         </div>
 
-        <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">${t('aboutStory')}</p>
+        <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed text-center">${t('aboutStory')}</p>
 
         <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1">
-          <h4 class="font-heading font-bold text-xs text-[var(--accent)] flex items-center gap-1.5">
+          <h4 class="font-heading font-bold text-xs text-[var(--accent)] flex items-center justify-center gap-1.5">
             <span>🛡️</span>
             <span>${t('disclaimerTitle')}</span>
           </h4>
-          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('disclaimerText')}</p>
+          <p class="text-xs text-[var(--muted)] leading-relaxed text-center">${t('disclaimerText')}</p>
         </div>
       </div>
     `;
@@ -701,23 +701,23 @@ export class PanelManager {
     this.bodyContainer.innerHTML = `
       <div class="space-y-3 text-[var(--text)]">
         <div class="p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('terms1Title')}</h4>
-          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('terms1Desc')}</p>
+          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('legalDisclaimerHeader') || t('terms1Title')}</h4>
+          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('legalDisclaimerText') || t('terms1Desc')}</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('terms2Title')}</h4>
-          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('terms2Desc')}</p>
+          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('legalContentRulesHeader') || t('terms2Title')}</h4>
+          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('legalContentRulesText') || t('terms2Desc')}</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('terms3Title')}</h4>
-          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('terms3Desc')}</p>
+          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('legalDataRetentionHeader') || t('terms3Title')}</h4>
+          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('legalDataRetentionText') || t('terms3Desc')}</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('terms4Title')}</h4>
-          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('terms4Desc')}</p>
+          <h4 class="font-heading font-bold text-xs text-[var(--accent)]">${t('legalRemovalHeader') || t('terms4Title')}</h4>
+          <p class="text-xs text-[var(--muted)] leading-relaxed">${t('legalRemovalText') || t('terms4Desc')}</p>
         </div>
       </div>
     `;

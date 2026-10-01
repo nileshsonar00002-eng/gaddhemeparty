@@ -28,11 +28,11 @@ export function openAboutModal() {
           </button>
 
           <!-- Header -->
-          <div class="flex items-center gap-3">
-            <img src="/logo.svg" alt="Logo" class="w-11 h-11 rounded-2xl drop-shadow-md" />
+          <div class="flex flex-col items-center text-center gap-2">
+            <img src="/logo.svg" alt="Logo" class="w-12 h-12 rounded-2xl drop-shadow-md mx-auto" />
             <div>
               <h3 class="font-heading font-extrabold text-xl text-white leading-tight">${t('appNameHindi')}</h3>
-              <p class="font-heading text-xs text-amber-400 font-semibold">"${t('tagline')}"</p>
+              <p class="font-heading text-xs text-amber-400 font-semibold mt-0.5">"${t('tagline')}"</p>
             </div>
           </div>
 

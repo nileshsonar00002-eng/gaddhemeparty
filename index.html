@@ -356,16 +356,22 @@
         <!-- 7. About Us Section (Band 4: --bg) -->
         <section id="about" class="w-full bg-[var(--bg)] py-16 sm:py-20 content-auto reveal-on-scroll">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-2 mb-10">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-i18n="aboutBadge">नागरिक पहल</span>
+              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--text)]" data-i18n="aboutTitle">हमारे बारे में (About Us)</h2>
+              <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-i18n="aboutSubtitle">100% स्वतंत्र व नागरिक-संचालित मंच</p>
+            </div>
+
             <div class="p-6 sm:p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-soft space-y-5">
-              <div class="flex items-center gap-3">
+              <div class="flex items-center justify-center gap-3">
                 <img src="/logo.svg" alt="Gaddhe Me Party Logo" class="w-10 h-10 rounded-xl" />
                 <div>
-                  <h2 class="text-xl sm:text-2xl font-heading font-bold text-[var(--text)]" data-i18n="aboutTitle">हमारे बारे में (About Us)</h2>
-                  <p class="text-xs text-[var(--muted)] font-medium" data-i18n="aboutSubtitle">100% स्वतंत्र व नागरिक-संचालित मंच</p>
+                  <h3 class="text-base sm:text-lg font-heading font-bold text-[var(--text)]" data-i18n="appNameHindi">गड्ढे में पार्टी</h3>
+                  <p class="text-xs text-[var(--muted)] font-medium">"<span data-i18n="tagline">जहाँ गड्ढा, वहाँ पार्टी</span>"</p>
                 </div>
               </div>
 
-              <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed" data-i18n="aboutStory">
+              <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed text-center sm:text-left" data-i18n="aboutStory">
                 गड्ढे में पार्टी की शुरुआत भारत के जागरूक नागरिकों द्वारा की गई एक स्वतंत्र नागरिक पहल है। इसका उद्देश्य व्यंग्य और तकनीक के माध्यम से हमारी सड़कों की दुर्दशा पर ध्यान आकर्षित करना और प्रशासन को जवाबदेह बनाना है।
               </p>
 
@@ -382,7 +388,7 @@
                 </p>
               </div>
 
-              <div class="flex items-center gap-3 pt-2 flex-wrap">
+              <div class="flex items-center justify-center sm:justify-start gap-3 pt-2 flex-wrap">
                 <a
                   href="mailto:contact@gaddhemeparty.in"
                   class="btn-secondary text-xs"
@@ -397,37 +403,35 @@
         <!-- 8. Terms of Use & Privacy Policy Section (Band 5: --surface) -->
         <section id="terms" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-t border-[var(--border)] content-auto reveal-on-scroll space-y-6">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="p-6 sm:p-8 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] shadow-xs space-y-6">
-              <div>
-                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-i18n="termsBadge">Legal & Transparency</span>
-                <h2 class="text-xl sm:text-2xl font-heading font-bold text-[var(--text)] mt-2" data-i18n="termsTitle">नियम व शर्तें एवं गोपनीयता नीति (Terms & Privacy)</h2>
-                <p class="text-xs text-[var(--muted)] mt-1" data-i18n="termsSubtitle">इस प्लेटफ़ॉर्म का उपयोग करके आप निम्नलिखित नियमों और गोपनीयता नीतियों से सहमत होते हैं।</p>
+            <div class="text-center space-y-2 mb-10">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-i18n="termsBadge">Legal & Transparency</span>
+              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--text)]" data-i18n="termsTitle">नियम व शर्तें एवं गोपनीयता नीति (Terms & Privacy)</h2>
+              <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-i18n="termsSubtitle">इस प्लेटफ़ॉर्म का उपयोग करके आप निम्नलिखित नियमों और गोपनीयता नीतियों से सहमत होते हैं।</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs text-[var(--muted)] leading-relaxed">
+              <!-- Clause 1 -->
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalDisclaimerHeader">१. मरम्मत की कोई गारंटी नहीं (No Repair Guarantee)</h4>
+                <p data-i18n="legalDisclaimerText">गड्ढे में पार्टी एक क्राउड-सोर्स्ड नागरिक मैपिंग टूल है। हम केवल डेटा एकत्र और सार्वजनिक करते हैं; हम किसी भी गड्ढे की मरम्मत करने या सरकारी कार्यवाई की गारंटी नहीं देते।</p>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs text-[var(--muted)] leading-relaxed">
-                <!-- Clause 1 -->
-                <div class="p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 shadow-xs">
-                  <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalDisclaimerHeader">१. मरम्मत की कोई गारंटी नहीं (No Repair Guarantee)</h4>
-                  <p data-i18n="legalDisclaimerText">गड्ढे में पार्टी एक क्राउड-सोर्स्ड नागरिक मैपिंग टूल है। हम केवल डेटा एकत्र और सार्वजनिक करते हैं; हम किसी भी गड्ढे की मरम्मत करने या सरकारी कार्यवाई की गारंटी नहीं देते।</p>
-                </div>
+              <!-- Clause 2 -->
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalContentRulesHeader">२. यूज़र सामग्री नियम (Content Rules)</h4>
+                <p data-i18n="legalContentRulesText">उपयोगकर्ता केवल सड़क के गड्ढों और सड़क क्षति की प्रामाणिक तस्वीरें ही अपलोड करें। किसी भी व्यक्ति का चेहरा, निजी संपत्ति, वाहन की नंबर प्लेट, या आपत्तिजनक सामग्री पोस्ट करना सख्त मना है।</p>
+              </div>
 
-                <!-- Clause 2 -->
-                <div class="p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 shadow-xs">
-                  <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalContentRulesHeader">२. यूज़र सामग्री नियम (Content Rules)</h4>
-                  <p data-i18n="legalContentRulesText">उपयोगकर्ता केवल सड़क के गड्ढों और सड़क क्षति की प्रामाणिक तस्वीरें ही अपलोड करें। किसी भी व्यक्ति का चेहरा, निजी संपत्ति, वाहन की नंबर प्लेट, या आपत्तिजनक सामग्री पोस्ट करना सख्त मना है।</p>
-                </div>
+              <!-- Clause 3 -->
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalDataRetentionHeader">३. डेटा संग्रह और प्राइवेसी (What We Collect)</h4>
+                <p data-i18n="legalDataRetentionText">हम कोई व्यक्तिगत नाम या ईमेल स्टोर नहीं करते। केवल फोटो, गड्ढे के GPS निर्देशांक, सुरक्षा के लिए हैशेड IP और अनाम सेशन आईडी दर्ज की जाती है।</p>
+              </div>
 
-                <!-- Clause 3 -->
-                <div class="p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 shadow-xs">
-                  <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalDataRetentionHeader">३. डेटा संग्रह और प्राइवेसी (What We Collect)</h4>
-                  <p data-i18n="legalDataRetentionText">हम कोई व्यक्तिगत नाम या ईमेल स्टोर नहीं करते। केवल फोटो, गड्ढे के GPS निर्देशांक, सुरक्षा के लिए हैशेड IP और अनाम सेशन आईडी दर्ज की जाती है।</p>
-                </div>
-
-                <!-- Clause 4 -->
-                <div class="p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] space-y-2 shadow-xs">
-                  <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalRemovalHeader">४. सामग्री हटाने का अनुरोध (Removal Requests)</h4>
-                  <p data-i18n="legalRemovalText">यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या contact@gaddhemeparty.in पर हटाए जाने का अनुरोध भेज सकते हैं।</p>
-                </div>
+              <!-- Clause 4 -->
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
+                <h4 class="font-heading font-bold text-[var(--text)] text-sm" data-i18n="legalRemovalHeader">४. सामग्री हटाने का अनुरोध (Removal Requests)</h4>
+                <p data-i18n="legalRemovalText">यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या contact@gaddhemeparty.in पर हटाए जाने का अनुरोध भेज सकते हैं।</p>
               </div>
             </div>
           </div>

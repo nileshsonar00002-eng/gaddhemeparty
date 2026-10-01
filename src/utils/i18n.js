@@ -168,6 +168,7 @@ export const translations = {
     faq3A: 'फोटो सार्वजनिक रूप से मैप पर दिखती है ताकि अन्य नागरिक और प्रशासन उसे देख सकें। कृपया केवल सड़क/गड्ढे की फोटो अपलोड करें; चेहरे या वाहन की नंबर प्लेट वर्जित हैं।',
 
     // About Us
+    aboutBadge: 'नागरिक पहल',
     aboutTitle: 'हमारे बारे में',
     aboutSubtitle: '100% स्वतंत्र व नागरिक-संचालित मंच',
     aboutStory: 'गड्ढे में पार्टी की शुरुआत भारत के जागरूक नागरिकों द्वारा की गई एक स्वतंत्र नागरिक पहल है। इसका उद्देश्य व्यंग्य और तकनीक के माध्यम से हमारी सड़कों की दुर्दशा पर ध्यान आकर्षित करना और प्रशासन को जवाबदेह बनाना है।',
@@ -381,6 +382,7 @@ export const translations = {
     faq3A: 'Uploaded photos are displayed publicly on the map. Please only upload road hazard photos; human faces, private property, and vehicle number plates are strictly prohibited.',
 
     // About Us
+    aboutBadge: 'Civic Initiative',
     aboutTitle: 'About Us',
     aboutSubtitle: '100% Independent & Citizen-Driven Platform',
     aboutStory: 'Gaddhe Me Party was created by proactive Indian citizens as an independent civic initiative. We use civic tech and gentle satire to spotlight neglected road infrastructure and foster public accountability.',
