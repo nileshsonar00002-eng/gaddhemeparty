@@ -63,24 +63,24 @@ export class LeaderboardSection {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <!-- #1 Rank Hero Card (7 Cols) -->
           ${heroPin ? `
-            <div class="lg:col-span-7 rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 shadow-soft flex flex-col justify-between group">
+            <div class="card-lime tilt-card lg:col-span-7 p-4 sm:p-5 flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs">
                     ${t('heroBadgeRank')}
                   </span>
-                  <span class="text-xs tabular-nums font-mono font-bold text-[var(--primary)] bg-[var(--surface-2)] px-2.5 py-0.5 rounded-lg border border-[var(--border)]">
+                  <span class="badge-rank-gold text-xs tabular-nums font-mono font-bold px-3 py-0.5 rounded-lg">
                     👑 #1 RANK
                   </span>
                 </div>
 
-                <div class="w-full h-44 sm:h-52 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] mb-3.5 relative">
+                <div class="w-full h-44 sm:h-52 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] mb-3.5 relative shadow-inner">
                   <img
                     src="${heroPin.thumbnailUrl || heroPin.imageUrl || 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=400&auto=format&fit=crop&q=60'}"
                     alt="Hero Pothole"
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
-                  <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-white border border-white/20">
+                  <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-white border border-white/20 shadow-xs">
                     📍 ${resolvePinCity(heroPin, isHindi)}
                   </div>
                 </div>
@@ -90,10 +90,10 @@ export class LeaderboardSection {
                 </h3>
 
                 <div class="flex items-center gap-2 mt-2 text-xs tabular-nums font-mono text-[var(--muted)] flex-wrap">
-                  <span class="bg-[#D93025]/15 text-[#D93025] border border-[#D93025]/30 px-2 py-0.5 rounded-lg font-bold">
+                  <span class="bg-[#D93025]/15 text-[#D93025] border border-[#D93025]/30 px-2 py-0.5 rounded-lg font-bold shadow-xs">
                     ${t('rankRowReports', { n: heroPin.reportCount || 1 })}
                   </span>
-                  <span class="bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] px-2 py-0.5 rounded-lg">
+                  <span class="bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] px-2 py-0.5 rounded-lg shadow-xs">
                     ${t('daysOpenText', { n: heroPin.daysOpen || 1 })}
                   </span>
                 </div>
@@ -103,7 +103,7 @@ export class LeaderboardSection {
                 <button
                   type="button"
                   onclick="window.__khaddaFlyToPin('${heroPin.id}')"
-                  class="btn-primary flex-1 py-2.5 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs cursor-pointer font-bold"
+                  class="btn-primary flex-1 py-2.5 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer font-bold"
                 >
                   <span>📍</span>
                   <span>${t('tapToViewOnMap')}</span>
@@ -111,7 +111,7 @@ export class LeaderboardSection {
               </div>
             </div>
           ` : `
-            <div class="lg:col-span-7 p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center text-[var(--muted)] text-sm">
+            <div class="card-lime lg:col-span-7 p-8 text-center text-[var(--muted)] text-sm">
               ${t('leaderboardEmptyTitle')}
             </div>
           `}
@@ -121,13 +121,13 @@ export class LeaderboardSection {
             ${runnerUps.length > 0 ? runnerUps.map((pin, idx) => `
               <div
                 onclick="window.__khaddaFlyToPin('${pin.id}')"
-                class="flex-1 p-4 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition flex items-center gap-3.5 cursor-pointer group shadow-soft"
+                class="card-lime tilt-card flex-1 p-4 flex items-center gap-3.5 cursor-pointer group"
               >
-                <div class="w-9 h-9 rounded-2xl bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] font-bold tabular-nums font-mono text-xs flex items-center justify-center flex-shrink-0">
+                <div class="${idx === 0 ? 'badge-rank-silver' : 'badge-rank-bronze'} w-9 h-9 rounded-2xl font-bold tabular-nums font-mono text-xs flex items-center justify-center flex-shrink-0 shadow-xs">
                   #${idx + 2}
                 </div>
 
-                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] flex-shrink-0">
+                <div class="w-14 h-14 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] flex-shrink-0 shadow-xs">
                   ${pin.thumbnailUrl || pin.imageUrl ? `
                     <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="thumb" class="w-full h-full object-cover" />
                   ` : `
@@ -136,13 +136,13 @@ export class LeaderboardSection {
                 </div>
 
                 <div class="flex-1 min-w-0">
-                  <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] truncate group-hover:text-[var(--accent)] transition">
+                  <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] truncate group-hover:text-[var(--primary)] transition">
                     ${pin.landmark || t('defaultLandmark')}
                   </h4>
                   <p class="text-[11px] text-[var(--muted)] mt-0.5 truncate">
                     📍 ${resolvePinCity(pin, isHindi)}
                   </p>
-                  <div class="flex items-center gap-2 mt-1 text-[10px] tabular-nums font-mono text-[var(--accent)]">
+                  <div class="flex items-center gap-2 mt-1 text-[10px] tabular-nums font-mono text-[var(--primary)]">
                     <span>🚨 ${pin.reportCount || 1} reps</span>
                     <span>👍 ${pin.upvotes || 0} votes</span>
                   </div>

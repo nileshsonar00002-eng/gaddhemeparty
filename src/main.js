@@ -35,6 +35,7 @@ import { PanelManager } from './components/PanelManager';
 import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimation';
 import { router } from './utils/router';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps } from './utils/geo';
+import { tilt3d } from './utils/tilt3d';
 
 // Real Live Data Store
 class KhaddaApp {
@@ -139,11 +140,15 @@ class KhaddaApp {
     this.setupStickyCtaObserver();
     this.setupScrollReveal();
 
+    // 10. Subtle Desktop 3D Card Tilt Engine
+    tilt3d.init();
+
     // 10.5. Initialize Animated Pothole Cartoon Strip (Above Footer)
     initPotholeCartoonAnimation('pothole-animation-mount');
     window.addEventListener('languageChanged', () => {
       initPotholeCartoonAnimation('pothole-animation-mount');
       this.renderHeaderAndStats();
+      tilt3d.refresh();
     });
 
     // 11. Window Resize Listener for full-width layout responsiveness
