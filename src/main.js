@@ -284,6 +284,7 @@ class KhaddaApp {
     createNavbar({
       onChaiTipClick: () => openChaiTipModal(),
       onToggleMapTheme: () => this.toggleMapTheme(),
+      onSetTheme: (theme) => this.applyGlobalTheme(theme, true),
       currentTheme: this.mapTheme,
       activeNav: this.activeNav
     });

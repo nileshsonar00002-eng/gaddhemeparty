@@ -12,6 +12,7 @@ export function createNavbar(options = {}) {
   const {
     onChaiTipClick,
     onToggleMapTheme,
+    onSetTheme,
     currentTheme = 'dark',
     activeNav = 'map'
   } = options;
@@ -236,20 +237,27 @@ export function createNavbar(options = {}) {
               </div>
             </div>
 
-            <!-- Theme Toggle Row -->
+            <!-- Segmented Theme Switcher -->
             <div class="flex flex-col gap-1.5">
               <span class="text-xs font-medium text-[var(--muted)]">Theme / थीम</span>
-              <button
-                id="btn-theme-toggle-drawer"
-                type="button"
-                class="btn-secondary h-11 w-full px-3.5 flex items-center justify-between rounded-xl"
-              >
-                <div class="flex items-center gap-2.5 text-sm font-medium">
-                  ${currentTheme === 'dark' ? getLucideIcon('sun', 'w-4 h-4 text-amber-400') : getLucideIcon('moon', 'w-4 h-4 text-slate-700')}
-                  <span>${currentTheme === 'dark' ? t('switchToLightMode') : t('switchToDarkMode')}</span>
-                </div>
-                <span class="text-xs font-semibold uppercase px-2 py-0.5 rounded-md bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]">${currentTheme}</span>
-              </button>
+              <div class="grid grid-cols-2 gap-1.5 bg-[var(--surface-2)] p-1 rounded-xl border border-[var(--border)]">
+                <button
+                  id="btn-theme-light-drawer"
+                  type="button"
+                  class="h-10 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${currentTheme === 'light' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+                >
+                  ${getLucideIcon('sun', 'w-4 h-4')}
+                  <span>${isHindi ? 'लाइट' : 'Light'}</span>
+                </button>
+                <button
+                  id="btn-theme-dark-drawer"
+                  type="button"
+                  class="h-10 flex items-center justify-center gap-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${currentTheme === 'dark' ? 'bg-[var(--accent)] text-[var(--accent-ink)] font-bold shadow-xs' : 'text-[var(--muted)] hover:text-[var(--text)]'}"
+                >
+                  ${getLucideIcon('moon', 'w-4 h-4')}
+                  <span>${isHindi ? 'डार्क' : 'Dark'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -311,9 +319,27 @@ export function createNavbar(options = {}) {
   const handleToggleTheme = () => {
     if (onToggleMapTheme) onToggleMapTheme();
   };
+  const handleSetTheme = (theme) => {
+    if (onSetTheme) {
+      onSetTheme(theme);
+    } else if (onToggleMapTheme && theme !== currentTheme) {
+      onToggleMapTheme();
+    }
+  };
+
   document.getElementById('btn-theme-toggle-desktop')?.addEventListener('click', handleToggleTheme);
-  document.getElementById('btn-theme-toggle-drawer')?.addEventListener('click', () => {
-    handleToggleTheme();
+  
+  document.getElementById('btn-theme-light-drawer')?.addEventListener('click', () => {
+    if (currentTheme !== 'light') {
+      handleSetTheme('light');
+    }
+    closeDrawer();
+  });
+
+  document.getElementById('btn-theme-dark-drawer')?.addEventListener('click', () => {
+    if (currentTheme !== 'dark') {
+      handleSetTheme('dark');
+    }
     closeDrawer();
   });
 
