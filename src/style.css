@@ -677,19 +677,18 @@ body.panel-scroll-locked {
 
 @keyframes vehicleDriveRightToLeft {
   0% { right: -25%; transform: translateY(0) rotate(0deg); }
-  38% { right: 40%; transform: translateY(0) rotate(0deg); }
-  43% { right: 46%; transform: translateY(16px) rotate(-22deg); }
-  47% { right: 49%; transform: translateY(-20px) rotate(18deg); }
-  51% { right: 53%; transform: translateY(8px) rotate(-10deg); }
-  56% { right: 58%; transform: translateY(-3px) rotate(3deg); }
-  60% { right: 64%; transform: translateY(0) rotate(0deg); }
+  45% { right: 43%; transform: translateY(0) rotate(0deg); }
+  48% { right: 47%; transform: translateY(12px) rotate(-14deg); }
+  51% { right: 51%; transform: translateY(-16px) rotate(12deg); }
+  54% { right: 55%; transform: translateY(4px) rotate(-4deg); }
+  57% { right: 59%; transform: translateY(0) rotate(0deg); }
   100% { right: 125%; transform: translateY(0) rotate(0deg); }
 }
 
 @keyframes comicBubblePop {
-  0%, 40% { opacity: 0; transform: scale(0.3) translateY(8px); }
-  43%, 52% { opacity: 1; transform: scale(1.15) translateY(-6px); }
-  56%, 100% { opacity: 0; transform: scale(0.5) translateY(-14px); }
+  0%, 45% { opacity: 0; transform: scale(0.3) translateY(8px); }
+  48%, 54% { opacity: 1; transform: scale(1.1) translateY(-6px); }
+  57%, 100% { opacity: 0; transform: scale(0.5) translateY(-14px); }
 }
 
 .vehicle-runner {
@@ -697,17 +696,17 @@ body.panel-scroll-locked {
   will-change: right, transform;
 }
 
-.vehicle-bike { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite 0s; }
-.vehicle-bike .comic-bubble { animation: comicBubblePop 14s ease-out infinite 0s; }
+.vehicle-bike { animation: vehicleDriveRightToLeft 16s linear infinite 0s; }
+.vehicle-bike .comic-bubble { animation: comicBubblePop 16s ease-out infinite 0s; }
 
-.vehicle-auto { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -3.5s; }
-.vehicle-auto .comic-bubble { animation: comicBubblePop 14s ease-out infinite -3.5s; }
+.vehicle-auto { animation: vehicleDriveRightToLeft 16s linear infinite -4s; }
+.vehicle-auto .comic-bubble { animation: comicBubblePop 16s ease-out infinite -4s; }
 
-.vehicle-car { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -7s; }
-.vehicle-car .comic-bubble { animation: comicBubblePop 14s ease-out infinite -7s; }
+.vehicle-car { animation: vehicleDriveRightToLeft 16s linear infinite -8s; }
+.vehicle-car .comic-bubble { animation: comicBubblePop 16s ease-out infinite -8s; }
 
-.vehicle-jeep { animation: vehicleDriveRightToLeft 14s cubic-bezier(0.25, 1, 0.5, 1) infinite -10.5s; }
-.vehicle-jeep .comic-bubble { animation: comicBubblePop 14s ease-out infinite -10.5s; }
+.vehicle-jeep { animation: vehicleDriveRightToLeft 16s linear infinite -12s; }
+.vehicle-jeep .comic-bubble { animation: comicBubblePop 16s ease-out infinite -12s; }
 
 /* Strict horizontal overflow prevention on mobile viewports */
 html, body {
