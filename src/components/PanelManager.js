@@ -439,33 +439,35 @@ export class PanelManager {
     if (hasHeroCard) {
       const cityName = isHindi ? (heroPin.cityNameHindi || heroPin.cityNameEnglish || 'भारत') : (heroPin.cityNameEnglish || heroPin.cityNameHindi || 'India');
       heroCardHtml = `
-        <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-transparent border border-amber-500/30 space-y-2 relative overflow-hidden group">
+        <div class="p-4.5 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-500/25 via-amber-500/10 to-transparent border-2 border-amber-500/40 space-y-3 relative overflow-hidden group shadow-md ring-1 ring-amber-500/20">
           <div class="flex items-center justify-between">
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] tabular-nums font-mono font-black uppercase">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs tabular-nums font-mono font-black uppercase shadow-sm">
               👑 #1 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
             </span>
-            <span class="text-xs tabular-nums font-mono font-bold text-amber-500">🔥 ${(heroPin.upvotes || 0) + (heroPin.reportCount || 1) * 3} pts</span>
+            <span class="text-xs sm:text-sm tabular-nums font-mono font-black text-amber-600 dark:text-amber-400 flex items-center gap-1">
+              🔥 ${(heroPin.upvotes || 0) + (heroPin.reportCount || 1) * 3} pts
+            </span>
           </div>
 
-          <div class="flex gap-3 items-center">
+          <div class="flex gap-3.5 items-center">
             ${heroPin.thumbnailUrl || heroPin.imageUrl ? `
-              <img src="${heroPin.thumbnailUrl || heroPin.imageUrl}" alt="Hero Pothole" class="w-16 h-16 rounded-xl object-cover border border-amber-500/40 flex-shrink-0" />
+              <img src="${heroPin.thumbnailUrl || heroPin.imageUrl}" alt="Hero Pothole" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-500/50 shadow-sm flex-shrink-0" />
             ` : `
-              <div class="w-16 h-16 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-2xl flex-shrink-0">🕳️</div>
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 flex items-center justify-center text-3xl flex-shrink-0">🕳️</div>
             `}
             <div class="min-w-0 flex-1">
-              <h3 class="font-heading font-bold text-sm text-[var(--text)] truncate">${heroPin.landmark || 'सड़क का गड्ढा'}</h3>
-              <p class="text-xs text-[var(--muted)]">📍 ${cityName}</p>
-              <div class="flex gap-2 text-[11px] text-[var(--muted)] mt-1 tabular-nums font-mono">
-                <span>📢 ${heroPin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'Reports'}</span>
-                <span>👍 ${heroPin.upvotes || 0} ${isHindi ? 'वोट' : 'Votes'}</span>
+              <h3 class="font-heading font-extrabold text-sm sm:text-base text-[var(--text)] truncate leading-tight">${heroPin.landmark || 'सड़क का गड्ढा'}</h3>
+              <p class="text-xs text-[var(--muted)] mt-0.5">📍 ${cityName}</p>
+              <div class="flex gap-2.5 text-xs text-[var(--muted)] mt-1.5 tabular-nums font-mono font-medium">
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">📢 ${heroPin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'Reports'}</span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">👍 ${heroPin.upvotes || 0} ${isHindi ? 'वोट' : 'Votes'}</span>
               </div>
             </div>
           </div>
 
           <button
             type="button"
-            class="panel-pin-row-btn w-full py-1.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-[var(--accent)] text-xs font-heading font-bold flex items-center justify-center gap-1.5 transition cursor-pointer"
+            class="panel-pin-row-btn w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-heading font-extrabold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm active:scale-[0.99]"
             data-pin-id="${heroPin.id}"
           >
             <span>🗺️</span>
@@ -481,20 +483,39 @@ export class PanelManager {
       if (topCities.length === 0) {
         listHtml = `<div class="text-center py-8 text-[var(--muted)] text-xs">${isHindi ? 'अभी कोई शहर डेटा उपलब्ध नहीं है।' : 'No city data available yet.'}</div>`;
       } else {
-        listHtml = topCities.map((c, idx) => `
-          <div class="p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs tabular-nums font-mono font-extrabold ${idx === 0 ? 'bg-amber-500 text-slate-950' : (idx === 1 ? 'bg-slate-300 text-slate-950' : (idx === 2 ? 'bg-amber-700 text-white' : 'bg-[var(--surface-2)] text-[var(--muted)]'))}">
-                #${idx + 1}
-              </span>
-              <div>
-                <h4 class="font-heading font-bold text-sm text-[var(--text)]">${isHindi ? (c.nameHindi || c.nameEnglish) : (c.nameEnglish || c.nameHindi)}</h4>
-                <p class="text-[11px] text-[var(--muted)]">${c.count || 0} ${isHindi ? 'कुल रिपोर्ट्स' : 'Total Reports'}</p>
+        listHtml = topCities.map((c, idx) => {
+          const isTop3 = idx < 3;
+          const badgeClass = idx === 0 
+            ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-black text-sm shadow-sm ring-1 ring-amber-500/40' 
+            : (idx === 1 
+              ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 text-slate-950 font-black text-sm shadow-sm ring-1 ring-slate-400/40' 
+              : (idx === 2 
+                ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-amber-700 via-amber-800 to-amber-900 text-amber-100 font-black text-sm shadow-sm ring-1 ring-amber-700/40' 
+                : 'w-7 h-7 rounded-xl bg-[var(--surface-2)] text-[var(--muted)] font-bold text-xs'));
+
+          const cardClass = isTop3
+            ? (idx === 0 
+              ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--surface)] to-[var(--surface)] border border-amber-500/40 shadow-sm' 
+              : (idx === 1 
+                ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-200/20 via-[var(--surface)] to-[var(--surface)] border border-slate-300 dark:border-slate-600 shadow-sm' 
+                : 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-800/10 via-[var(--surface)] to-[var(--surface)] border border-amber-700/30 shadow-sm'))
+            : 'p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-sm';
+
+          return `
+            <div class="${cardClass} flex items-center justify-between transition">
+              <div class="flex items-center gap-3">
+                <span class="${badgeClass} flex items-center justify-center tabular-nums font-mono flex-shrink-0">
+                  #${idx + 1}
+                </span>
+                <div>
+                  <h4 class="font-heading ${isTop3 ? 'font-extrabold text-sm sm:text-base' : 'font-bold text-sm'} text-[var(--text)]">${isHindi ? (c.nameHindi || c.nameEnglish) : (c.nameEnglish || c.nameHindi)}</h4>
+                  <p class="text-[11px] text-[var(--muted)]">${c.count || 0} ${isHindi ? 'कुल रिपोर्ट्स' : 'Total Reports'}</p>
+                </div>
               </div>
+              <span class="text-xs ${isTop3 ? 'sm:text-sm font-black text-amber-600 dark:text-amber-400' : 'font-bold text-amber-500'} tabular-nums font-mono">🚨 ${c.count || 0}</span>
             </div>
-            <span class="text-xs tabular-nums font-mono font-bold text-amber-500">🚨 ${c.count || 0}</span>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
     } else {
       const listKey = this.leaderboardTab === 'week' ? 'weekRankings' : 'allTimeRankings';
@@ -509,31 +530,51 @@ export class PanelManager {
       } else {
         listHtml = pins.map((pin, idx) => {
           const rankNumber = startRank + idx;
+          const isTop3 = rankNumber <= 3;
           const cityName = isHindi ? (pin.cityNameHindi || pin.cityNameEnglish || 'भारत') : (pin.cityNameEnglish || pin.cityNameHindi || 'India');
+
+          const badgeClass = rankNumber === 1 
+            ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 text-slate-950 font-black text-sm shadow-sm ring-1 ring-amber-500/50' 
+            : (rankNumber === 2 
+              ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 text-slate-950 font-black text-sm shadow-sm ring-1 ring-slate-400/50' 
+              : (rankNumber === 3 
+                ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-amber-700 via-amber-800 to-amber-900 text-amber-100 font-black text-sm shadow-sm ring-1 ring-amber-700/50' 
+                : 'w-6 h-6 rounded-lg bg-[var(--surface-2)] text-[var(--muted)] font-bold text-xs'));
+
+          const cardClass = isTop3
+            ? (rankNumber === 1 
+              ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[var(--surface)] to-[var(--surface)] border border-amber-500/40 hover:border-amber-500/60 shadow-sm' 
+              : (rankNumber === 2 
+                ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-200/20 via-[var(--surface)] to-[var(--surface)] border border-slate-300 dark:border-slate-600 hover:border-slate-400 shadow-sm' 
+                : 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-800/10 via-[var(--surface)] to-[var(--surface)] border border-amber-700/30 hover:border-amber-700/50 shadow-sm'))
+            : 'p-3 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-amber-500/40 shadow-sm';
+
+          const thumbSize = isTop3 ? 'w-12 h-12' : 'w-10 h-10';
+
           return `
             <div
-              class="panel-pin-row p-3 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] hover:border-amber-500/40 transition flex items-center justify-between gap-3 cursor-pointer group shadow-sm"
+              class="panel-pin-row ${cardClass} transition flex items-center justify-between gap-3 cursor-pointer group"
               data-pin-id="${pin.id}"
             >
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs tabular-nums font-mono font-bold flex-shrink-0 ${rankNumber === 1 ? 'bg-amber-500 text-slate-950 font-black' : (rankNumber === 2 ? 'bg-slate-300 text-slate-950 font-black' : (rankNumber === 3 ? 'bg-amber-700 text-white' : 'bg-[var(--surface-2)] text-[var(--muted)]'))}">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="${badgeClass} flex items-center justify-center tabular-nums font-mono flex-shrink-0">
                   ${rankNumber}
                 </span>
 
                 ${pin.thumbnailUrl || pin.imageUrl ? `
-                  <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="Pothole thumb" class="w-10 h-10 rounded-xl object-cover border border-[var(--border)] flex-shrink-0" />
+                  <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="Pothole thumb" class="${thumbSize} rounded-xl object-cover border border-[var(--border)] flex-shrink-0 shadow-xs" />
                 ` : `
-                  <div class="w-10 h-10 rounded-xl bg-[var(--surface-2)] flex items-center justify-center text-sm flex-shrink-0">🕳️</div>
+                  <div class="${thumbSize} rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center ${isTop3 ? 'text-lg' : 'text-sm'} flex-shrink-0">🕳️</div>
                 `}
 
                 <div class="min-w-0">
-                  <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] truncate group-hover:text-amber-500 transition">${pin.landmark || 'सड़क का गड्ढा'}</h4>
+                  <h4 class="font-heading ${isTop3 ? 'font-extrabold text-sm sm:text-base' : 'font-bold text-xs sm:text-sm'} text-[var(--text)] truncate group-hover:text-amber-500 transition">${pin.landmark || 'सड़क का गड्ढा'}</h4>
                   <p class="text-[11px] text-[var(--muted)] truncate">📍 ${cityName} • ${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}</p>
                 </div>
               </div>
 
               <div class="flex items-center gap-2 flex-shrink-0">
-                <span class="px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[var(--accent)] tabular-nums font-mono font-bold text-xs">
+                <span class="px-2.5 py-1 rounded-lg ${isTop3 ? 'bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-300 font-extrabold' : 'bg-amber-500/10 border-amber-500/20 text-[var(--accent)] font-bold'} border tabular-nums font-mono text-xs">
                   👍 ${pin.upvotes || 0}
                 </span>
                 <span class="text-[var(--muted)] group-hover:text-[var(--text)] transition text-xs">➔</span>
