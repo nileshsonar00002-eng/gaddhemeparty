@@ -1,6 +1,7 @@
 // Responsive Report Drawer / Bottom Sheet Component
 // Desktop (>= 768px): Right-side docked non-modal panel (440px wide, no backdrop, map interactive)
 // Mobile (< 768px): Modal Bottom Sheet (max-h 85dvh, backdrop, drag handle, swipe-to-close)
+// Fullscreen Support: Dynamically docks over the map in both normal and fullscreen modes
 
 import { modalManager } from '../utils/modalManager';
 
@@ -92,7 +93,37 @@ export class BottomSheet {
           this.backdrop?.classList.add('opacity-100', 'pointer-events-auto');
         }
       }
+      this.syncFullscreenMount();
     });
+
+    // Handle Fullscreen state transitions to ensure panel is always above map
+    const handleFsChange = () => this.syncFullscreenMount();
+    document.addEventListener('fullscreenchange', handleFsChange);
+    document.addEventListener('webkitfullscreenchange', handleFsChange);
+  }
+
+  syncFullscreenMount() {
+    const card = document.getElementById('map-card-container');
+    const isFs = !!(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullScreenElement ||
+      document.msFullscreenElement ||
+      card?.classList.contains('is-fullscreen')
+    );
+
+    if (isFs && card) {
+      if (this.container && this.container.parentElement !== card) {
+        card.appendChild(this.container);
+      }
+      this.drawer?.classList.add('is-map-fullscreen');
+    } else {
+      const appRoot = document.getElementById('app') || document.body;
+      if (this.container && this.container.parentElement !== appRoot && this.container.parentElement !== document.body) {
+        appRoot.appendChild(this.container);
+      }
+      this.drawer?.classList.remove('is-map-fullscreen');
+    }
   }
 
   setupMobileSwipe() {
@@ -134,6 +165,8 @@ export class BottomSheet {
 
   open(htmlContent = '') {
     if (!this.drawer) return;
+    this.syncFullscreenMount();
+
     if (htmlContent && this.content) {
       this.content.innerHTML = htmlContent;
     }

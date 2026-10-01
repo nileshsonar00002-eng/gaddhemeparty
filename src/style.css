@@ -750,3 +750,24 @@ body.map-confirm-active {
   overflow: hidden !important;
   touch-action: pan-x pan-y pinch-zoom;
 }
+
+/* Fullscreen Map Report Panel Support */
+#sheet-drawer.is-map-fullscreen {
+  top: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  border-radius: 0 !important;
+  z-index: 1050 !important;
+}
+
+@media (max-width: 767px) {
+  #sheet-drawer.is-map-fullscreen {
+    top: auto !important;
+    bottom: 0 !important;
+    height: auto !important;
+    max-height: 85dvh !important;
+    border-top-left-radius: 1.5rem !important;
+    border-top-right-radius: 1.5rem !important;
+  }
+}
+
