@@ -188,7 +188,16 @@ class KhaddaApp {
   initPanelsAndRouter() {
     this.panelManager = new PanelManager({
       onSelectPin: (pin) => {
+        const pinRank = pin.rank || window.__khaddaGetPinRank?.(pin.id) || null;
+        if (pinRank) pin.rank = pinRank;
+
         this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+        if (this.mapAdapter.highlightPin) {
+          this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
+        }
+        if (this.mapAdapter.playArrivalRipple) {
+          this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+        }
         setTimeout(() => {
           openPinDetailModal(pin);
         }, 350);
@@ -204,7 +213,15 @@ class KhaddaApp {
       if (route.type === 'pin' && route.id) {
         const pin = this.currentPins.find((p) => p.id === route.id);
         if (pin) {
+          const pinRank = window.__khaddaGetPinRank?.(pin.id) || null;
+          if (pinRank) pin.rank = pinRank;
           this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+          if (this.mapAdapter.highlightPin) {
+            this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
+          }
+          if (this.mapAdapter.playArrivalRipple) {
+            this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+          }
           openPinDetailModal(pin);
         }
       } else if (route.type === 'panel') {
@@ -346,16 +363,71 @@ class KhaddaApp {
     document.addEventListener('mozfullscreenchange', onFullscreenChange);
     document.addEventListener('MSFullscreenChange', onFullscreenChange);
 
-    // Global Pin Navigation Handlers
-    window.__khaddaFlyToPin = (pinId) => {
+    // Global Pin Navigation & Rank Handlers
+    window.__khaddaGetPinRank = (pinId) => {
+      if (!pinId) return null;
+      if (this.panelManager?.leaderboardData?.heroPotholeOfWeek?.id === pinId) {
+        return 1;
+      }
+      const weekRankings = this.panelManager?.leaderboardData?.weekRankings || [];
+      const weekIdx = weekRankings.findIndex((p) => p.id === pinId);
+      if (weekIdx !== -1) return weekIdx + 1;
+
+      const allTimeRankings = this.panelManager?.leaderboardData?.allTimeRankings || [];
+      const allTimeIdx = allTimeRankings.findIndex((p) => p.id === pinId);
+      if (allTimeIdx !== -1) return allTimeIdx + 1;
+
+      if (this.currentPins && this.currentPins.length > 0) {
+        const sorted = [...this.currentPins].sort((a, b) => (b.upvotes || 0) + (b.reportCount || 1) * 3 - ((a.upvotes || 0) + (a.reportCount || 1) * 3));
+        const sortedIdx = sorted.findIndex((p) => p.id === pinId);
+        if (sortedIdx !== -1 && sortedIdx < 10) return sortedIdx + 1;
+      }
+      return null;
+    };
+
+    window.__khaddaFocusPinOnMap = (pin, rank = null) => {
+      if (!pin || !pin.latitude || !pin.longitude) return;
+
+      const mapEl = document.getElementById('map-section');
+      if (mapEl) {
+        mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      const pinRank = rank || pin.rank || window.__khaddaGetPinRank(pin.id);
+
+      if (this.panelManager && window.innerWidth < 1024) {
+        this.panelManager.setMobilePeek(true);
+      }
+
+      if (this.mapAdapter) {
+        this.mapAdapter.setView(pin.latitude, pin.longitude, 18);
+        if (this.mapAdapter.highlightPin) {
+          this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
+        }
+        if (this.mapAdapter.playArrivalRipple) {
+          this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+        }
+      }
+    };
+
+    window.__khaddaFlyToPin = (pinId, rank = null) => {
       const pin = this.currentPins.find((p) => p.id === pinId) ||
                   (this.panelManager?.leaderboardData?.heroPotholeOfWeek?.id === pinId ? this.panelManager.leaderboardData.heroPotholeOfWeek : null);
       if (pin) {
+        const pinRank = rank || pin.rank || window.__khaddaGetPinRank(pinId);
+        if (pinRank) pin.rank = pinRank;
+
         const mapEl = document.getElementById('map-section');
         if (mapEl) {
           mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+        if (this.mapAdapter.highlightPin) {
+          this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
+        }
+        if (this.mapAdapter.playArrivalRipple) {
+          this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+        }
         setTimeout(() => {
           openPinDetailModal(pin);
         }, 400);

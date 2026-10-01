@@ -578,6 +578,83 @@ export class GoogleMapsAdapter extends MapAdapter {
     }
   }
 
+  highlightPin(lat, lng, rank = null) {
+    if (!this.map) return;
+    this.clearHighlightPin();
+
+    const rankNumber = Number(rank);
+    const hasRank = !isNaN(rankNumber) && rankNumber > 0;
+    const isTop1 = hasRank && rankNumber === 1;
+    const isTop2 = hasRank && rankNumber === 2;
+    const isTop3 = hasRank && rankNumber === 3;
+
+    const rankText = isTop1 
+      ? '👑 #1' 
+      : isTop2 
+      ? '🥈 #2' 
+      : isTop3 
+      ? '🥉 #3' 
+      : (hasRank ? `#${rankNumber}` : '📍');
+
+    const badgeBg = isTop1
+      ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black'
+      : isTop2
+      ? 'bg-gradient-to-r from-slate-200 to-slate-300 text-slate-950 font-black'
+      : isTop3
+      ? 'bg-gradient-to-r from-amber-700 to-amber-800 text-white font-black'
+      : (hasRank ? 'bg-amber-500 text-slate-950 font-black' : 'bg-rose-600 text-white font-bold');
+
+    const htmlContent = `
+      <div class="pin-rank-bounce relative flex flex-col items-center pointer-events-none select-none transform -translate-x-1/2 -translate-y-full" style="z-index: 999985;">
+        <!-- Floating Rank Badge -->
+        <div class="mb-1 px-3 py-1 text-xs font-heading tracking-wider uppercase rounded-full ${badgeBg} shadow-2xl ring-2 ring-white whitespace-nowrap flex items-center gap-1.5 transform hover:scale-110 transition">
+          <span>${rankText}</span>
+          <span class="text-[10px] tracking-tight opacity-90">${hasRank ? 'RANK' : 'POTHOLE'}</span>
+        </div>
+
+        <!-- Pulsing Hazard Marker Body -->
+        <div class="relative flex items-center justify-center w-11 h-11">
+          <div class="absolute w-14 h-14 bg-amber-500 rounded-full animate-ping opacity-75"></div>
+          <div class="absolute w-9 h-9 bg-amber-400/40 rounded-full animate-pulse"></div>
+          <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-white ring-2 ring-amber-950/60 shadow-2xl flex items-center justify-center text-slate-950 font-black text-sm">
+            🕳️
+          </div>
+        </div>
+
+        <!-- Ground Target Ping -->
+        <div class="relative flex items-center justify-center -mt-0.5">
+          <div class="absolute w-7 h-7 bg-amber-400/70 rounded-full animate-ping"></div>
+          <div class="w-3.5 h-1.5 bg-black/60 rounded-full blur-[1px]"></div>
+        </div>
+      </div>
+    `;
+
+    this.highlightMarker = new HTMLMarkerOverlay(
+      this.map,
+      { lat, lng },
+      htmlContent,
+      null,
+      999985,
+      'floatPane'
+    );
+
+    if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+    this.highlightTimeout = setTimeout(() => {
+      this.clearHighlightPin();
+    }, 9000);
+  }
+
+  clearHighlightPin() {
+    if (this.highlightMarker) {
+      this.highlightMarker.setMap(null);
+      this.highlightMarker = null;
+    }
+    if (this.highlightTimeout) {
+      clearTimeout(this.highlightTimeout);
+      this.highlightTimeout = null;
+    }
+  }
+
   setAccuracyCircle(lat, lng, radius = 20000) {
     if (!this.map || !window.google || !window.google.maps) return;
     this.clearAccuracyCircle();
@@ -765,6 +842,7 @@ export class GoogleMapsAdapter extends MapAdapter {
   }
 
   destroy() {
+    this.clearHighlightPin();
     if (this.markersMap) {
       this.markersMap.forEach((marker) => marker.setMap(null));
       this.markersMap.clear();

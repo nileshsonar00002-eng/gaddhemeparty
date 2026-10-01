@@ -557,8 +557,12 @@ export class PanelManager {
       row.addEventListener('click', (e) => {
         const pinId = e.currentTarget.getAttribute('data-pin-id');
         const listKey = this.leaderboardTab === 'week' ? 'weekRankings' : 'allTimeRankings';
-        const pin = (data[listKey] || []).find((p) => p.id === pinId) || (data.heroPotholeOfWeek?.id === pinId ? data.heroPotholeOfWeek : null);
+        const list = data[listKey] || [];
+        const pinIdx = list.findIndex((p) => p.id === pinId);
+        const pin = (pinIdx !== -1 ? list[pinIdx] : null) || (data.heroPotholeOfWeek?.id === pinId ? data.heroPotholeOfWeek : null);
         if (pin) {
+          const rank = pinIdx !== -1 ? (pinIdx + 1) : (data.heroPotholeOfWeek?.id === pinId ? 1 : null);
+          if (rank) pin.rank = rank;
           this.onSelectPin(pin);
           if (window.innerWidth < 1024) {
             this.setMobilePeek(true);

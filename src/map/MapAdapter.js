@@ -44,6 +44,14 @@ export class MapAdapter {
     throw new Error('openPopup() must be implemented');
   }
 
+  highlightPin(lat, lng, rank) {
+    // Optional highlight implementation
+  }
+
+  clearHighlightPin() {
+    // Optional clear highlight implementation
+  }
+
   destroy() {
     throw new Error('destroy() must be implemented');
   }

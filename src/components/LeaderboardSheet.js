@@ -407,7 +407,7 @@ export class LeaderboardSheet {
           <div class="mt-3 pt-2.5 border-t border-[var(--border)] flex items-center gap-2">
             <button
               type="button"
-              onclick="window.__khaddaFlyToPin('${heroPin.id}')"
+              onclick="window.__khaddaFlyToPin('${heroPin.id}', 1)"
               class="flex-1 py-2 px-3 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-heading font-extrabold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
             >
               <span>📍</span>
@@ -447,7 +447,7 @@ export class LeaderboardSheet {
 
         html += `
           <div
-            onclick="window.__khaddaFlyToPin('${pin.id}')"
+            onclick="window.__khaddaFlyToPin('${pin.id}', ${rankNum})"
             class="flex items-center gap-3 p-2.5 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] active:scale-[0.99] transition cursor-pointer group"
           >
             <!-- Rank Number -->
@@ -562,7 +562,7 @@ export class LeaderboardSheet {
 
       html += `
         <div
-          onclick="window.__khaddaFlyToPin('${pin.id}')"
+          onclick="window.__khaddaFlyToPin('${pin.id}', ${rankNum})"
           class="flex items-center gap-3 p-2.5 rounded-2xl bg-[#080C14] hover:bg-[#131C2E] border border-slate-800 hover:border-slate-700 active:scale-[0.99] transition cursor-pointer group"
         >
           <div class="w-7 h-7 rounded-xl bg-slate-800 group-hover:bg-rose-500 group-hover:text-white tabular-nums font-mono font-black text-xs text-slate-300 flex items-center justify-center flex-shrink-0 transition">

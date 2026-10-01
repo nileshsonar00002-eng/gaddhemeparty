@@ -53,6 +53,7 @@ export function openPinDetailModal(pin) {
   const reportCount = pin.reportCount || 1;
   const upvoteCount = pin.upvotes || 0;
   const timeStr = formatRelativeTime(pin.createdAt || pin.lastReportedAt);
+  const resolvedRank = pin.rank || (window.__khaddaGetPinRank ? window.__khaddaGetPinRank(pin.id) : null);
 
   // Collect all uploaded photos
   const allImages = [];
@@ -190,9 +191,21 @@ export function openPinDetailModal(pin) {
                 ${reportCount > 1 ? t('reportedByCount', { count: reportCount }) : t('reportedBySingle')}
               </span>
 
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)]">
-                📍 ${cityName}
-              </span>
+              <button
+                id="pin-modal-location-btn"
+                type="button"
+                title="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
+                aria-label="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] hover:bg-amber-500/20 text-[var(--text)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-amber-500/40 transition cursor-pointer active:scale-95 group shadow-sm"
+              >
+                <span class="group-hover:scale-110 transition">📍</span>
+                <span>${cityName}</span>
+                ${resolvedRank ? `
+                  <span class="ml-0.5 px-1.5 py-0.2 rounded-md ${resolvedRank === 1 ? 'bg-amber-500 text-slate-950 font-black' : (resolvedRank === 2 ? 'bg-slate-300 text-slate-950 font-black' : (resolvedRank === 3 ? 'bg-amber-700 text-white font-bold' : 'bg-amber-500/20 text-amber-400 font-bold'))} text-[10px] font-mono tabular-nums">
+                    #${resolvedRank}
+                  </span>
+                ` : ''}
+              </button>
             </div>
 
             <span class="text-[11px] text-[var(--muted)] font-mono font-medium">${timeStr}</span>
@@ -438,6 +451,19 @@ export function openPinDetailModal(pin) {
 
   closeBtn?.addEventListener('click', () => {
     closeModal();
+  });
+
+  const locationBtn = container.querySelector('#pin-modal-location-btn');
+  locationBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeModal();
+    if (pin.latitude && pin.longitude) {
+      if (window.__khaddaFocusPinOnMap) {
+        window.__khaddaFocusPinOnMap(pin, resolvedRank);
+      } else if (window.__khaddaFlyToPin) {
+        window.__khaddaFlyToPin(pin.id, resolvedRank);
+      }
+    }
   });
 
   upvoteBtn?.addEventListener('click', async () => {
