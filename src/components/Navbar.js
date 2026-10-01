@@ -126,11 +126,11 @@ export function createNavbar(options = {}) {
           href="${whatsappShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-3 py-2 text-xs min-h-[40px] rounded-xl border border-[var(--band-ink)]/35 bg-transparent hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all cursor-pointer font-medium"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-xl border border-[var(--band-ink)]/25 bg-[var(--band)]/70 hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all duration-150 cursor-pointer font-medium hover:-translate-y-0.5 active:translate-y-0"
           title="Share on WhatsApp"
           aria-label="Share on WhatsApp"
         >
-          ${getLucideIcon('share', 'w-4 h-4 text-[#25D366]')}
+          ${getLucideIcon('share', 'w-3.5 h-3.5 text-[#25D366]')}
           <span>Share</span>
         </a>
       </div>
