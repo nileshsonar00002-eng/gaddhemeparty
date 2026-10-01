@@ -117,8 +117,29 @@
             <!-- Map Canvas -->
             <div id="map" class="w-full h-full bg-[var(--map-bg)]"></div>
 
-            <!-- Floating Map Controls (Zoom In, Zoom Out, Fullscreen) Inside Card -->
+            <!-- Floating Map Controls (Locate Me, Zoom In, Zoom Out, Fullscreen) Inside Card -->
             <div class="absolute top-4 right-4 z-[400] flex flex-col bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-md overflow-hidden select-none">
+              <!-- Locate Me Button -->
+              <button
+                id="btn-locate-me"
+                type="button"
+                class="w-9 h-9 flex items-center justify-center text-[var(--accent)] hover:text-amber-300 hover:bg-[var(--surface-2)] active:scale-95 transition font-bold focus:outline-none cursor-pointer"
+                title="मेरी लोकेशन"
+                aria-label="मेरी लोकेशन"
+                data-i18n-title="locateMe"
+                data-i18n-aria="locateMe"
+              >
+                <!-- Modern Clear GPS Crosshairs / Compass Target Icon -->
+                <svg class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="7"/>
+                  <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+                  <line x1="12" y1="1" x2="12" y2="4"/>
+                  <line x1="12" y1="20" x2="12" y2="23"/>
+                  <line x1="1" y1="12" x2="4" y2="12"/>
+                  <line x1="20" y1="12" x2="23" y2="12"/>
+                </svg>
+              </button>
+              <div class="h-[1px] bg-[var(--border)] mx-1.5"></div>
               <!-- Zoom In Button -->
               <button
                 id="btn-zoom-in"
@@ -164,13 +185,8 @@
               </button>
             </div>
 
-            <!-- Floating Controls: Locate Me, Info & Primary Report Button (Anchored inside Card) -->
+            <!-- Floating Controls: Info & Primary Report Button (Anchored inside Card) -->
             <div class="absolute bottom-3 sm:bottom-4 left-2.5 right-2.5 sm:left-6 sm:right-6 z-[400] flex items-center gap-2 sm:gap-3.5 pointer-events-none">
-              <!-- Locate Me Button (Min 40px tap target) -->
-              <button id="btn-locate-me" type="button" class="pointer-events-auto btn-secondary w-10 h-10 sm:w-11 sm:h-11 p-0 flex items-center justify-center bg-[var(--surface)] shadow-md shrink-0 rounded-xl" title="मेरी लोकेशन" aria-label="मेरी लोकेशन" data-i18n-title="locateMe" data-i18n-aria="locateMe">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[var(--accent)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-              </button>
-
               <!-- About / Info Modal Button (Min 40px tap target) -->
               <button id="btn-open-about" type="button" class="pointer-events-auto btn-secondary w-10 h-10 sm:w-11 sm:h-11 p-0 flex items-center justify-center bg-[var(--surface)] shadow-md shrink-0 rounded-xl" title="नागरिक पहल जानकारी" aria-label="About Gaddhe Me Party" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
