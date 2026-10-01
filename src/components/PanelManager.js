@@ -497,7 +497,7 @@ export class PanelManager {
 
           <button
             type="button"
-            class="panel-pin-row-btn w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-heading font-extrabold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm active:scale-[0.99]"
+            class="panel-pin-row-btn w-full py-2 px-3 rounded-none bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-heading font-extrabold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm active:scale-[0.99]"
             data-pin-id="${heroPin.id}"
           >
             <span>🗺️</span>

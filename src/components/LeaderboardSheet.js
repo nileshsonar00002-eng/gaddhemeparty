@@ -78,7 +78,7 @@ export class LeaderboardSection {
           <button
             type="button"
             id="btn-open-full-leaderboard"
-            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl btn-primary text-xs sm:text-sm font-heading font-extrabold text-xs sm:text-sm shadow-md transition cursor-pointer"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none btn-primary text-xs sm:text-sm font-heading font-extrabold shadow-md transition cursor-pointer"
           >
             <span>🏆</span>
             <span>${isHindi ? 'पूरा लीडरबोर्ड देखें' : 'View Full Leaderboard'}</span>
@@ -130,7 +130,7 @@ export class LeaderboardSection {
                 <button
                   type="button"
                   onclick="window.__khaddaFlyToPin('${heroPin.id}')"
-                  class="btn-primary flex-1 py-2.5 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md cursor-pointer font-bold"
+                  class="btn-primary flex-1 py-2.5 px-3 text-xs rounded-none flex items-center justify-center gap-1.5 shadow-md cursor-pointer font-bold"
                 >
                   <span>📍</span>
                   <span>${t('tapToViewOnMap')}</span>
@@ -438,7 +438,7 @@ export class LeaderboardSheet {
             <button
               type="button"
               onclick="window.__khaddaFlyToPin('${heroPin.id}', 1)"
-              class="btn-primary flex-1 py-2 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-xs cursor-pointer font-bold"
+              class="btn-primary flex-1 py-2 px-3 text-xs rounded-none flex items-center justify-center gap-1.5 shadow-xs cursor-pointer font-bold"
             >
               <span>📍</span>
               <span>${t('tapToViewOnMap')}</span>
