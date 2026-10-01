@@ -35,6 +35,7 @@ import { PanelManager } from './components/PanelManager';
 import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimation';
 import { router } from './utils/router';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps } from './utils/geo';
+import { scrollReveal } from './utils/scrollReveal';
 
 // Real Live Data Store
 class KhaddaApp {
@@ -679,22 +680,7 @@ class KhaddaApp {
   }
 
   setupScrollReveal() {
-    const reveals = document.querySelectorAll('.reveal-on-scroll');
-    if (reveals.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-revealed');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { rootMargin: '0px 0px -50px 0px', threshold: 0.1 }
-    );
-
-    reveals.forEach((el) => observer.observe(el));
+    scrollReveal.init();
   }
 
   detectInitialLocation() {
