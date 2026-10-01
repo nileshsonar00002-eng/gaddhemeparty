@@ -49,7 +49,7 @@ export class PanelManager {
       <!-- Modal Backdrop (Hidden / Non-blocking for Leaderboard) -->
       <div
         id="panel-backdrop"
-        class="fixed inset-0 z-[1090] bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-250 ease-out"
+        class="fixed inset-0 z-[1040] bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-250 ease-out"
         aria-hidden="true"
       ></div>
 
@@ -59,7 +59,7 @@ export class PanelManager {
         role="dialog"
         aria-modal="false"
         aria-labelledby="panel-header-title"
-        class="fixed z-[1100] bg-[var(--surface)] border-[var(--border)] shadow-2xl flex flex-col transition-all duration-250 ease-out pointer-events-none text-[var(--text)]
+        class="fixed z-[1050] bg-[var(--surface)] border-[var(--border)] shadow-2xl flex flex-col transition-all duration-250 ease-out pointer-events-none text-[var(--text)]
                /* Desktop: Right-side Drawer */
                lg:top-0 lg:right-0 lg:bottom-0 lg:w-[480px] lg:max-w-[90vw] lg:h-full lg:border-l lg:translate-x-full
                /* Mobile: Bottom Sheet */

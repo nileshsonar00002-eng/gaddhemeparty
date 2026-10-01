@@ -8,7 +8,7 @@ export function checkAndShowOnboarding() {
   if (!container) return;
 
   container.innerHTML = `
-    <div id="onboarding-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-md z-[1080] flex items-center justify-center p-4 animate-fade-in">
+    <div id="onboarding-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-md z-[1200] flex items-center justify-center p-4 animate-fade-in">
       <div class="relative w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-3xl shadow-2xl p-6 sm:p-7 space-y-5 text-center">
         <!-- Close / Dismiss X -->
         <button id="btn-close-onboarding" class="absolute top-4 right-4 p-1.5 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition">

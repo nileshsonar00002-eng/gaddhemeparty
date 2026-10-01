@@ -43,8 +43,10 @@ export function openPinDetailModal(pin) {
   if (!container) {
     container = document.createElement('div');
     container.id = 'pin-detail-modal-container';
-    container.className = 'z-[1070]';
+    container.className = 'z-[1200]';
     document.getElementById('app')?.appendChild(container);
+  } else {
+    container.className = 'z-[1200]';
   }
 
   const isHindi = getLanguage() === 'hindi';
@@ -91,7 +93,7 @@ export function openPinDetailModal(pin) {
 
   container.innerHTML = `
     <!-- Center Modal Overlay -->
-    <div id="pin-modal-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[1070] flex items-center justify-center p-4 sm:p-6 transition-opacity duration-200">
+    <div id="pin-modal-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-xs z-[1200] flex items-center justify-center p-4 sm:p-6 transition-opacity duration-200">
       <!-- Centered Card -->
       <div
         id="pin-modal-card"

@@ -23,7 +23,7 @@ export async function openChaiTipModal(options = {}) {
   modalManager.openModal('chai-tip-modal', () => closeModal(false));
 
   container.innerHTML = `
-    <div id="chai-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-xs z-[1100] flex items-center justify-center p-4 animate-fade-in">
+    <div id="chai-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-xs z-[1200] flex items-center justify-center p-4 animate-fade-in">
       <div class="relative w-full max-w-sm bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-xl p-6 text-center space-y-4">
         <!-- Close Button -->
         <button id="btn-close-chai" class="btn-secondary absolute top-4 right-4 p-1.5" aria-label="Close">

@@ -17,7 +17,7 @@ export function openHowItWorksModal() {
   modalManager.openModal('how-it-works-modal', () => closeModal(false));
 
   container.innerHTML = `
-    <div id="hw-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-md z-[1090] flex items-center justify-center p-4 animate-fade-in">
+    <div id="hw-backdrop" class="fixed inset-0 bg-black/75 backdrop-blur-md z-[1200] flex items-center justify-center p-4 animate-fade-in">
       <div class="relative w-full max-w-lg bg-[#0F172A] border border-slate-700/80 rounded-3xl shadow-2xl p-6 sm:p-7 space-y-4 text-left max-h-[88dvh] overflow-y-auto">
         <!-- Close Button -->
         <button id="btn-close-hw" class="absolute top-4 right-4 p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white transition">
