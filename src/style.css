@@ -67,7 +67,7 @@
     scroll-behavior: smooth;
     background-color: var(--bg);
     color: var(--text);
-    overflow-x: clip;
+    overflow-x: hidden;
   }
 
   body {
@@ -84,7 +84,7 @@
     width: 100%;
     min-width: 100%;
     min-height: 100vh;
-    overflow-x: clip;
+    overflow-x: hidden;
     overflow-y: auto;
   }
 
@@ -93,7 +93,6 @@
     min-width: 100%;
     max-width: 100vw;
     min-height: 100vh;
-    overflow-x: clip;
     background-color: var(--bg);
     color: var(--text);
   }
@@ -890,137 +889,6 @@ body.map-confirm-active {
   85% {
     transform: rotate(-5deg) scale(1.08);
     filter: drop-shadow(0 0 3px var(--heading));
-  }
-}
-
-/* ==========================================================================
-   SCROLL REVEAL & PROGRESS ANIMATION SYSTEM
-   ========================================================================== */
-
-/* Progressive enhancement: Only hide unrevealed elements when JS is active */
-.js [data-reveal]:not(.revealed) {
-  opacity: 0;
-  visibility: hidden;
-}
-
-.js [data-stagger] [data-stagger-item]:not(.revealed) {
-  opacity: 0;
-  visibility: hidden;
-}
-
-/* Base Transitions for Reveal */
-[data-reveal],
-[data-stagger-item] {
-  --reveal-duration: 650ms;
-  --reveal-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --reveal-y: 48px;
-  --reveal-x: 48px;
-  transition: opacity var(--reveal-duration) var(--reveal-ease),
-              transform var(--reveal-duration) var(--reveal-ease),
-              visibility var(--reveal-duration) var(--reveal-ease);
-}
-
-@media (max-width: 768px) {
-  [data-reveal],
-  [data-stagger-item] {
-    --reveal-y: 24px;
-    --reveal-x: 24px;
-    --reveal-duration: 550ms;
-  }
-}
-
-.will-animate-reveal {
-  will-change: transform, opacity;
-}
-
-/* Initial States when unrevealed */
-.js [data-reveal="up"]:not(.revealed),
-.js [data-stagger-item]:not(.revealed) {
-  transform: translate3d(0, var(--reveal-y), 0);
-}
-
-.js [data-reveal="left"]:not(.revealed) {
-  transform: translate3d(calc(-1 * var(--reveal-x)), 0, 0);
-}
-
-.js [data-reveal="right"]:not(.revealed) {
-  transform: translate3d(var(--reveal-x), 0, 0);
-}
-
-.js [data-reveal="zoom"]:not(.revealed) {
-  transform: scale(0.94);
-}
-
-/* Revealed States */
-[data-reveal].revealed,
-[data-stagger-item].revealed {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translate3d(0, 0, 0) scale(1) !important;
-}
-
-/* Heading Accent Underline Draw */
-.heading-accent-draw {
-  position: relative;
-  display: inline-block;
-}
-.heading-accent-draw::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 3px;
-  background-color: var(--heading);
-  border-radius: 2px;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.revealed .heading-accent-draw::after,
-.heading-accent-draw.revealed::after {
-  transform: scaleX(1);
-}
-
-/* Scroll Progress Bar below header */
-#scroll-progress-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 2.5px;
-  background: var(--heading);
-  width: 0%;
-  transition: width 80ms linear;
-  z-index: 1010;
-  pointer-events: none;
-}
-
-/* FAQ smooth open/close accordion transition */
-details.faq-accordion {
-  transition: all 0.25s ease-out;
-}
-
-/* Hero Mascot Parallax */
-.hero-mascot-parallax {
-  will-change: transform;
-}
-
-/* Prefers-reduced-motion overrides */
-@media (prefers-reduced-motion: reduce) {
-  .js [data-reveal]:not(.revealed),
-  .js [data-stagger] [data-stagger-item]:not(.revealed) {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
-  }
-  [data-reveal],
-  [data-stagger-item],
-  .heading-accent-draw::after {
-    transition: none !important;
-    transform: none !important;
-  }
-  .hero-mascot-parallax {
-    transform: none !important;
   }
 }
 

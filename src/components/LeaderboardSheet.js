@@ -63,7 +63,7 @@ export class LeaderboardSection {
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <!-- #1 Rank Hero Card (7 Cols) -->
           ${heroPin ? `
-            <div data-reveal="left" class="lg:col-span-7 rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 shadow-soft flex flex-col justify-between group">
+            <div class="lg:col-span-7 rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-4 sm:p-5 shadow-soft flex flex-col justify-between group">
               <div>
                 <div class="flex items-center justify-between mb-3">
                   <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs">
@@ -111,16 +111,15 @@ export class LeaderboardSection {
               </div>
             </div>
           ` : `
-            <div data-reveal="left" class="lg:col-span-7 p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center text-[var(--muted)] text-sm">
+            <div class="lg:col-span-7 p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center text-[var(--muted)] text-sm">
               ${t('leaderboardEmptyTitle')}
             </div>
           `}
 
           <!-- #2 and #3 Runner-Ups (5 Cols) -->
-          <div class="lg:col-span-5 flex flex-col justify-start gap-3.5" data-stagger="90" data-delay="100">
+          <div class="lg:col-span-5 flex flex-col justify-start gap-3.5">
             ${runnerUps.length > 0 ? runnerUps.map((pin, idx) => `
               <div
-                data-stagger-item
                 onclick="window.__khaddaFlyToPin('${pin.id}')"
                 class="flex-1 p-4 rounded-2xl bg-[var(--surface)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition flex items-center gap-3.5 cursor-pointer group shadow-soft"
               >

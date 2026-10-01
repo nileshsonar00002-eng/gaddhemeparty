@@ -39,10 +39,8 @@
     <!-- Main Application Shell -->
     <div id="app" class="relative w-full min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-200">
       
-      <!-- 1. Sticky Header with Scroll Progress Bar -->
-      <header id="navbar-container" class="sticky top-0 left-0 right-0 z-[1000] w-full">
-        <div id="scroll-progress-bar"></div>
-      </header>
+      <!-- 1. Sticky Header -->
+      <header id="navbar-container" class="sticky top-0 left-0 right-0 z-[1000] w-full"></header>
 
       <!-- Offline Status Banner -->
       <div id="offline-banner" class="hidden sticky top-16 left-4 right-4 z-[998] mx-auto max-w-4xl my-2 bg-amber-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-center text-xs sm:text-sm shadow-md border border-amber-600/30 flex items-center justify-center gap-2">
@@ -59,33 +57,33 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
               <!-- Left Column: Short Chip, Balanced H1, Concrete Description & Translucent Stat Chips -->
-              <div class="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 sm:space-y-5" data-stagger="90">
+              <div class="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 sm:space-y-5">
                 <!-- Short Concrete Badge Chip -->
-                <div class="chip-neutral" data-stagger-item>
+                <div class="chip-neutral">
                   <span data-i18n="heroBadge">मुफ़्त • बिना लॉगिन</span>
                 </div>
 
                 <!-- Balanced H1 without quotation marks -->
-                <h1 id="hero-title" class="w-full font-heading font-bold text-[var(--heading)] tracking-tight text-[clamp(1.75rem,7vw,2.25rem)] leading-[1.15] break-words" data-stagger-item data-i18n-html="heroTitleHtml">
+                <h1 id="hero-title" class="w-full font-heading font-bold text-[var(--heading)] tracking-tight text-[clamp(1.75rem,7vw,2.25rem)] leading-[1.15] break-words" data-i18n-html="heroTitleHtml">
                   जहाँ गड्ढा, <span class="hero-highlight-word font-bold">वहाँ पार्टी</span>
                 </h1>
 
                 <!-- Concrete, Human Description -->
-                <p class="w-full max-w-xl text-sm sm:text-base text-[var(--muted)] leading-relaxed font-normal break-words" data-stagger-item data-i18n="heroDescription">
+                <p class="w-full max-w-xl text-sm sm:text-base text-[var(--muted)] leading-relaxed font-normal break-words" data-i18n="heroDescription">
                   सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें और अपने शहर की रैंकिंग देखें। 100% खुली व सुरक्षित नागरिक पहल।
                 </p>
 
                 <!-- Translucent Stat Chips Container -->
-                <div id="stats-strip-container" class="pt-2 flex flex-wrap justify-center lg:justify-start gap-2.5" data-stagger-item></div>
+                <div id="stats-strip-container" class="pt-2 flex flex-wrap justify-center lg:justify-start gap-2.5"></div>
               </div>
 
               <!-- Right Column: Mascot Illustration with Float Animation & #gddp Text Tag -->
-              <div class="lg:col-span-4 flex flex-col justify-center items-center py-2" data-reveal="zoom">
-                <div class="relative w-32 h-32 sm:w-44 sm:h-44 lg:w-52 lg:h-52 flex items-center justify-center animate-gentle-float hero-mascot-parallax">
+              <div class="lg:col-span-4 flex flex-col justify-center items-center py-2">
+                <div class="relative w-32 h-32 sm:w-44 sm:h-44 lg:w-52 lg:h-52 flex items-center justify-center animate-gentle-float">
                   <img src="/khaddawaliparty-logo.svg" alt="Gaddhe Me Party Mascot" class="w-full h-full object-contain drop-shadow-xl" />
                 </div>
                 <!-- Small Text Tag Beneath Mascot -->
-                <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--muted)] text-xs font-mono font-bold tracking-wider" data-reveal="up" data-delay="150">
+                <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--muted)] text-xs font-mono font-bold tracking-wider">
                   <span>#gddp</span>
                 </div>
               </div>
@@ -95,7 +93,7 @@
 
         <!-- 3. Contained Map Card Overlapping Hero Bottom Edge by 48px -->
         <section id="map-section" class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-14 lg:-mt-16 z-30 mb-12 sm:mb-16">
-          <div id="map-card-container" data-reveal="up" class="relative w-full h-[74dvh] sm:h-[78vh] lg:h-[82vh] max-h-[900px] rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-soft overflow-hidden transition-all duration-200">
+          <div id="map-card-container" class="relative w-full h-[74dvh] sm:h-[78vh] lg:h-[82vh] max-h-[900px] rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-soft overflow-hidden transition-all duration-200">
             <!-- Map Canvas -->
             <div id="map" class="w-full h-full bg-[var(--map-bg)]"></div>
 
@@ -215,24 +213,24 @@
     </section>
 
         <!-- 4. Live Leaderboard Section (Band 1: --surface with contrast) -->
-        <section id="leaderboard" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-y border-[var(--border)] content-auto" data-reveal="up">
+        <section id="leaderboard" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-y border-[var(--border)] content-auto reveal-on-scroll">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="leaderboard-mount"></div>
           </div>
         </section>
 
         <!-- 5. Our Mission Section (Forest Band: --band with card-forest) -->
-        <section id="mission" class="w-full bg-[var(--band)] text-[var(--band-ink)] py-16 sm:py-20 content-auto">
+        <section id="mission" class="w-full bg-[var(--band)] text-[var(--band-ink)] py-16 sm:py-20 content-auto reveal-on-scroll">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center space-y-2 mb-10" data-stagger="90">
-              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--band-ink)]/15 text-[var(--band-ink)] border border-[var(--band-ink)]/30 uppercase tracking-wider" data-stagger-item data-i18n="missionBadge">Mission & Impact</span>
-              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--band-ink)] heading-accent-draw" data-stagger-item data-i18n="missionTitle">हमारा उद्देश्य (Our Mission)</h2>
-              <p class="text-xs sm:text-sm text-[var(--band-ink)]/80 max-w-xl mx-auto" data-stagger-item data-i18n="missionSubtitle">नागरिक शक्ति और पारदर्शी तकनीक से भारतीय सड़कों को सुरक्षित बनाना</p>
+            <div class="text-center space-y-2 mb-10">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--band-ink)]/15 text-[var(--band-ink)] border border-[var(--band-ink)]/30 uppercase tracking-wider" data-i18n="missionBadge">Mission & Impact</span>
+              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--band-ink)]" data-i18n="missionTitle">हमारा उद्देश्य (Our Mission)</h2>
+              <p class="text-xs sm:text-sm text-[var(--band-ink)]/80 max-w-xl mx-auto" data-i18n="missionSubtitle">नागरिक शक्ति और पारदर्शी तकनीक से भारतीय सड़कों को सुरक्षित बनाना</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <!-- Pillar 1 -->
-              <div class="card-forest p-6 sm:p-7" data-reveal="left">
+              <div class="card-forest p-6 sm:p-7">
                 <div class="w-11 h-11 rounded-xl bg-[var(--band-ink)]/15 border border-[var(--band-ink)]/30 flex items-center justify-center text-[var(--band-ink)] mb-4">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
                 </div>
@@ -243,7 +241,7 @@
               </div>
 
               <!-- Pillar 2 -->
-              <div class="card-forest p-6 sm:p-7" data-reveal="zoom">
+              <div class="card-forest p-6 sm:p-7">
                 <div class="w-11 h-11 rounded-xl bg-[var(--band-ink)]/15 border border-[var(--band-ink)]/30 flex items-center justify-center text-[var(--band-ink)] mb-4">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 </div>
@@ -254,7 +252,7 @@
               </div>
 
               <!-- Pillar 3 -->
-              <div class="card-forest p-6 sm:p-7" data-reveal="right">
+              <div class="card-forest p-6 sm:p-7">
                 <div class="w-11 h-11 rounded-xl bg-[var(--band-ink)]/15 border border-[var(--band-ink)]/30 flex items-center justify-center text-[var(--band-ink)] mb-4">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
                 </div>
@@ -268,27 +266,27 @@
         </section>
 
         <!-- 6. How It Works & FAQs Section (Lime Band: --bg with --surface cards) -->
-        <section id="how" class="w-full bg-[var(--bg)] py-16 sm:py-20 border-y border-[var(--border)] content-auto">
+        <section id="how" class="w-full bg-[var(--bg)] py-16 sm:py-20 border-y border-[var(--border)] content-auto reveal-on-scroll">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center space-y-2 mb-10" data-stagger="90">
-              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-stagger-item data-i18n="howItWorksBadge">Simple & Transparent</span>
-              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--heading)] heading-accent-draw" data-stagger-item data-i18n="howItWorksTitle">कैसे काम करता है? (How It Works)</h2>
-              <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-stagger-item data-i18n="howItWorksSubtitle">३ आसान चरणों में किसी भी खराब सड़क की रिपोर्ट दर्ज करें</p>
+            <div class="text-center space-y-2 mb-10">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-i18n="howItWorksBadge">Simple & Transparent</span>
+              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--heading)]" data-i18n="howItWorksTitle">कैसे काम करता है? (How It Works)</h2>
+              <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-i18n="howItWorksSubtitle">३ आसान चरणों में किसी भी खराब सड़क की रिपोर्ट दर्ज करें</p>
             </div>
 
             <!-- 3 Steps -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" data-stagger="110">
-              <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3 shadow-soft" data-stagger-item>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3 shadow-soft">
                 <span class="w-8 h-8 mx-auto rounded-lg bg-[var(--primary)] text-[var(--primary-ink)] font-mono font-bold text-sm flex items-center justify-center">1</span>
                 <h3 class="font-heading font-bold text-base text-[var(--heading)]" data-i18n="hwStep1Title">फोटो खींचें</h3>
                 <p class="text-xs text-[var(--muted)]" data-i18n="hwStep1Desc">खराब सड़क या गड्ढे की फोटो लें। फोन पर ही EXIF प्राइवेसी सुरक्षित हो जाती है।</p>
               </div>
-              <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3 shadow-soft" data-stagger-item>
+              <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3 shadow-soft">
                 <span class="w-8 h-8 mx-auto rounded-lg bg-[var(--primary)] text-[var(--primary-ink)] font-mono font-bold text-sm flex items-center justify-center">2</span>
                 <h3 class="font-heading font-bold text-base text-[var(--heading)]" data-i18n="hwStep2Title">GPS लोकेशन लॉक</h3>
                 <p class="text-xs text-[var(--muted)]" data-i18n="hwStep2Desc">सिस्टम सटीक GPS लोकेशन लेता है और 5m के दायरे में डुप्लीकेट को रोकता है।</p>
               </div>
-              <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3 shadow-soft" data-stagger-item>
+              <div class="p-6 rounded-2xl bg-[var(--surface)] border border-[var(--border)] text-center space-y-3 shadow-soft">
                 <span class="w-8 h-8 mx-auto rounded-lg bg-[var(--primary)] text-[var(--primary-ink)] font-mono font-bold text-sm flex items-center justify-center">3</span>
                 <h3 class="font-heading font-bold text-base text-[var(--heading)]" data-i18n="hwStep3Title">तुरंत लाइव रिपोर्ट</h3>
                 <p class="text-xs text-[var(--muted)]" data-i18n="hwStep3Desc">पिन लाइव मैप और लीडरबोर्ड पर आ जाता है, जहाँ अन्य नागरिक पुष्टि कर सकते हैं।</p>
@@ -296,11 +294,11 @@
             </div>
 
             <!-- FAQ Accordion -->
-            <div class="max-w-3xl mx-auto space-y-3.5" data-stagger="90">
-              <h3 class="font-heading font-bold text-lg text-[var(--heading)] mb-4 text-center" data-stagger-item data-i18n="faqTitle">अक्सर पूछे जाने वाले सवाल (FAQ)</h3>
+            <div class="max-w-3xl mx-auto space-y-3.5">
+              <h3 class="font-heading font-bold text-lg text-[var(--heading)] mb-4 text-center" data-i18n="faqTitle">अक्सर पूछे जाने वाले सवाल (FAQ)</h3>
 
               <!-- FAQ Item 1 -->
-              <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-xs faq-accordion" data-stagger-item>
+              <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-xs">
                 <summary class="font-heading font-bold text-sm text-[var(--heading)] cursor-pointer list-none flex items-center justify-between">
                   <span data-i18n="faq1Q">क्या मुझे रिपोर्ट करने के लिए लॉगिन या साइन अप करना होगा?</span>
                   <span class="text-[var(--muted)] group-open:rotate-180 transition transform">▼</span>
@@ -311,7 +309,7 @@
               </details>
 
               <!-- FAQ Item 2 -->
-              <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-xs faq-accordion" data-stagger-item>
+              <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-xs">
                 <summary class="font-heading font-bold text-sm text-[var(--heading)] cursor-pointer list-none flex items-center justify-between">
                   <span data-i18n="faq2Q">क्या मेरा व्यक्तिगत डेटा या लोकेशन ट्रैक होती है?</span>
                   <span class="text-[var(--muted)] group-open:rotate-180 transition transform">▼</span>
@@ -322,7 +320,7 @@
               </details>
 
               <!-- FAQ Item 3 -->
-              <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-xs faq-accordion" data-stagger-item>
+              <details class="group rounded-xl bg-[var(--surface)] border border-[var(--border)] p-4 transition shadow-xs">
                 <summary class="font-heading font-bold text-sm text-[var(--heading)] cursor-pointer list-none flex items-center justify-between">
                   <span data-i18n="faq3Q">मेरी फोटो कौन देख सकता है और क्या नियम हैं?</span>
                   <span class="text-[var(--muted)] group-open:rotate-180 transition transform">▼</span>
@@ -336,15 +334,15 @@
         </section>
 
         <!-- 7. About Us Section (Forest Band: --band with card-forest and btn-band) -->
-        <section id="about" class="w-full bg-[var(--band)] text-[var(--band-ink)] py-16 sm:py-20 content-auto">
+        <section id="about" class="w-full bg-[var(--band)] text-[var(--band-ink)] py-16 sm:py-20 content-auto reveal-on-scroll">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center space-y-2 mb-10" data-stagger="90">
-              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--band-ink)]/15 text-[var(--band-ink)] border border-[var(--band-ink)]/30 uppercase tracking-wider" data-stagger-item data-i18n="aboutBadge">नागरिक पहल</span>
-              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--band-ink)] heading-accent-draw" data-stagger-item data-i18n="aboutTitle">हमारे बारे में (About Us)</h2>
-              <p class="text-xs sm:text-sm text-[var(--band-ink)]/80 max-w-xl mx-auto" data-stagger-item data-i18n="aboutSubtitle">100% स्वतंत्र व नागरिक-संचालित मंच</p>
+            <div class="text-center space-y-2 mb-10">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--band-ink)]/15 text-[var(--band-ink)] border border-[var(--band-ink)]/30 uppercase tracking-wider" data-i18n="aboutBadge">नागरिक पहल</span>
+              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--band-ink)]" data-i18n="aboutTitle">हमारे बारे में (About Us)</h2>
+              <p class="text-xs sm:text-sm text-[var(--band-ink)]/80 max-w-xl mx-auto" data-i18n="aboutSubtitle">100% स्वतंत्र व नागरिक-संचालित मंच</p>
             </div>
 
-            <div class="card-forest p-6 sm:p-8 space-y-5" data-reveal="zoom">
+            <div class="card-forest p-6 sm:p-8 space-y-5">
               <div class="flex items-center justify-center gap-3">
                 <img src="/logo.svg" alt="Gaddhe Me Party Logo" class="w-10 h-10 rounded-xl" />
                 <div>
@@ -358,7 +356,7 @@
               </p>
 
               <!-- Prominent Civic Disclaimer Box -->
-              <div class="p-4 rounded-xl bg-[var(--band-ink)]/10 border border-[var(--band-ink)]/25 text-[var(--band-ink)] space-y-1" data-reveal="up" data-delay="150">
+              <div class="p-4 rounded-xl bg-[var(--band-ink)]/10 border border-[var(--band-ink)]/25 text-[var(--band-ink)] space-y-1">
                 <h4 class="font-heading font-bold text-sm flex items-center gap-1.5 text-[var(--band-ink)]">
                   <span data-i18n="aboutDisclaimerTitle">महत्वपूर्ण सूचना (Disclaimer):</span>
                 </h4>
@@ -383,35 +381,35 @@
         </section>
 
         <!-- 8. Terms of Use & Privacy Policy Section (Band 5: --surface) -->
-        <section id="terms" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-t border-[var(--border)] content-auto space-y-6">
+        <section id="terms" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-t border-[var(--border)] content-auto reveal-on-scroll space-y-6">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center space-y-2 mb-10" data-stagger="90">
-              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-stagger-item data-i18n="termsBadge">Legal & Transparency</span>
-              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--heading)] heading-accent-draw" data-stagger-item data-i18n="termsTitle">नियम व शर्तें एवं गोपनीयता नीति (Terms & Privacy)</h2>
-              <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-stagger-item data-i18n="termsSubtitle">इस प्लेटफ़ॉर्म का उपयोग करके आप निम्नलिखित नियमों और गोपनीयता नीतियों से सहमत होते हैं।</p>
+            <div class="text-center space-y-2 mb-10">
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--surface-2)] text-[var(--muted)] border border-[var(--border)] uppercase tracking-wider" data-i18n="termsBadge">Legal & Transparency</span>
+              <h2 class="text-2xl sm:text-3xl font-heading font-bold text-[var(--heading)]" data-i18n="termsTitle">नियम व शर्तें एवं गोपनीयता नीति (Terms & Privacy)</h2>
+              <p class="text-xs sm:text-sm text-[var(--muted)] max-w-xl mx-auto" data-i18n="termsSubtitle">इस प्लेटफ़ॉर्म का उपयोग करके आप निम्नलिखित नियमों और गोपनीयता नीतियों से सहमत होते हैं।</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs text-[var(--muted)] leading-relaxed">
               <!-- Clause 1 -->
-              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs" data-reveal="left">
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
                 <h4 class="font-heading font-bold text-[var(--heading)] text-sm" data-i18n="legalDisclaimerHeader">१. मरम्मत की कोई गारंटी नहीं (No Repair Guarantee)</h4>
                 <p data-i18n="legalDisclaimerText">गड्ढे में पार्टी एक क्राउड-सोर्स्ड नागरिक मैपिंग टूल है। हम केवल डेटा एकत्र और सार्वजनिक करते हैं; हम किसी भी गड्ढे की मरम्मत करने या सरकारी कार्यवाई की गारंटी नहीं देते।</p>
               </div>
 
               <!-- Clause 2 -->
-              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs" data-reveal="right">
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
                 <h4 class="font-heading font-bold text-[var(--heading)] text-sm" data-i18n="legalContentRulesHeader">२. यूज़र सामग्री नियम (Content Rules)</h4>
                 <p data-i18n="legalContentRulesText">उपयोगकर्ता केवल सड़क के गड्ढों और सड़क क्षति की प्रामाणिक तस्वीरें ही अपलोड करें। किसी भी व्यक्ति का चेहरा, निजी संपत्ति, वाहन की नंबर प्लेट, या आपत्तिजनक सामग्री पोस्ट करना सख्त मना है।</p>
               </div>
 
               <!-- Clause 3 -->
-              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs" data-reveal="left" data-delay="100">
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
                 <h4 class="font-heading font-bold text-[var(--heading)] text-sm" data-i18n="legalDataRetentionHeader">३. डेटा संग्रह और प्राइवेसी (What We Collect)</h4>
                 <p data-i18n="legalDataRetentionText">हम कोई व्यक्तिगत नाम या ईमेल स्टोर नहीं करते। केवल फोटो, गड्ढे के GPS निर्देशांक, सुरक्षा के लिए हैशेड IP और अनाम सेशन आईडी दर्ज की जाती है।</p>
               </div>
 
               <!-- Clause 4 -->
-              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs" data-reveal="right" data-delay="100">
+              <div class="p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-2 shadow-xs">
                 <h4 class="font-heading font-bold text-[var(--heading)] text-sm" data-i18n="legalRemovalHeader">४. सामग्री हटाने का अनुरोध (Removal Requests)</h4>
                 <p data-i18n="legalRemovalText">यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या contact@gaddhemeparty.in पर हटाए जाने का अनुरोध भेज सकते हैं।</p>
               </div>
@@ -421,12 +419,12 @@
       </main>
 
       <!-- 8.5 Fun Animated Pothole Drive & Party Strip (Above Footer) -->
-      <section id="pothole-cartoon-strip" class="w-full relative z-20" data-reveal="up">
+      <section id="pothole-cartoon-strip" class="w-full relative z-20">
         <div id="pothole-animation-mount"></div>
       </section>
 
       <!-- 9. Footer: Forest Band (--band) with --band-ink -->
-      <footer class="w-full border-t border-[var(--border)] bg-[var(--band)] text-[var(--band-ink)] py-10 px-4 transition-colors duration-200" data-reveal="up">
+      <footer class="w-full border-t border-[var(--border)] bg-[var(--band)] text-[var(--band-ink)] py-10 px-4 transition-colors duration-200">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div class="flex items-center gap-3">
             <img src="/logo.svg" alt="Logo" class="w-9 h-9 rounded-xl" />
