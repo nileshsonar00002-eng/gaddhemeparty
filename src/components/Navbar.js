@@ -21,8 +21,8 @@ export function createNavbar(options = {}) {
   const isHindi = currentLang === 'hindi';
   const shareUrl = window.location.origin;
   const shareText = isHindi
-    ? `🚗💥 *गड्ढे में पार्टी* (Gaddhe Me Party)\n"जहाँ गड्ढा, वहाँ पार्टी"\n\nसड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें! लाइव मैप पर अपने शहर के गड्ढे देखें:\n👉 ${shareUrl}`
-    : `🚗💥 *Gaddhe Me Party*\n"Jaha Gaddha, Waha Party"\n\nReport & track road hazards without login across India! Check live pothole map:\n👉 ${shareUrl}`;
+    ? `🚗💥 *गड्ढे में पार्टी* (Gaddhe Me Party)\n"मेरा गड्ढा, मेरी शान"\n\nसड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें! लाइव मैप पर अपने शहर के गड्ढे देखें:\n👉 ${shareUrl}`
+    : `🚗💥 *Gaddhe Me Party*\n"Mera Gaddha, Meri Shan"\n\nReport & track road hazards without login across India! Check live pothole map:\n👉 ${shareUrl}`;
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
     container.innerHTML = `

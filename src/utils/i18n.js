@@ -5,7 +5,7 @@ export const translations = {
   hindi: {
     appNameHindi: 'गड्ढे में पार्टी',
     appNameEnglish: 'Gaddhe Me Party',
-    tagline: 'जहाँ गड्ढा, वहाँ पार्टी',
+    tagline: 'मेरा गड्ढा, मेरी शान',
     heroBadge: 'मुफ़्त • बिना लॉगिन',
     heroTitleHtml: 'जहाँ गड्ढा, <span class="hero-highlight-word font-bold">वहाँ पार्टी</span>',
     heroDescription: 'सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें और अपने शहर की रैंकिंग देखें। 100% खुली व सुरक्षित नागरिक पहल।',
@@ -112,7 +112,7 @@ export const translations = {
     timeMinutesAgo: '{n} मिनट पहले',
     timeHoursAgo: '{n} घंटे पहले',
     timeDaysAgo: '{n} दिन पहले',
-    whatsappShareTemplate: '⚠️ सड़क पर गड्ढे की रिपोर्ट!\n📍 लैंडमार्क: {landmark}\n👥 {count} नागरिकों ने पुष्टि की\n👉 लाइव मैप पर देखें और +1 करें: {url}\n\n(गड्ढे में पार्टी - "जहाँ गड्ढा, वहाँ पार्टी")',
+    whatsappShareTemplate: '⚠️ सड़क पर गड्ढे की रिपोर्ट!\n📍 लैंडमार्क: {landmark}\n👥 {count} नागरिकों ने पुष्टि की\n👉 लाइव मैप पर देखें और +1 करें: {url}\n\n(गड्ढे में पार्टी - "मेरा गड्ढा, मेरी शान")',
     
     // Leaderboard Strings
     leaderboardTitle: 'लाइव गड्ढा लीडरबोर्ड',
@@ -197,7 +197,7 @@ export const translations = {
     footerCopyright: '© 2026 गड्ढे में पार्टी • 100% Free Civic Tech',
     footerLinksHeader: 'त्वरित लिंक',
     footerLegalHeader: 'कानूनी व प्राइवेसी',
-    footerTagline: '"जहाँ गड्ढा, वहाँ पार्टी"',
+    footerTagline: '"मेरा गड्ढा, मेरी शान"',
     footerMap: 'नक्शा',
     footerLeaderboard: 'लीडरबोर्ड',
     footerMission: 'उद्देश्य',
@@ -209,7 +209,7 @@ export const translations = {
   english: {
     appNameHindi: 'Gaddhe Me Party',
     appNameEnglish: 'Pothole Tracker',
-    tagline: 'Jaha Gaddha, Waha Party',
+    tagline: 'Mera Gaddha, Meri Shan',
     heroBadge: 'Free · No login',
     heroTitleHtml: 'Jaha Gaddha, <span class="hero-highlight-word font-bold">Waha Party</span>',
     heroDescription: 'Map road hazards and pothole hotspots with live GPS and instant community verification. 100% free and open citizen tool.',
@@ -326,7 +326,7 @@ export const translations = {
     timeMinutesAgo: '{n}m ago',
     timeHoursAgo: '{n}h ago',
     timeDaysAgo: '{n}d ago',
-    whatsappShareTemplate: '⚠️ Pothole Alert on Road!\n📍 Landmark: {landmark}\n👥 {count} citizens confirmed\n👉 View on live map & +1: {url}\n\n(Gaddhe Me Party - "Jaha Gaddha, Waha Party")',
+    whatsappShareTemplate: '⚠️ Pothole Alert on Road!\n📍 Landmark: {landmark}\n👥 {count} citizens confirmed\n👉 View on live map & +1: {url}\n\n(Gaddhe Me Party - "Mera Gaddha, Meri Shan")',
     
     // Leaderboard
     leaderboardTitle: 'Live Pothole Leaderboard',
@@ -411,7 +411,7 @@ export const translations = {
     footerCopyright: '© 2026 Gaddhe Me Party • 100% Free Civic Tech',
     footerLinksHeader: 'Quick Links',
     footerLegalHeader: 'Legal & Privacy',
-    footerTagline: '"Jaha Gaddha, Waha Party"',
+    footerTagline: '"Mera Gaddha, Meri Shan"',
     footerMap: 'Map',
     footerLeaderboard: 'Leaderboard',
     footerMission: 'Mission',
