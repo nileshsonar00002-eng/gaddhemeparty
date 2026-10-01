@@ -318,16 +318,18 @@ export function createNavbar(options = {}) {
     });
   };
 
-  const closeDrawer = () => {
+  const closeDrawer = (skipScrollUnlock = false) => {
     mobilePanel?.classList.add('translate-x-full');
-    document.body.classList.remove('panel-scroll-locked');
+    if (!skipScrollUnlock) {
+      document.body.classList.remove('panel-scroll-locked');
+    }
     setTimeout(() => {
       mobileDrawer?.classList.add('hidden');
     }, 250);
   };
 
   toggleBtn?.addEventListener('click', openDrawer);
-  closeBtn?.addEventListener('click', closeDrawer);
+  closeBtn?.addEventListener('click', () => closeDrawer());
   mobileDrawer?.addEventListener('click', (e) => {
     if (e.target === mobileDrawer) closeDrawer();
   });
@@ -345,8 +347,9 @@ export function createNavbar(options = {}) {
   // Panel navigation buttons in header and mobile drawer
   document.querySelectorAll('.nav-panel-btn, .mobile-nav-panel-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
-      closeDrawer();
       const panelId = e.currentTarget.getAttribute('data-nav-panel');
+      const isOpeningPanel = panelId && panelId !== 'map';
+      closeDrawer(isOpeningPanel);
       if (panelId === 'map') {
         router.navigate('');
       } else {

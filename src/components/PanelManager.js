@@ -125,9 +125,7 @@ export class PanelManager {
     // Event Listeners
     this.closeBtn.addEventListener('click', () => this.close());
     this.backdrop.addEventListener('click', () => {
-      if (this.activePanelId !== 'leaderboard') {
-        this.close();
-      }
+      this.close();
     });
 
     this.refreshLbBtn.addEventListener('click', async () => {
@@ -212,18 +210,10 @@ export class PanelManager {
 
     this.setMobilePeek(false);
 
-    const isModal = panelId !== 'leaderboard';
-    this.drawer.setAttribute('aria-modal', isModal ? 'true' : 'false');
-
-    if (isModal) {
-      this.backdrop.classList.remove('opacity-0', 'pointer-events-none');
-      this.backdrop.classList.add('opacity-100', 'pointer-events-auto');
-      this.lockBodyScroll();
-    } else {
-      this.backdrop.classList.add('opacity-0', 'pointer-events-none');
-      this.backdrop.classList.remove('opacity-100', 'pointer-events-auto');
-      this.unlockBodyScroll();
-    }
+    this.drawer.setAttribute('aria-modal', 'true');
+    this.backdrop.classList.remove('opacity-0', 'pointer-events-none');
+    this.backdrop.classList.add('opacity-100', 'pointer-events-auto');
+    this.lockBodyScroll();
 
     this.drawer.classList.remove('pointer-events-none', 'lg:translate-x-full', 'max-lg:translate-y-full');
     this.drawer.classList.add('pointer-events-auto', 'lg:translate-x-0', 'max-lg:translate-y-0');
@@ -238,9 +228,7 @@ export class PanelManager {
 
     this.renderContent(panelId, wasOpen && previousPanel !== panelId);
 
-    if (isModal) {
-      setTimeout(() => this.closeBtn.focus(), 150);
-    }
+    setTimeout(() => this.closeBtn.focus(), 150);
 
     this.onPanelStateChange(panelId, true);
   }

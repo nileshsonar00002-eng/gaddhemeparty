@@ -543,7 +543,9 @@ main {
 body.panel-scroll-locked {
   position: fixed;
   width: 100%;
+  overflow: hidden;
   overflow-y: hidden;
+  touch-action: none;
 }
 
 /* Performance optimization */
