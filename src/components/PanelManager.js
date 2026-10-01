@@ -476,7 +476,7 @@ export class PanelManager {
 
     let listHtml = '';
     if (this.leaderboardTab === 'cities') {
-      const topCities = data.topCities || [];
+      const topCities = (data.topCities || []).slice(0, 10);
       if (topCities.length === 0) {
         listHtml = `<div class="text-center py-8 text-[var(--muted)] text-xs">${isHindi ? 'अभी कोई शहर डेटा उपलब्ध नहीं है।' : 'No city data available yet.'}</div>`;
       } else {
@@ -497,7 +497,7 @@ export class PanelManager {
       }
     } else {
       const listKey = this.leaderboardTab === 'week' ? 'weekRankings' : 'allTimeRankings';
-      const pins = data[listKey] || [];
+      const pins = (data[listKey] || []).slice(0, 10);
 
       if (pins.length === 0) {
         listHtml = `<div class="text-center py-8 text-[var(--muted)] text-xs">${isHindi ? 'इस श्रेणी में अभी कोई गड्ढे नहीं हैं।' : 'No reported potholes in this category yet.'}</div>`;

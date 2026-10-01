@@ -495,7 +495,7 @@ export class LeaderboardSheet {
 
   renderCitiesTab() {
     const isHindi = getLanguage() === 'hindi';
-    const cities = this.leaderboardData?.topCities || [];
+    const cities = (this.leaderboardData?.topCities || []).slice(0, 10);
 
     if (cities.length === 0) {
       this.content.innerHTML = this.renderEmptyState();
@@ -538,7 +538,7 @@ export class LeaderboardSheet {
 
   renderMostReportedTab() {
     const isHindi = getLanguage() === 'hindi';
-    const pins = this.leaderboardData?.allTimeRankings || this.leaderboardData?.weekRankings || [];
+    const pins = (this.leaderboardData?.allTimeRankings || this.leaderboardData?.weekRankings || []).slice(0, 10);
 
     if (pins.length === 0) {
       this.content.innerHTML = this.renderEmptyState();

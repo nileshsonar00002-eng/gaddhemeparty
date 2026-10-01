@@ -556,12 +556,12 @@ class KhaddaApp {
 
       // If leaderboard doesn't have custom server data yet, construct from live user pins
       if (this.currentPins.length > 0) {
-        const sorted = [...this.currentPins].sort((a, b) => (b.upvotes || 0) + (b.reportCount || 1) * 3 - ((a.upvotes || 0) + (a.reportCount || 1) * 3));
+        const sorted = [...this.currentPins].sort((a, b) => (b.upvotes || 0) + (b.reportCount || 1) * 3 - ((a.upvotes || 0) + (a.reportCount || 1) * 3)).slice(0, 10);
         const topCities = Object.entries(cityCounts).map(([name, count]) => ({
           nameEnglish: name,
           nameHindi: name,
           count
-        })).sort((a, b) => b.count - a.count);
+        })).sort((a, b) => b.count - a.count).slice(0, 10);
 
         const lbPayload = {
           heroPotholeOfWeek: sorted[0] || null,
