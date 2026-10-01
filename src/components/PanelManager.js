@@ -444,9 +444,6 @@ export class PanelManager {
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs tabular-nums font-mono font-black uppercase shadow-sm">
               👑 #1 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
             </span>
-            <span class="text-xs sm:text-sm tabular-nums font-mono font-black text-amber-600 dark:text-amber-400 flex items-center gap-1">
-              🔥 ${(heroPin.upvotes || 0) + (heroPin.reportCount || 1) * 3} pts
-            </span>
           </div>
 
           <div class="flex gap-3.5 items-center">
