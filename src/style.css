@@ -224,6 +224,15 @@
   outline-offset: 2px;
 }
 
+.rounded-none,
+.btn-primary.rounded-none,
+.btn-secondary.rounded-none,
+#btn-open-report.rounded-none,
+#btn-open-about.rounded-none,
+#btn-open-full-leaderboard.rounded-none {
+  border-radius: 0 !important;
+}
+
 /* Button for Burgundy Band (Pill 3D style) */
 .btn-band {
   display: inline-flex;
