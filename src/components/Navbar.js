@@ -270,7 +270,7 @@ export function createNavbar(options = {}) {
             class="btn-primary w-full h-12 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl"
           >
             ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
-            <span>${isHindi ? 'सर्वर चाय टिप (₹20)' : 'Tip Server Chai (₹20)'}</span>
+            <span>${isHindi ? 'सर्वर चाय टिप' : 'Tip Server Chai'}</span>
           </button>
 
           <a
