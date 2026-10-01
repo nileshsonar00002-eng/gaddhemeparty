@@ -1062,6 +1062,11 @@ body.map-confirm-active {
   transform-origin: 50% 0%;
 }
 
+#bell-clapper-assembly {
+  transform-origin: 80px 137px;
+  transform-box: view-box;
+}
+
 @keyframes templeBellSwing {
   0% {
     transform: rotate(0deg);
@@ -1094,28 +1099,28 @@ body.map-confirm-active {
 
 @keyframes clapperCounterSwing {
   0% {
-    transform: rotate(0deg) translateX(0);
+    transform: rotate(0deg);
   }
   10% {
-    transform: rotate(-24deg) translateX(-5px);
+    transform: rotate(-24deg);
   }
   24% {
-    transform: rotate(18deg) translateX(4px);
+    transform: rotate(18deg);
   }
   38% {
-    transform: rotate(-12deg) translateX(-3px);
+    transform: rotate(-12deg);
   }
   52% {
-    transform: rotate(8deg) translateX(2px);
+    transform: rotate(8deg);
   }
   68% {
-    transform: rotate(-4deg) translateX(-1px);
+    transform: rotate(-4deg);
   }
   84% {
-    transform: rotate(2deg) translateX(0);
+    transform: rotate(2deg);
   }
   100% {
-    transform: rotate(0deg) translateX(0);
+    transform: rotate(0deg);
   }
 }
 
