@@ -889,7 +889,7 @@ body.panel-scroll-locked {
 
 .road-stripes-move {
   width: 200%;
-  animation: roadStripesMove 1.4s linear infinite;
+  animation: roadStripesMove 1.12s linear infinite;
 }
 
 @keyframes vehicleDriveRightToLeft {
@@ -913,17 +913,17 @@ body.panel-scroll-locked {
   will-change: right, transform;
 }
 
-.vehicle-bike { animation: vehicleDriveRightToLeft 16s linear infinite 0s; }
-.vehicle-bike .comic-bubble { animation: comicBubblePop 16s ease-out infinite 0s; }
+.vehicle-bike { animation: vehicleDriveRightToLeft 12.8s linear infinite 0s; }
+.vehicle-bike .comic-bubble { animation: comicBubblePop 12.8s ease-out infinite 0s; }
 
-.vehicle-auto { animation: vehicleDriveRightToLeft 16s linear infinite -4s; }
-.vehicle-auto .comic-bubble { animation: comicBubblePop 16s ease-out infinite -4s; }
+.vehicle-auto { animation: vehicleDriveRightToLeft 12.8s linear infinite -3.2s; }
+.vehicle-auto .comic-bubble { animation: comicBubblePop 12.8s ease-out infinite -3.2s; }
 
-.vehicle-car { animation: vehicleDriveRightToLeft 16s linear infinite -8s; }
-.vehicle-car .comic-bubble { animation: comicBubblePop 16s ease-out infinite -8s; }
+.vehicle-car { animation: vehicleDriveRightToLeft 12.8s linear infinite -6.4s; }
+.vehicle-car .comic-bubble { animation: comicBubblePop 12.8s ease-out infinite -6.4s; }
 
-.vehicle-jeep { animation: vehicleDriveRightToLeft 16s linear infinite -12s; }
-.vehicle-jeep .comic-bubble { animation: comicBubblePop 16s ease-out infinite -12s; }
+.vehicle-jeep { animation: vehicleDriveRightToLeft 12.8s linear infinite -9.6s; }
+.vehicle-jeep .comic-bubble { animation: comicBubblePop 12.8s ease-out infinite -9.6s; }
 
 /* Strict horizontal overflow prevention on mobile viewports */
 html, body {
