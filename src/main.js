@@ -33,6 +33,7 @@ import { StarfieldCanvas } from './components/StarfieldCanvas';
 import { NightGlobe } from './components/NightGlobe';
 import { PanelManager } from './components/PanelManager';
 import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimation';
+import { TempleBellWidget } from './components/TempleBell';
 import { router } from './utils/router';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps } from './utils/geo';
 import { tilt3d } from './utils/tilt3d';
@@ -44,6 +45,7 @@ class KhaddaApp {
     this.bottomSheet = new BottomSheet();
     this.panelManager = null;
     this.leaderboardSection = new LeaderboardSection('leaderboard-mount');
+    this.templeBell = new TempleBellWidget('temple-bell-mount');
     this.currentPins = [];
     this.userCoords = getCachedUserLocation();
     this.mapTheme = 'dark';
@@ -75,6 +77,9 @@ class KhaddaApp {
 
     // 0.2. Render saved language across static DOM
     renderAllPageI18n();
+
+    // 0.3. Render Interactive 3D Temple Bell Widget
+    this.templeBell?.render();
 
     // 0.5. Initialize Hero Cinematic Visuals (Starfield & 3D Night Globe)
     this.initHeroVisuals();
@@ -496,6 +501,9 @@ class KhaddaApp {
       if (this.leaderboardSection) {
         this.leaderboardSection.render();
       }
+
+      // Re-render Temple Bell Widget
+      this.templeBell?.render();
 
       // Re-render active panel if open
       if (this.panelManager && this.panelManager.isOpen) {
