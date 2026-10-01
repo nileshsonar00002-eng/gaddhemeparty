@@ -435,13 +435,14 @@ export class PanelManager {
     `;
 
     let heroCardHtml = '';
-    if (heroPin && this.leaderboardTab === 'week') {
+    const hasHeroCard = Boolean(heroPin && this.leaderboardTab === 'week');
+    if (hasHeroCard) {
       const cityName = isHindi ? (heroPin.cityNameHindi || heroPin.cityNameEnglish || 'भारत') : (heroPin.cityNameEnglish || heroPin.cityNameHindi || 'India');
       heroCardHtml = `
         <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-transparent border border-amber-500/30 space-y-2 relative overflow-hidden group">
           <div class="flex items-center justify-between">
             <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[10px] tabular-nums font-mono font-black uppercase">
-              👑 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
+              👑 #1 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
             </span>
             <span class="text-xs tabular-nums font-mono font-bold text-amber-500">🔥 ${(heroPin.upvotes || 0) + (heroPin.reportCount || 1) * 3} pts</span>
           </div>
@@ -497,12 +498,17 @@ export class PanelManager {
       }
     } else {
       const listKey = this.leaderboardTab === 'week' ? 'weekRankings' : 'allTimeRankings';
-      const pins = (data[listKey] || []).slice(0, 10);
+      const allPins = data[listKey] || [];
+      const pins = hasHeroCard ? allPins.slice(1, 10) : allPins.slice(0, 10);
+      const startRank = hasHeroCard ? 2 : 1;
 
-      if (pins.length === 0) {
+      if (pins.length === 0 && !hasHeroCard) {
         listHtml = `<div class="text-center py-8 text-[var(--muted)] text-xs">${isHindi ? 'इस श्रेणी में अभी कोई गड्ढे नहीं हैं।' : 'No reported potholes in this category yet.'}</div>`;
+      } else if (pins.length === 0 && hasHeroCard) {
+        listHtml = '';
       } else {
         listHtml = pins.map((pin, idx) => {
+          const rankNumber = startRank + idx;
           const cityName = isHindi ? (pin.cityNameHindi || pin.cityNameEnglish || 'भारत') : (pin.cityNameEnglish || pin.cityNameHindi || 'India');
           return `
             <div
@@ -510,8 +516,8 @@ export class PanelManager {
               data-pin-id="${pin.id}"
             >
               <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs tabular-nums font-mono font-bold flex-shrink-0 ${idx === 0 ? 'bg-amber-500 text-slate-950 font-black' : (idx === 1 ? 'bg-slate-300 text-slate-950 font-black' : (idx === 2 ? 'bg-amber-700 text-white' : 'bg-[var(--surface-2)] text-[var(--muted)]'))}">
-                  ${idx + 1}
+                <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs tabular-nums font-mono font-bold flex-shrink-0 ${rankNumber === 1 ? 'bg-amber-500 text-slate-950 font-black' : (rankNumber === 2 ? 'bg-slate-300 text-slate-950 font-black' : (rankNumber === 3 ? 'bg-amber-700 text-white' : 'bg-[var(--surface-2)] text-[var(--muted)]'))}">
+                  ${rankNumber}
                 </span>
 
                 ${pin.thumbnailUrl || pin.imageUrl ? `
