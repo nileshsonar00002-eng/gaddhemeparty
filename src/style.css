@@ -789,3 +789,114 @@ body.map-confirm-active {
   }
 }
 
+/* ========================================================
+   Header Chai Tip Periodic Attention Spark & Shimmer
+   ======================================================== */
+.chai-tip-spark {
+  position: relative !important;
+  overflow: hidden !important;
+  animation: chai-spark-pulse 4.5s ease-in-out infinite;
+  will-change: transform, box-shadow, border-color;
+}
+
+@keyframes chai-spark-pulse {
+  0%, 70%, 100% {
+    transform: scale(1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    border-color: var(--border);
+  }
+  76% {
+    transform: scale(1.05);
+    border-color: #F5B301;
+    box-shadow: 0 0 0 2px rgba(245, 179, 1, 0.35), 0 0 12px rgba(245, 179, 1, 0.5);
+  }
+  82% {
+    transform: scale(1.08);
+    border-color: #FBBF24;
+    box-shadow: 0 0 0 4px rgba(245, 179, 1, 0.5), 0 0 16px rgba(245, 179, 1, 0.7);
+  }
+  88% {
+    transform: scale(1.03);
+    border-color: #F5B301;
+    box-shadow: 0 0 0 2px rgba(245, 179, 1, 0.35), 0 0 8px rgba(245, 179, 1, 0.4);
+  }
+  94% {
+    transform: scale(1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    border-color: var(--border);
+  }
+}
+
+/* Light shimmer reflection beam sweeping across the button during spark */
+.chai-tip-spark::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -80%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  pointer-events: none;
+  opacity: 0;
+  animation: chai-spark-shimmer 4.5s ease-in-out infinite;
+}
+
+[data-theme="dark"] .chai-tip-spark::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.5) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes chai-spark-shimmer {
+  0%, 72% {
+    left: -80%;
+    opacity: 0;
+  }
+  75% {
+    opacity: 0.85;
+  }
+  85% {
+    left: 150%;
+    opacity: 0.95;
+  }
+  88%, 100% {
+    left: 150%;
+    opacity: 0;
+  }
+}
+
+/* Subtle coffee cup wiggle during spark */
+.chai-tip-spark svg {
+  animation: chai-spark-wiggle 4.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes chai-spark-wiggle {
+  0%, 74%, 90%, 100% {
+    transform: rotate(0deg);
+    filter: none;
+  }
+  77% {
+    transform: rotate(-10deg) scale(1.12);
+    filter: drop-shadow(0 0 3px #F5B301);
+  }
+  81% {
+    transform: rotate(10deg) scale(1.16);
+    filter: drop-shadow(0 0 5px #F5B301);
+  }
+  85% {
+    transform: rotate(-5deg) scale(1.08);
+    filter: drop-shadow(0 0 3px #F5B301);
+  }
+}
+
+

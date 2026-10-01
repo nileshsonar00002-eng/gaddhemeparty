@@ -124,7 +124,7 @@ export function createNavbar(options = {}) {
         <button
           id="btn-chai-tip-desktop"
           type="button"
-          class="btn-secondary px-3 py-2 text-xs min-h-[40px]"
+          class="btn-secondary px-3 py-2 text-xs min-h-[40px] chai-tip-spark"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
@@ -150,7 +150,7 @@ export function createNavbar(options = {}) {
         <button
           id="btn-chai-tip-mobile"
           type="button"
-          class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl shrink-0 cursor-pointer"
+          class="btn-secondary w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl shrink-0 cursor-pointer chai-tip-spark"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
