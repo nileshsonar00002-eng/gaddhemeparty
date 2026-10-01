@@ -685,14 +685,6 @@ export class PanelManager {
         </div>
 
         <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed text-center">${t('aboutStory')}</p>
-
-        <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1">
-          <h4 class="font-heading font-bold text-xs text-[var(--accent)] flex items-center justify-center gap-1.5">
-            <span>🛡️</span>
-            <span>${t('disclaimerTitle')}</span>
-          </h4>
-          <p class="text-xs text-[var(--muted)] leading-relaxed text-center">${t('disclaimerText')}</p>
-        </div>
       </div>
     `;
   }
