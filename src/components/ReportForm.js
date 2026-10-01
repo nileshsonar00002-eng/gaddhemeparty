@@ -157,7 +157,7 @@ export function renderReportForm(container, options = {}) {
               <div class="min-w-0 flex-1 space-y-1.5">
                 <div id="photo-size-badge" class="inline-flex items-center gap-1 tabular-nums text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-bold">
                   <span>✓</span>
-                  <span>${processedImageData ? t('photoOptimized', { size: processedImageData.sizeKb }) : ''}</span>
+                  <span>${processedImageData ? t('photoOptimized', { size: processedImageData.compressedSizeKb || processedImageData.sizeKb || 120 }) : ''}</span>
                 </div>
                 <div>
                   <button
@@ -233,12 +233,12 @@ export function renderReportForm(container, options = {}) {
               <span class="w-5 h-5 rounded-full bg-[var(--surface-2)] text-[var(--muted)] font-mono font-bold text-xs flex items-center justify-center">3</span>
               <span>${t('step3Title')}</span>
             </label>
-            <span id="char-counter" class="tabular-nums text-[11px] font-mono text-[var(--muted)]">0/100</span>
+            <span id="char-counter" class="tabular-nums text-[11px] font-mono text-[var(--muted)]">0/50</span>
           </div>
           <input
             type="text"
             id="landmark-input"
-            maxlength="100"
+            maxlength="50"
             value="${options.landmark || ''}"
             placeholder="${t('landmarkPlaceholder')}"
             ${quota.isLimitReached ? 'disabled' : ''}
@@ -388,7 +388,8 @@ export function renderReportForm(container, options = {}) {
 
       if (previewImg && previewContainer && sizeBadge && photoPlaceholder) {
         previewImg.src = processed.previewUrl;
-        sizeBadge.innerHTML = `<span>✓</span><span>${t('photoOptimized', { size: processed.sizeKb })}</span>`;
+        const sizeNum = processed.compressedSizeKb || processed.sizeKb || 120;
+        sizeBadge.innerHTML = `<span>✓</span><span>${t('photoOptimized', { size: sizeNum })}</span>`;
         photoPlaceholder.classList.add('hidden');
         previewContainer.classList.remove('hidden');
         previewContainer.classList.add('flex');
@@ -401,11 +402,11 @@ export function renderReportForm(container, options = {}) {
     }
   });
 
-  // Character Counter for Landmark
+  // Character Counter for Landmark (Max 50 characters)
   if (landmarkInput && charCounter) {
-    charCounter.textContent = `${landmarkInput.value.length}/100`;
+    charCounter.textContent = `${landmarkInput.value.length}/50`;
     landmarkInput.addEventListener('input', (e) => {
-      charCounter.textContent = `${e.target.value.length}/100`;
+      charCounter.textContent = `${e.target.value.length}/50`;
     });
   }
 
