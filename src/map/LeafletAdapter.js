@@ -370,7 +370,8 @@ export class LeafletAdapter extends MapAdapter {
       fillColor: '#DC2626',
       fillOpacity: 0.08,
       weight: 2,
-      radius: radius
+      radius: radius,
+      interactive: false
     }).addTo(this.map);
   }
 

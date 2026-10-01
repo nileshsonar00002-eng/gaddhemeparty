@@ -422,7 +422,20 @@ export function renderReportForm(container, options = {}) {
     }
   };
 
-  openMapPickerBtn?.addEventListener('click', () => {
+  openMapPickerBtn?.addEventListener('click', async () => {
+    try {
+      const liveCoords = await getLiveUserLocation({
+        enableHighAccuracy: true,
+        timeout: 4000,
+        fallbackToCache: true
+      });
+      if (liveCoords && liveCoords.lat && liveCoords.lng) {
+        currentCoordinates = liveCoords;
+        setRealDeviceGps(liveCoords, liveCoords.source || 'gps');
+        setCachedUserLocation(liveCoords, liveCoords.source || 'gps');
+      }
+    } catch (_) {}
+
     startMapPinConfirm();
   });
 

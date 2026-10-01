@@ -662,7 +662,7 @@ class KhaddaApp {
 
   startMapLocationConfirm(formState = {}) {
     const { currentCoordinates, imageData, landmark } = formState;
-    const realGps = getRealDeviceGps() || this.realDeviceGps || formState.baseGps || currentCoordinates || { lat: 18.5204, lng: 73.8567 };
+    let realGps = getRealDeviceGps() || this.realDeviceGps || formState.baseGps || currentCoordinates || { lat: 18.5204, lng: 73.8567 };
     if (!this.realDeviceGps && realGps) {
       this.realDeviceGps = realGps;
       setRealDeviceGps(realGps);
@@ -695,10 +695,9 @@ class KhaddaApp {
 
     // 5. Target initial position
     let activeCoords = {
-      lat: currentCoordinates?.lat || this.userCoords?.lat || 18.6298,
-      lng: currentCoordinates?.lng || this.userCoords?.lng || 73.7997
+      lat: currentCoordinates?.lat || realGps?.lat || this.userCoords?.lat || 18.6298,
+      lng: currentCoordinates?.lng || realGps?.lng || this.userCoords?.lng || 73.7997
     };
-    const accuracy = currentCoordinates?.accuracy || 20;
 
     const updateBarDisplay = (c) => {
       if (coordsDisplay && c) {
@@ -736,6 +735,20 @@ class KhaddaApp {
       } else {
         this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, 20000);
       }
+
+      // Background fresh live GPS query to ensure latest live position is rendered
+      getLiveUserLocation({ enableHighAccuracy: true, timeout: 5000, fallbackToCache: true })
+        .then((freshGps) => {
+          if (freshGps && freshGps.lat && freshGps.lng) {
+            realGps = freshGps;
+            this.realDeviceGps = freshGps;
+            setRealDeviceGps(freshGps, freshGps.source || 'gps');
+            this.mapAdapter?.setUserLocationMarker?.(freshGps.lat, freshGps.lng);
+            this.mapAdapter?.setAccuracyCircle?.(freshGps.lat, freshGps.lng, 20000);
+          }
+        })
+        .catch(() => {});
+
       this.mapAdapter.setConfirmLocationMarker?.(activeCoords.lat, activeCoords.lng, (newPos, isEnd) => {
         const distFromOrigin = (realGps && typeof realGps.lat === 'number') 
           ? haversineDistanceKm(realGps.lat, realGps.lng, newPos.lat, newPos.lng) 

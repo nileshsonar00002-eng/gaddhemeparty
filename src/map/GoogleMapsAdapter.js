@@ -590,7 +590,8 @@ export class GoogleMapsAdapter extends MapAdapter {
       map: this.map,
       center: { lat, lng },
       radius: radius,
-      zIndex: 50
+      zIndex: 50,
+      clickable: false
     });
   }
 
