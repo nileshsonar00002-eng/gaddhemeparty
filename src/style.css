@@ -470,6 +470,41 @@
   box-shadow: var(--shadow-header);
 }
 
+/* Header Navigation Pill Buttons & Interactive Hover Animation */
+.nav-panel-btn {
+  position: relative;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.nav-panel-btn:hover {
+  transform: translateY(-1.5px);
+}
+
+.nav-panel-btn svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+.nav-panel-btn:hover svg {
+  transform: scale(1.22) translateY(-0.5px);
+}
+
+.nav-panel-btn span {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), letter-spacing 0.22s ease, text-shadow 0.22s ease;
+  display: inline-block;
+  will-change: transform;
+}
+
+.nav-panel-btn:hover span {
+  transform: scale(1.06);
+  letter-spacing: 0.02em;
+}
+
+.nav-panel-btn:active {
+  transform: translateY(0.5px) scale(0.98);
+}
+
 /* Main body padding to offset fixed header smoothly */
 main {
   padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
