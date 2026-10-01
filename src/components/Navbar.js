@@ -157,12 +157,22 @@ export function createNavbar(options = {}) {
         </button>
       </div>
     </div>
+  `;
 
+  // Mount Mobile Full-Height Navigation Drawer to body portal so it is never clipped or trapped behind fixed header
+  let drawerPortal = document.getElementById('mobile-nav-drawer-portal');
+  if (!drawerPortal) {
+    drawerPortal = document.createElement('div');
+    drawerPortal.id = 'mobile-nav-drawer-portal';
+    document.body.appendChild(drawerPortal);
+  }
+
+  drawerPortal.innerHTML = `
     <!-- Mobile Full-Height Navigation Drawer Overlay -->
-    <div id="mobile-nav-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1150] hidden transition-opacity duration-200">
+    <div id="mobile-nav-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[99999] hidden transition-opacity duration-200">
       <div
         id="mobile-nav-panel"
-        class="fixed top-0 right-0 w-[85%] max-w-sm h-full bg-[var(--surface)] border-l border-[var(--border)] p-5 flex flex-col justify-between shadow-2xl overflow-y-auto transform transition-transform duration-250 ease-out translate-x-full"
+        class="fixed top-0 right-0 w-[85%] max-w-sm h-full bg-[var(--surface)] border-l border-[var(--border)] p-5 flex flex-col justify-between shadow-2xl overflow-y-auto transform transition-transform duration-250 ease-out translate-x-full z-[99999]"
       >
         <div class="space-y-5">
           <!-- Drawer Top Header -->
@@ -332,8 +342,8 @@ export function createNavbar(options = {}) {
     });
   }
 
-  // Panel navigation buttons
-  container.querySelectorAll('.nav-panel-btn, .mobile-nav-panel-btn').forEach((btn) => {
+  // Panel navigation buttons in header and mobile drawer
+  document.querySelectorAll('.nav-panel-btn, .mobile-nav-panel-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       closeDrawer();
       const panelId = e.currentTarget.getAttribute('data-nav-panel');
