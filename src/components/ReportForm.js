@@ -62,8 +62,8 @@ export function renderReportForm(container, options = {}) {
       level: 'red',
       dotClass: 'bg-rose-500',
       cardClass: 'bg-rose-500/5 border-rose-500/30 text-rose-600 dark:text-rose-400',
-      statusText: t('gpsWeakStatus', { acc }),
-      accText: `±${acc}m`
+      statusText: t('gpsWeakStatus'),
+      accText: ''
     };
   };
 
@@ -146,9 +146,6 @@ export function renderReportForm(container, options = {}) {
               <div class="text-xs font-semibold text-[var(--text)]">
                 ${t('takePhoto')}
               </div>
-              <div class="text-[11px] text-[var(--muted)]">
-                ${t('photoOptNote')}
-              </div>
             </div>
 
             <!-- Uploaded Thumbnail Preview with Change Button -->
@@ -194,7 +191,7 @@ export function renderReportForm(container, options = {}) {
                     ${initialStatus.statusText}
                   </div>
                   <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)] truncate">
-                    ${formatCoords(currentCoordinates)} (${initialStatus.accText})
+                    ${formatCoords(currentCoordinates)}${initialStatus.accText ? ` (${initialStatus.accText})` : ''}
                   </div>
                 </div>
               </div>
@@ -351,7 +348,7 @@ export function renderReportForm(container, options = {}) {
       gpsStatusText.textContent = statusData.statusText;
     }
     if (gpsCoordsText) {
-      gpsCoordsText.textContent = `${formatCoords(coords)} (${statusData.accText})`;
+      gpsCoordsText.textContent = `${formatCoords(coords)}${statusData.accText ? ` (${statusData.accText})` : ''}`;
     }
     updateSubmitButtonState();
   };
