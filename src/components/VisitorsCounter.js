@@ -22,14 +22,13 @@ export function initVisitorsCounter(mountId = 'visitors-counter-mount') {
 
   const render = (countNum) => {
     const isHindi = getLanguage() === 'hindi';
-    const label = isHindi ? 'कुल विजिटर्स' : 'Total Visitors';
+    const label = isHindi ? 'कुल विजिटर्स' : 'TOTAL VISITORS';
     const formattedCount = Number(countNum).toLocaleString(isHindi ? 'hi-IN' : 'en-US');
 
-    // Clean dark color theme text, NO background box
+    // Clean dark color theme text, NO background box, NO emoji, CAPITAL text
     container.innerHTML = `
       <div class="w-full py-3 px-4 text-center select-none bg-transparent">
-        <p class="inline-flex items-center justify-center gap-2 text-sm sm:text-base font-heading font-extrabold text-[#2B100C] dark:text-[#F9F2E8] tracking-wide">
-          <span class="text-base sm:text-lg">👥</span>
+        <p class="inline-flex items-center justify-center gap-2 text-sm sm:text-base font-heading font-black text-[#2B100C] dark:text-[#F9F2E8] tracking-wider uppercase">
           <span>${label}:</span>
           <span class="font-mono font-black text-amber-700 dark:text-amber-400 tabular-nums">${formattedCount}</span>
         </p>
