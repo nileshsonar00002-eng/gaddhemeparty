@@ -33,6 +33,7 @@ import { StarfieldCanvas } from './components/StarfieldCanvas';
 import { NightGlobe } from './components/NightGlobe';
 import { PanelManager } from './components/PanelManager';
 import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimation';
+import { initVisitorsCounter } from './components/VisitorsCounter';
 import { TempleBellWidget } from './components/TempleBell';
 import { router } from './utils/router';
 import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps } from './utils/geo';
@@ -148,10 +149,12 @@ class KhaddaApp {
     // 10. Subtle Desktop 3D Card Tilt Engine
     tilt3d.init();
 
-    // 10.5. Initialize Animated Pothole Cartoon Strip (Above Footer)
+    // 10.5. Initialize Animated Pothole Cartoon Strip & Visitors Counter (Above Footer)
     initPotholeCartoonAnimation('pothole-animation-mount');
+    initVisitorsCounter('visitors-counter-mount');
     window.addEventListener('languageChanged', () => {
       initPotholeCartoonAnimation('pothole-animation-mount');
+      initVisitorsCounter('visitors-counter-mount');
       this.renderHeaderAndStats();
       tilt3d.refresh();
     });

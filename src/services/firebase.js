@@ -16,6 +16,8 @@ import {
   addDoc,
   getDocs,
   updateDoc,
+  setDoc,
+  increment,
   serverTimestamp,
   connectFirestoreEmulator
 } from 'firebase/firestore';
@@ -561,4 +563,22 @@ export function subscribeToModerationPins(onPinsUpdated, onError) {
     return () => {};
   }
 }
+
+/**
+ * Record a unique visitor session atomically in Firestore
+ */
+export async function recordVisitorSession() {
+  if (typeof window === 'undefined') return;
+  const SESSION_KEY = 'khadda_visitor_recorded_v1';
+  if (!sessionStorage.getItem(SESSION_KEY)) {
+    sessionStorage.setItem(SESSION_KEY, 'true');
+    try {
+      const statsRef = doc(db, 'stats', 'global');
+      await setDoc(statsRef, { visitorCount: increment(1) }, { merge: true });
+    } catch (err) {
+      console.warn('[Firebase] Visitor count increment notice:', err);
+    }
+  }
+}
+
 
