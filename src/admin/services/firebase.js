@@ -145,6 +145,37 @@ export async function bulkRejectPins(pinIds, reason = 'Bulk rejected by admin') 
 }
 
 /**
+ * Bulk Archive multiple pins
+ */
+export async function bulkArchivePins(pinIds) {
+  if (!Array.isArray(pinIds) || pinIds.length === 0) return 0;
+  const batch = writeBatch(db);
+  pinIds.forEach((id) => {
+    const pinRef = doc(db, 'pins', id);
+    batch.update(pinRef, {
+      status: 'archived',
+      archivedAt: serverTimestamp()
+    });
+  });
+  await batch.commit();
+  return pinIds.length;
+}
+
+/**
+ * Bulk Delete multiple pins
+ */
+export async function bulkDeletePins(pinIds) {
+  if (!Array.isArray(pinIds) || pinIds.length === 0) return 0;
+  const batch = writeBatch(db);
+  pinIds.forEach((id) => {
+    const pinRef = doc(db, 'pins', id);
+    batch.delete(pinRef);
+  });
+  await batch.commit();
+  return pinIds.length;
+}
+
+/**
  * Update Landmark description
  */
 export async function updatePinLandmark(pinId, newLandmark) {
@@ -178,3 +209,4 @@ export async function hardDeletePin(pinId) {
   await deleteDoc(pinRef);
   return true;
 }
+

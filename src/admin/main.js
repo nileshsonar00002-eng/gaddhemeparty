@@ -8,6 +8,8 @@ import {
   rejectPin,
   bulkApprovePins,
   bulkRejectPins,
+  bulkArchivePins,
+  bulkDeletePins,
   updatePinLandmark,
   archivePin,
   hardDeletePin
@@ -298,6 +300,28 @@ class AdminApp {
             this.selectedPinIds.clear();
           } catch (err) {
             showToast('Failed to bulk reject', 'error');
+          }
+        }
+      },
+      onBulkDelete: async () => {
+        const ids = Array.from(this.selectedPinIds);
+        if (ids.length === 0) return;
+        if (confirm(`Are you sure you want to delete / archive ${ids.length} selected reports?`)) {
+          try {
+            // Attempt permanent deletion
+            await bulkDeletePins(ids);
+            showToast(`🗑️ Successfully deleted ${ids.length} reports!`, 'info');
+            this.selectedPinIds.clear();
+          } catch (err) {
+            console.warn('[Admin] Direct delete restricted, falling back to bulk archive:', err);
+            try {
+              // Fallback to bulk soft-archive
+              await bulkArchivePins(ids);
+              showToast(`🗑️ Archived ${ids.length} reports!`, 'info');
+              this.selectedPinIds.clear();
+            } catch (fallbackErr) {
+              showToast('Failed to delete selected reports', 'error');
+            }
           }
         }
       }

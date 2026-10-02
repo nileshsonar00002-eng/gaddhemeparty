@@ -15,7 +15,8 @@ export function renderQueueFilter(container, options = {}) {
     onSortChange,
     onSelectAll,
     onBulkApprove,
-    onBulkReject
+    onBulkReject,
+    onBulkDelete
   } = options;
 
   container.innerHTML = `
@@ -133,7 +134,7 @@ export function renderQueueFilter(container, options = {}) {
                 type="checkbox"
                 id="select-all-checkbox"
                 ${isAllSelected ? 'checked' : ''}
-                class="w-4 h-4 rounded text-amber-500 bg-slate-950 border-slate-700 focus:ring-amber-500"
+                class="w-4 h-4 rounded text-amber-500 bg-slate-950 border-slate-700 focus:ring-amber-500 cursor-pointer"
               />
               <span>Select All (${totalVisible})</span>
             </label>
@@ -145,13 +146,13 @@ export function renderQueueFilter(container, options = {}) {
           </div>
 
           ${selectedCount > 0 ? `
-            <div class="flex items-center gap-2 animate-in fade-in duration-150">
+            <div class="flex items-center gap-2 animate-in fade-in duration-150 flex-wrap">
               <button
                 type="button"
                 id="btn-bulk-approve"
                 class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center gap-1.5 cursor-pointer"
               >
-                <span>✓ Approve Selected (${selectedCount})</span>
+                <span>✓ Approve (${selectedCount})</span>
               </button>
 
               <button
@@ -159,7 +160,16 @@ export function renderQueueFilter(container, options = {}) {
                 id="btn-bulk-reject"
                 class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition flex items-center gap-1.5 cursor-pointer"
               >
-                <span>✕ Reject Selected (${selectedCount})</span>
+                <span>✕ Reject (${selectedCount})</span>
+              </button>
+
+              <button
+                type="button"
+                id="btn-bulk-delete"
+                class="px-3 py-1.5 rounded-xl bg-red-900/80 hover:bg-red-700 text-red-100 hover:text-white font-bold text-xs shadow-md shadow-red-950/40 border border-red-700/50 transition flex items-center gap-1.5 cursor-pointer"
+                title="Delete selected pins"
+              >
+                <span>🗑️ Delete (${selectedCount})</span>
               </button>
             </div>
           ` : ''}
@@ -199,5 +209,10 @@ export function renderQueueFilter(container, options = {}) {
   // Wire Bulk Reject
   container.querySelector('#btn-bulk-reject')?.addEventListener('click', () => {
     if (onBulkReject) onBulkReject();
+  });
+
+  // Wire Bulk Delete
+  container.querySelector('#btn-bulk-delete')?.addEventListener('click', () => {
+    if (onBulkDelete) onBulkDelete();
   });
 }
