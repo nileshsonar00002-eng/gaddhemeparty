@@ -214,7 +214,7 @@ export const translations = {
   english: {
     appNameHindi: 'Gaddhe Me Party',
     appNameEnglish: 'Pothole Tracker',
-    tagline: 'Mera Gaddha, Meri Shan',
+    tagline: 'मेरा गड्ढा, मेरी शान',
     heroBadge: 'Free · No login',
     heroTitleHtml: 'Jaha Gaddha, <span class="hero-highlight-word font-bold">Waha Party</span>',
     heroDescription: 'Map road hazards and pothole hotspots with live GPS and instant community verification. 100% free and open citizen tool.',
@@ -421,7 +421,7 @@ export const translations = {
     footerCopyright: '© 2026 Gaddhe Me Party • 100% Free Civic Tech',
     footerLinksHeader: 'Quick Links',
     footerLegalHeader: 'Legal & Privacy',
-    footerTagline: '"Mera Gaddha, Meri Shan"',
+    footerTagline: '"मेरा गड्ढा, मेरी शान"',
     footerMap: 'Map',
     footerLeaderboard: 'Leaderboard',
     footerMission: 'Mission',
