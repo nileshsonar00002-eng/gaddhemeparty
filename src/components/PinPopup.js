@@ -59,10 +59,10 @@ export function createPinPopupHtml(pin) {
         type="button"
         onclick="window.__khaddaClosePopup && window.__khaddaClosePopup()"
         aria-label="Close popup"
-        class="absolute top-2 right-2 w-7 h-7 rounded-full bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)] flex items-center justify-center transition shadow-md z-30 cursor-pointer"
+        class="absolute top-2 right-2 w-8 h-8 rounded-full bg-slate-900/90 text-white hover:bg-rose-600 border border-slate-700 flex items-center justify-center transition-all shadow-lg z-30 cursor-pointer active:scale-95"
       >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
 

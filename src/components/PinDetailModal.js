@@ -111,11 +111,12 @@ export function openPinDetailModal(pin) {
         <button
           id="btn-close-pin-modal"
           type="button"
-          class="btn-secondary absolute top-3 right-3 w-9 h-9 p-0 rounded-full flex items-center justify-center transition shadow-md z-30 cursor-pointer active:scale-90"
+          class="absolute top-3.5 right-3.5 w-10 h-10 rounded-full bg-slate-900/90 text-white border-2 border-slate-700 hover:bg-rose-600 hover:border-rose-500 flex items-center justify-center transition-all duration-150 shadow-xl z-40 cursor-pointer active:scale-95"
           aria-label="Close"
+          title="Close"
         >
-          <svg class="w-5 h-5 text-[var(--muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
 
