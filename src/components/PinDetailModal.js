@@ -100,32 +100,32 @@ export function openPinDetailModal(pin) {
 
   container.innerHTML = `
     <!-- Center Modal Overlay -->
-    <div id="pin-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1200] flex items-center justify-center p-4 sm:p-6 transition-opacity duration-200">
-      <!-- Centered Card -->
+    <div id="pin-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1200] flex items-center justify-center pt-[calc(var(--header-h,80px)+12px)] pb-4 px-3 sm:px-6 transition-opacity duration-200">
+      <!-- Centered Card (Reduced 20% in size & constrained below header) -->
       <div
         id="pin-modal-card"
-        class="relative w-full max-w-[360px] sm:max-w-[420px] max-h-[90dvh] bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 text-[var(--text)]"
+        class="relative w-full max-w-[315px] sm:max-w-[350px] max-h-[75dvh] sm:max-h-[78dvh] bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 text-[var(--text)]"
         onclick="event.stopPropagation()"
       >
         <!-- Floating Close Button (Top Right) -->
         <button
           id="btn-close-pin-modal"
           type="button"
-          class="absolute top-3.5 right-3.5 w-10 h-10 rounded-full bg-slate-900/90 text-white border-2 border-slate-700 hover:bg-rose-600 hover:border-rose-500 flex items-center justify-center transition-all duration-150 shadow-xl z-40 cursor-pointer active:scale-95"
+          class="absolute top-2.5 right-2.5 w-9 h-9 rounded-full bg-slate-900/90 text-white border-2 border-slate-700 hover:bg-rose-600 hover:border-rose-500 flex items-center justify-center transition-all duration-150 shadow-xl z-40 cursor-pointer active:scale-95"
           aria-label="Close"
           title="Close"
         >
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
 
         <!-- Scrollable Content -->
-        <div class="overflow-y-auto overscroll-contain p-4 space-y-3.5">
+        <div class="overflow-y-auto overscroll-contain p-3.5 sm:p-4 space-y-3">
           <!-- Photo Gallery / Moderation Status Section -->
           ${photoApproved && allImages.length > 0 ? `
             <div class="space-y-2">
-              <div id="gallery-main-container" class="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
+              <div id="gallery-main-container" class="w-full h-38 sm:h-44 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
                 <img
                   id="gallery-main-img"
                   src="${allImages[0]}"
