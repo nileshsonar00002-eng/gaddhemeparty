@@ -391,7 +391,7 @@ class KhaddaApp {
     window.__khaddaFocusPinOnMap = (pin, rank = null) => {
       if (!pin || !pin.latitude || !pin.longitude) return;
 
-      if (this.panelManager && window.innerWidth < 1024) {
+      if (this.panelManager) {
         this.panelManager.close();
       }
 
@@ -420,7 +420,7 @@ class KhaddaApp {
         const pinRank = rank || pin.rank || window.__khaddaGetPinRank(pinId);
         if (pinRank) pin.rank = pinRank;
 
-        if (this.panelManager && window.innerWidth < 1024) {
+        if (this.panelManager) {
           this.panelManager.close();
         }
 
@@ -442,7 +442,7 @@ class KhaddaApp {
     };
 
     window.__khaddaOpenPinModal = (pin) => {
-      if (this.panelManager && window.innerWidth < 1024) {
+      if (this.panelManager) {
         this.panelManager.close();
       }
       if (pin) openPinDetailModal(pin);

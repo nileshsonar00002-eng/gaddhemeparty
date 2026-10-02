@@ -628,9 +628,7 @@ export class PanelManager {
         if (pin) {
           const rank = pinIdx !== -1 ? (pinIdx + 1) : (data.heroPotholeOfWeek?.id === pinId ? 1 : null);
           if (rank) pin.rank = rank;
-          if (window.innerWidth < 1024) {
-            this.close();
-          }
+          this.close();
           this.onSelectPin(pin);
         }
       });
