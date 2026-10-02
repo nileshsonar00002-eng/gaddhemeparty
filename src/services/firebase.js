@@ -225,6 +225,8 @@ export async function callSubmitReport(reportPayload) {
         thumbnailUrl: reportPayload.thumbnailUrl || existingPinDoc.data.thumbnailUrl || null,
         images: existingImages,
         thumbnails: existingThumbs,
+        photoStatus: reportPayload.imageUrl ? 'pending' : (existingPinDoc.data.photoStatus || 'approved'),
+        photoApproved: false,
         lastReportedAt: serverTimestamp()
       });
 
@@ -243,6 +245,7 @@ export async function callSubmitReport(reportPayload) {
     }
 
     // Create new pin with images and thumbnails arrays
+    const hasPhoto = Boolean(reportPayload.imageUrl);
     const newDoc = await addDoc(pinsRef, {
       latitude: reportPayload.latitude,
       longitude: reportPayload.longitude,
@@ -254,6 +257,8 @@ export async function callSubmitReport(reportPayload) {
       thumbnailUrl: reportPayload.thumbnailUrl || reportPayload.imageUrl || null,
       images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
       thumbnails: reportPayload.thumbnailUrl ? [reportPayload.thumbnailUrl] : (reportPayload.imageUrl ? [reportPayload.imageUrl] : []),
+      photoStatus: hasPhoto ? 'pending' : 'none',
+      photoApproved: false,
       reportCount: 1,
       upvotes: 0,
       flagCount: 0,
@@ -451,3 +456,109 @@ export async function callRefreshLeaderboard() {
     return null;
   }
 }
+
+/**
+ * Check if a pin's photo is approved for public viewing
+ */
+export function isPinPhotoApproved(pin) {
+  if (!pin) return false;
+  // If explicitly approved
+  if (pin.photoStatus === 'approved' || pin.photoApproved === true) return true;
+  // If explicitly pending or rejected
+  if (pin.photoStatus === 'pending' || pin.photoStatus === 'rejected' || pin.photoApproved === false) return false;
+  // Legacy pins fallback: if photo exists and no photoStatus set, consider legacy approved
+  return Boolean(pin.imageUrl || (Array.isArray(pin.images) && pin.images.length > 0));
+}
+
+/**
+ * Admin Moderation Actions
+ */
+export async function approvePinPhoto(pinId) {
+  if (!pinId) return false;
+  try {
+    const pinRef = doc(db, 'pins', pinId);
+    await updateDoc(pinRef, {
+      photoStatus: 'approved',
+      photoApproved: true,
+      photoApprovedAt: serverTimestamp()
+    });
+    return true;
+  } catch (err) {
+    console.error('[Admin] Approve photo error:', err);
+    throw err;
+  }
+}
+
+export async function rejectPinPhoto(pinId, reason = 'Photo does not meet guidelines') {
+  if (!pinId) return false;
+  try {
+    const pinRef = doc(db, 'pins', pinId);
+    await updateDoc(pinRef, {
+      photoStatus: 'rejected',
+      photoApproved: false,
+      photoRejectedReason: reason,
+      photoRejectedAt: serverTimestamp()
+    });
+    return true;
+  } catch (err) {
+    console.error('[Admin] Reject photo error:', err);
+    throw err;
+  }
+}
+
+export async function updatePinLandmark(pinId, landmark) {
+  if (!pinId) return false;
+  try {
+    const pinRef = doc(db, 'pins', pinId);
+    await updateDoc(pinRef, {
+      landmark: String(landmark || '').trim()
+    });
+    return true;
+  } catch (err) {
+    console.error('[Admin] Update landmark error:', err);
+    throw err;
+  }
+}
+
+export async function deleteOrArchivePin(pinId) {
+  if (!pinId) return false;
+  try {
+    const pinRef = doc(db, 'pins', pinId);
+    await updateDoc(pinRef, {
+      status: 'archived',
+      archivedAt: serverTimestamp()
+    });
+    return true;
+  } catch (err) {
+    console.error('[Admin] Archive pin error:', err);
+    throw err;
+  }
+}
+
+/**
+ * Real-time listener for Admin Moderation Queue (all pins)
+ */
+export function subscribeToModerationPins(onPinsUpdated, onError) {
+  try {
+    const pinsRef = collection(db, 'pins');
+    const q = query(pinsRef, limit(500));
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const pins = [];
+        snapshot.forEach((d) => {
+          pins.push({ id: d.id, ...d.data() });
+        });
+        onPinsUpdated(pins);
+      },
+      (err) => {
+        console.warn('[Admin] Moderation query notice:', err);
+        if (onError) onError(err);
+      }
+    );
+  } catch (err) {
+    if (onError) onError(err);
+    return () => {};
+  }
+}
+

@@ -1068,6 +1068,8 @@ class KhaddaApp {
           targetPin.reportCount = (targetPin.reportCount || 1) + 1;
           if (imageUrl && targetPin.images) {
             targetPin.images.unshift(imageUrl);
+            targetPin.photoStatus = 'pending';
+            targetPin.photoApproved = false;
           }
         }
       } else if (result.pinId) {
@@ -1081,6 +1083,8 @@ class KhaddaApp {
           imageUrl,
           thumbnailUrl,
           images: imageUrl ? [imageUrl] : [],
+          photoStatus: imageUrl ? 'pending' : 'none',
+          photoApproved: false,
           reportCount: 1,
           upvotes: 0,
           status: 'active',

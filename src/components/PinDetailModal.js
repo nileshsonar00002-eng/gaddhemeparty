@@ -2,7 +2,7 @@ import { t, getLanguage } from '../utils/i18n';
 import { modalManager } from '../utils/modalManager';
 import { resolvePinCity } from '../utils/cities';
 import { processPotholeImage } from '../utils/imageProcessor';
-import { attachPhotoToPin, uploadPotholePhoto } from '../services/firebase';
+import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved } from '../services/firebase';
 import { showToast } from './Toast';
 import { openPhotoLightbox } from './PhotoLightbox';
 import { hasUserReportedOrUpvoted, hasUserUpvoted, getActionQuota, recordLocalCountedAction } from '../utils/upvoteStorage';
@@ -82,6 +82,9 @@ export function openPinDetailModal(pin) {
   }
 
   let activePhotoIndex = 0;
+  const photoApproved = isPinPhotoApproved(pin);
+  const isPendingPhoto = !photoApproved && (allImages.length > 0 || pin.photoStatus === 'pending');
+  const isRejectedPhoto = pin.photoStatus === 'rejected';
 
   // Generate deep-link share URL for this pin
   const origin = window.location.origin;
@@ -118,8 +121,8 @@ export function openPinDetailModal(pin) {
 
         <!-- Scrollable Content -->
         <div class="overflow-y-auto overscroll-contain p-4 space-y-3.5">
-          <!-- Photo Gallery / Carousel Section -->
-          ${allImages.length > 0 ? `
+          <!-- Photo Gallery / Moderation Status Section -->
+          ${photoApproved && allImages.length > 0 ? `
             <div class="space-y-2">
               <div id="gallery-main-container" class="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
                 <img
@@ -181,6 +184,40 @@ export function openPinDetailModal(pin) {
                   `).join('')}
                 </div>
               ` : ''}
+            </div>
+          ` : isPendingPhoto ? `
+            <!-- Photo Under Review Card -->
+            <div class="w-full p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col items-center justify-center text-center gap-2.5 relative overflow-hidden shadow-inner">
+              <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center justify-center text-2xl animate-pulse">
+                ⏳
+              </div>
+              <div class="space-y-1">
+                <div class="text-sm font-heading font-bold text-amber-600 dark:text-amber-400">
+                  ${t('photoUnderReviewTitle')}
+                </div>
+                <div class="text-[11px] text-[var(--muted)] max-w-xs leading-relaxed">
+                  ${t('photoUnderReviewDesc')}
+                </div>
+              </div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] font-bold border border-amber-500/40">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                <span>${t('photoUnderReviewBadge')}</span>
+              </div>
+            </div>
+          ` : isRejectedPhoto ? `
+            <!-- Photo Rejected Card -->
+            <div class="w-full p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-3 text-left">
+              <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-500 flex items-center justify-center text-lg shrink-0">
+                ❌
+              </div>
+              <div>
+                <div class="text-xs sm:text-sm font-heading font-bold text-rose-600 dark:text-rose-400">
+                  ${t('photoRejectedTitle')}
+                </div>
+                <div class="text-[11px] text-[var(--muted)] mt-0.5">
+                  ${pin.photoRejectedReason || t('photoRejectedDesc')}
+                </div>
+              </div>
             </div>
           ` : `
             <div class="w-full h-28 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col items-center justify-center text-[var(--muted)] gap-1">

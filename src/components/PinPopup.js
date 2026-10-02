@@ -1,5 +1,6 @@
 import { t, getLanguage } from '../utils/i18n';
 import { hasUserReportedOrUpvoted, hasUserUpvoted } from '../utils/upvoteStorage';
+import { isPinPhotoApproved } from '../services/firebase';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -34,6 +35,9 @@ function formatRelativeTime(timestamp) {
 export function createPinPopupHtml(pin) {
   const safeLandmark = escapeHtml(pin.landmark || t('defaultLandmark'));
   const safeThumbnail = pin.thumbnailUrl || pin.imageUrl || '';
+  const isApproved = isPinPhotoApproved(pin);
+  const isPending = !isApproved && (Boolean(safeThumbnail) || pin.photoStatus === 'pending');
+  const isRejected = pin.photoStatus === 'rejected';
   const reportCount = pin.reportCount || 1;
   const upvoteCount = pin.upvotes || 0;
   const timeStr = formatRelativeTime(pin.createdAt || pin.lastReportedAt);
@@ -62,8 +66,8 @@ export function createPinPopupHtml(pin) {
         </svg>
       </button>
 
-      <!-- Image Thumbnail -->
-      ${safeThumbnail ? `
+      <!-- Image Thumbnail or Moderation Status -->
+      ${isApproved && safeThumbnail ? `
         <div
           onclick="window.__khaddaOpenPinDetail && window.__khaddaOpenPinDetail('${pin.id}')"
           title="Click to view details"
@@ -77,6 +81,19 @@ export function createPinPopupHtml(pin) {
             class="w-full h-full object-cover group-hover:scale-105 transition"
             onerror="this.parentElement.style.display='none'"
           />
+        </div>
+      ` : isPending ? `
+        <div class="w-full py-2.5 px-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2.5 text-amber-700 dark:text-amber-300">
+          <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-sm animate-pulse shrink-0">⏳</div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-bold truncate">${t('photoUnderReviewTitle')}</div>
+            <div class="text-[10px] text-[var(--muted)] truncate">${t('photoUnderReviewBadge')}</div>
+          </div>
+        </div>
+      ` : isRejected ? `
+        <div class="w-full py-2 px-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-2 text-rose-600 dark:text-rose-400">
+          <span class="text-xs">❌</span>
+          <span class="text-xs font-bold">${t('photoRejectedTitle')}</span>
         </div>
       ` : ''}
 

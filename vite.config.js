@@ -1,7 +1,12 @@
+import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  server: {
+    port: 5173,
+    host: true
+  },
   plugins: [
     VitePWA({
       registerType: 'prompt',
@@ -65,6 +70,12 @@ export default defineConfig({
   ],
   build: {
     target: 'es2022',
-    chunkSizeWarningLimit: 600
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        admin: resolve(__dirname, 'admin.html')
+      }
+    }
   }
 });
