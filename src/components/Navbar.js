@@ -26,12 +26,12 @@ export function createNavbar(options = {}) {
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
     container.innerHTML = `
-    <div class="w-full h-full px-3 sm:px-6 lg:px-8 flex items-center justify-between bg-[var(--band)]/88 backdrop-blur-md border-b border-[var(--band-ink)]/15 relative z-50 transition-colors duration-200 flex-nowrap overflow-hidden text-[var(--band-ink)]">
+    <div class="w-full h-full px-3.5 sm:px-6 lg:px-7 flex items-center justify-between bg-[var(--band)]/90 backdrop-blur-md border border-[var(--band-ink)]/20 rounded-full shadow-lg relative z-50 transition-all duration-200 flex-nowrap text-[var(--band-ink)]">
       
       <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
-      <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
         <button type="button" id="nav-brand-btn" class="shrink-0 cursor-pointer focus:outline-none flex items-center justify-center" title="${t('appNameHindi')}">
-          <img src="/logo.svg" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl transition transform duration-150 hover:scale-105" />
+          <img src="/logo.svg" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full transition transform duration-150 hover:scale-105" />
         </button>
 
         <div class="flex flex-col justify-center min-w-0 overflow-hidden">
@@ -45,11 +45,11 @@ export function createNavbar(options = {}) {
       </div>
 
       <!-- Center Nav Links (Desktop >= 1024px) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/60 backdrop-blur-xs p-1 rounded-xl border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
+      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/60 backdrop-blur-xs p-1 rounded-full border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
         <button
           type="button"
           data-nav-panel="map"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('map', 'w-3.5 h-3.5')}
           <span>${t('navMap')}</span>
@@ -58,7 +58,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="leaderboard"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('trophy', 'w-3.5 h-3.5')}
           <span>${t('navLeaderboard')}</span>
@@ -67,7 +67,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="mission"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('target', 'w-3.5 h-3.5')}
           <span>${t('navMission')}</span>
@@ -76,7 +76,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="how"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('zap', 'w-3.5 h-3.5')}
           <span>${t('navHowItWorks')}</span>
@@ -85,7 +85,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="about"
-          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('info', 'w-3.5 h-3.5')}
           <span>${t('navAbout')}</span>
@@ -94,18 +94,18 @@ export function createNavbar(options = {}) {
 
       <!-- Desktop Right Controls (>= 1024px) -->
       <div class="hidden lg:flex items-center gap-2 shrink-0">
-        <div class="flex items-center bg-[var(--band)]/70 p-0.5 rounded-xl border border-[var(--band-ink)]/25">
+        <div class="flex items-center bg-[var(--band)]/70 p-0.5 rounded-full border border-[var(--band-ink)]/25">
           <button
             id="btn-lang-hi-desktop"
             type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
           >
             हिंदी
           </button>
           <button
             id="btn-lang-en-desktop"
             type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
+            class="px-2.5 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
           >
             EN
           </button>
@@ -114,7 +114,7 @@ export function createNavbar(options = {}) {
         <button
           id="btn-chai-tip-desktop"
           type="button"
-          class="inline-flex items-center gap-1.5 px-3 py-2 text-xs min-h-[40px] rounded-xl border border-[var(--band-ink)]/35 bg-transparent hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all cursor-pointer chai-tip-spark font-medium"
+          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs min-h-[38px] rounded-full border border-[var(--band-ink)]/35 bg-transparent hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all cursor-pointer chai-tip-spark font-medium"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
@@ -126,7 +126,7 @@ export function createNavbar(options = {}) {
           href="${whatsappShareUrl}"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-xl border border-[var(--band-ink)]/25 bg-[var(--band)]/70 hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all duration-150 cursor-pointer font-medium hover:-translate-y-0.5 active:translate-y-0"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border border-[var(--band-ink)]/25 bg-[var(--band)]/70 hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all duration-150 cursor-pointer font-medium hover:-translate-y-0.5 active:translate-y-0"
           title="Share on WhatsApp"
           aria-label="Share on WhatsApp"
         >
@@ -140,7 +140,7 @@ export function createNavbar(options = {}) {
         <button
           id="btn-chai-tip-mobile"
           type="button"
-          class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer chai-tip-spark"
+          class="w-9 h-9 min-w-[36px] min-h-[36px] p-0 flex items-center justify-center rounded-full border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer chai-tip-spark"
           title="${t('tipChai')}"
           aria-label="${t('tipChai')}"
         >
@@ -150,7 +150,7 @@ export function createNavbar(options = {}) {
         <button
           id="btn-mobile-menu-toggle"
           type="button"
-          class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer"
+          class="w-9 h-9 min-w-[36px] min-h-[36px] p-0 flex items-center justify-center rounded-full border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer"
           aria-label="Open navigation menu"
         >
           ${getLucideIcon('menu', 'w-4 h-4 text-[var(--band-ink)]')}
