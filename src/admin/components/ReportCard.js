@@ -86,23 +86,37 @@ export function createReportCardHtml(pin, isSelected = false) {
         <div class="relative h-44 rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center group/img">
           ${hasPhoto ? `
             <img
+              id="card-img-${pin.id}"
               src="${images[0]}"
               alt="Pothole"
               loading="lazy"
               class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105 cursor-pointer"
-              onclick="window.__khaddaAdminOpenLightbox && window.__khaddaAdminOpenLightbox('${images[0]}', '${escapeHtml(landmark)}')"
+              data-action="open-lightbox"
             />
             <!-- Click to Zoom Badge -->
             <button
               type="button"
-              onclick="window.__khaddaAdminOpenLightbox && window.__khaddaAdminOpenLightbox('${images[0]}', '${escapeHtml(landmark)}')"
-              class="absolute bottom-2 right-2 px-2 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-[10px] font-bold text-white border border-slate-700 flex items-center gap-1 shadow-lg cursor-pointer hover:bg-amber-500 hover:text-slate-950 transition"
+              data-action="open-lightbox"
+              class="absolute bottom-2 right-2 px-2 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-[10px] font-bold text-white border border-slate-700 flex items-center gap-1 shadow-lg cursor-pointer hover:bg-amber-500 hover:text-slate-950 transition z-10"
             >
               <span>🔍 Zoom</span>
             </button>
             ${images.length > 1 ? `
-              <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-slate-900/80 text-white text-[10px] font-bold border border-slate-700">
-                📸 ${images.length} Photos
+              <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-slate-900/80 text-white text-[10px] font-bold border border-slate-700 flex items-center gap-1 z-10">
+                <span>📸 ${images.length} Photos</span>
+              </div>
+              <!-- Small thumbnail switcher on card -->
+              <div class="absolute bottom-2 left-2 flex items-center gap-1 z-10 bg-slate-950/80 p-1 rounded-xl border border-slate-800 backdrop-blur-sm">
+                ${images.map((img, idx) => `
+                  <button
+                    type="button"
+                    data-card-thumb="${idx}"
+                    class="card-thumb-btn w-5 h-5 rounded-md overflow-hidden border ${idx === 0 ? 'border-amber-400 ring-1 ring-amber-400 scale-105' : 'border-slate-700 opacity-60 hover:opacity-100'} transition cursor-pointer"
+                    title="Photo ${idx + 1}"
+                  >
+                    <img src="${img}" class="w-full h-full object-cover" />
+                  </button>
+                `).join('')}
               </div>
             ` : ''}
           ` : `

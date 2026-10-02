@@ -27,7 +27,7 @@ import { playNewPendingChime, playApprovePing, playRejectWoosh } from './utils/a
 import { initMiniMap, cleanupAllMiniMaps } from './utils/leafletMap';
 
 // Global Exposure for inline HTML onclick handlers
-window.__khaddaAdminOpenLightbox = (url, title) => openLightbox(url, title);
+window.__khaddaAdminOpenLightbox = (images, title, initialIndex = 0) => openLightbox(images, title, initialIndex);
 
 class AdminApp {
   constructor() {
@@ -358,6 +358,56 @@ class AdminApp {
     pins.forEach((pin) => {
       const card = document.getElementById(`pin-card-${pin.id}`);
       if (!card) return;
+
+      // Extract all unique images for this pin
+      const images = [];
+      if (Array.isArray(pin.images)) {
+        pin.images.forEach((img) => {
+          if (img && typeof img === 'string' && !images.includes(img)) images.push(img);
+        });
+      }
+      if (pin.imageUrl && typeof pin.imageUrl === 'string' && !images.includes(pin.imageUrl)) {
+        images.unshift(pin.imageUrl);
+      }
+      if (pin.thumbnailUrl && typeof pin.thumbnailUrl === 'string' && !images.includes(pin.thumbnailUrl)) {
+        if (images.length === 0) images.push(pin.thumbnailUrl);
+      }
+
+      let cardActiveImgIndex = 0;
+      const cardImgEl = card.querySelector(`#card-img-${pin.id}`);
+
+      const triggerLightbox = () => {
+        if (images.length > 0) {
+          openLightbox(images, pin.landmark || 'Pothole Image', cardActiveImgIndex);
+        }
+      };
+
+      // Open Lightbox on main photo or Zoom button click
+      card.querySelectorAll('[data-action="open-lightbox"]').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          triggerLightbox();
+        });
+      });
+
+      // Switch active photo preview on card thumbnail click
+      card.querySelectorAll('[data-card-thumb]').forEach((thumbBtn) => {
+        thumbBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = Number(thumbBtn.getAttribute('data-card-thumb'));
+          if (!isNaN(idx) && images[idx]) {
+            cardActiveImgIndex = idx;
+            if (cardImgEl) cardImgEl.src = images[idx];
+            card.querySelectorAll('[data-card-thumb]').forEach((btn, bIdx) => {
+              if (bIdx === idx) {
+                btn.className = 'card-thumb-btn w-5 h-5 rounded-md overflow-hidden border border-amber-400 ring-1 ring-amber-400 scale-105 transition cursor-pointer';
+              } else {
+                btn.className = 'card-thumb-btn w-5 h-5 rounded-md overflow-hidden border border-slate-700 opacity-60 hover:opacity-100 transition cursor-pointer';
+              }
+            });
+          }
+        });
+      });
 
       // Checkbox
       card.querySelector(`[data-select-id="${pin.id}"]`)?.addEventListener('change', (e) => {
