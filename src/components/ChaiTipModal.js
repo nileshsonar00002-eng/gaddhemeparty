@@ -35,7 +35,11 @@ export async function openChaiTipModal(options = {}) {
           ${getLucideIcon('coffee', 'w-6 h-6')}
         </div>
         <div>
-          <h3 class="text-base sm:text-lg font-heading font-bold text-[var(--text)] tracking-tight">${t('tipChaiModalTitle')}</h3>
+          <h3 class="text-base sm:text-lg font-heading font-bold text-[var(--text)] tracking-tight flex items-center justify-center gap-1.5 flex-wrap">
+            <span class="brand-roadtok text-xl sm:text-2xl text-[var(--heading)]">RoadTok</span>
+            <span class="text-[var(--muted)]">•</span>
+            <span>${t('tipChaiModalTitle')}</span>
+          </h3>
           <p class="text-xs text-[var(--muted)] mt-1">${t('tipChaiDesc')}</p>
         </div>
 

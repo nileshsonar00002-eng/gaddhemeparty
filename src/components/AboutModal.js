@@ -28,11 +28,11 @@ export function openAboutModal() {
           </button>
 
           <!-- Header -->
-          <div class="flex flex-col items-center text-center gap-2">
+          <div class="flex flex-col items-center text-center gap-1.5">
             <img src="/logo.svg" alt="Logo" class="w-12 h-12 rounded-2xl drop-shadow-md mx-auto" />
             <div>
-              <h3 class="font-heading font-extrabold text-xl text-[var(--heading)] leading-tight">${t('appNameHindi')}</h3>
-              <p class="font-heading text-xs text-[var(--muted)] font-semibold mt-0.5">"${t('tagline')}"</p>
+              <h3 class="brand-roadtok text-2xl sm:text-3xl text-[var(--heading)] leading-none">RoadTok</h3>
+              <p class="font-heading text-xs text-[var(--muted)] font-semibold mt-1">"${t('tagline')}"</p>
             </div>
           </div>
 
@@ -87,7 +87,7 @@ export function openAboutModal() {
             ${activeTab === 'contact' ? `
               <div class="space-y-2">
                 <p class="font-bold text-[var(--heading)]">💻 ओपन सोर्स नागरिक पहल:</p>
-                <p>गड्ढे में पार्टी (Gaddhe Me Party) एक 100% फ्री कम्युनिटी प्रोजेक्ट है। सर्वर और मैप खर्च नागरिक सहयोग से चलता है।</p>
+                <p><span class="brand-roadtok text-sm font-normal">RoadTok</span> एक 100% फ्री कम्युनिटी प्रोजेक्ट है। सर्वर और मैप खर्च नागरिक सहयोग से चलता है।</p>
                 <div class="pt-1 flex items-center gap-2">
                   <span class="px-2 py-1 bg-[var(--surface-2)] rounded-md text-[11px] font-mono text-[var(--text)] border border-[var(--border)]">contact@gaddhemeparty.in</span>
                 </div>
