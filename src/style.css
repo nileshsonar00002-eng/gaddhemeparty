@@ -77,7 +77,7 @@
   }
 
   body {
-    font-family: 'Average Sans', 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    font-family: 'Average Sans', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 400;
@@ -102,6 +102,7 @@
     background-color: var(--bg);
     color: var(--text);
     position: relative;
+    font-family: 'Average Sans', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
   }
 
   /* Deep-linked section scroll margin offset */
@@ -134,8 +135,8 @@
     color: var(--heading);
   }
 
-  h1, h2, h3, .font-heading {
-    font-family: 'Average Sans', 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+  h1, h2, h3, h4, h5, h6, input, button, select, textarea, .font-sans, .font-heading {
+    font-family: 'Average Sans', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
   }
 }
 
