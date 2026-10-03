@@ -25,8 +25,8 @@ export default {
         success: 'var(--success)',
       },
       fontFamily: {
-        heading: ['"Average Sans"', '"Khand"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
-        sans: ['"Average Sans"', '"Khand"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+        heading: ['"Khand"', '"Average Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Khand"', '"Average Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
       },
       borderRadius: {
         'btn': '12px',

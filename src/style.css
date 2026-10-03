@@ -77,7 +77,7 @@
   }
 
   body {
-    font-family: 'Average Sans', 'Khand', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    font-family: 'Khand', 'Average Sans', system-ui, -apple-system, sans-serif;
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 400;
@@ -102,7 +102,7 @@
     background-color: var(--bg);
     color: var(--text);
     position: relative;
-    font-family: 'Average Sans', 'Khand', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    font-family: 'Khand', 'Average Sans', system-ui, -apple-system, sans-serif;
   }
 
   /* Deep-linked section scroll margin offset */
@@ -136,7 +136,7 @@
   }
 
   h1, h2, h3, h4, h5, h6, input, button, select, textarea, .font-sans, .font-heading {
-    font-family: 'Average Sans', 'Khand', 'Noto Sans Devanagari', system-ui, -apple-system, sans-serif;
+    font-family: 'Khand', 'Average Sans', system-ui, -apple-system, sans-serif;
   }
 }
 

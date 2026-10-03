@@ -33,13 +33,13 @@
   </g>
 
   <!-- Text Header -->
-  <text x="400" y="270" font-family="'Noto Sans Devanagari', 'Inter', sans-serif" font-weight="800" font-size="76" fill="#F9F2E8" letter-spacing="-1">
+  <text x="400" y="270" font-family="'Khand', 'Average Sans', sans-serif" font-weight="800" font-size="76" fill="#F9F2E8" letter-spacing="-1">
     गड्ढे में पार्टी
   </text>
   <text x="400" y="335" font-family="'Inter', sans-serif" font-weight="700" font-size="30" fill="#F2B705" letter-spacing="2">
     GADDHE ME PARTY
   </text>
-  <text x="400" y="395" font-family="'Noto Sans Devanagari', sans-serif" font-weight="600" font-size="34" fill="#F1E6D8">
+  <text x="400" y="395" font-family="'Khand', sans-serif" font-weight="600" font-size="34" fill="#F1E6D8">
     "जहाँ गड्ढा, वहाँ पार्टी"
   </text>
   <text x="400" y="460" font-family="'Inter', sans-serif" font-weight="500" font-size="22" fill="#DDD0C2">
@@ -48,7 +48,7 @@
 
   <!-- Footer Disclaimer -->
   <rect x="0" y="570" width="1200" height="60" fill="#240C08"/>
-  <text x="600" y="608" font-family="'Noto Sans Devanagari', sans-serif" font-size="18" fill="#DDD0C2" text-anchor="middle">
+  <text x="600" y="608" font-family="'Khand', sans-serif" font-size="18" fill="#DDD0C2" text-anchor="middle">
     नागरिक पहल • कोई राजनीतिक दल नहीं • 100% Free Civic Tech
   </text>
 </svg>
