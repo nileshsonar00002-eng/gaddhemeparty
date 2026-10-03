@@ -35,8 +35,8 @@ export function createNavbar(options = {}) {
         </button>
 
         <div class="flex flex-col justify-center min-w-0 overflow-hidden">
-          <span class="font-heading font-bold text-sm sm:text-base text-[var(--band-ink)] tracking-tight leading-tight whitespace-nowrap truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
-            ${t('appNameHindi')}
+          <span class="brand-roadtok text-lg sm:text-xl text-[var(--band-ink)] leading-tight whitespace-nowrap truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
+            RoadTok
           </span>
           <p class="hidden sm:block font-medium text-[11px] sm:text-xs text-[var(--band-ink)]/80 tracking-normal leading-none mt-0.5 whitespace-nowrap truncate">
             "${t('tagline')}"
