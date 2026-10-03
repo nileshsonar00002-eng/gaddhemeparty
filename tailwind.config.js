@@ -25,8 +25,8 @@ export default {
         success: 'var(--success)',
       },
       fontFamily: {
-        heading: ['"Valley Sans"', '"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
-        sans: ['"Valley Sans"', '"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+        heading: ['"Average Sans"', '"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Average Sans"', '"Inter"', '"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
       },
       borderRadius: {
         'btn': '12px',
