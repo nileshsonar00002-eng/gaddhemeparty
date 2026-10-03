@@ -140,11 +140,11 @@
   }
 }
 
-/* Brand Name Font: Genos (Designed by Robert Leuschke - Regular 400 Italic) */
+/* Brand Name Font: Genos (Designed by Robert Leuschke - SemiBold 600 Italic) */
 .brand-roadtok {
   font-family: 'Genos', sans-serif !important;
   font-style: italic !important;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
   letter-spacing: 0.03em;
 }
 
