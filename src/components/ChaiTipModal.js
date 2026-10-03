@@ -30,17 +30,19 @@ export async function openChaiTipModal(options = {}) {
           ${getLucideIcon('x', 'w-4 h-4')}
         </button>
 
-        <!-- Icon & Header -->
-        <div class="w-12 h-12 mx-auto rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)]">
-          ${getLucideIcon('coffee', 'w-6 h-6')}
-        </div>
-        <div>
-          <h3 class="text-base sm:text-lg font-heading font-bold text-[var(--text)] tracking-tight flex items-center justify-center gap-1.5 flex-wrap">
-            <span class="brand-roadtok text-xl sm:text-2xl text-[var(--heading)]">RoadTok</span>
-            <span class="text-[var(--muted)]">•</span>
-            <span>${t('tipChaiModalTitle')}</span>
-          </h3>
-          <p class="text-xs text-[var(--muted)] mt-1">${t('tipChaiDesc')}</p>
+        <!-- Header & Brand Title Top -->
+        <div class="space-y-3">
+          <h2 class="brand-roadtok text-2xl sm:text-3xl text-[var(--heading)] leading-none">RoadTok</h2>
+
+          <!-- Chai Cup Icon -->
+          <div class="w-12 h-12 mx-auto rounded-xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)] shadow-xs">
+            ${getLucideIcon('coffee', 'w-6 h-6')}
+          </div>
+
+          <div>
+            <h3 class="text-base sm:text-lg font-heading font-bold text-[var(--text)] tracking-tight">${t('tipChaiModalTitle')}</h3>
+            <p class="text-xs text-[var(--muted)] mt-1">${t('tipChaiDesc')}</p>
+          </div>
         </div>
 
         <!-- Mobile: Direct UPI Deep Link -->
