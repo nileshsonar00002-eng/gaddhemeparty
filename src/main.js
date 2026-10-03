@@ -1,4 +1,5 @@
 import './style.css';
+import { syncAllModalContainersMount } from './utils/domUtils';
 import { LeafletAdapter } from './map/LeafletAdapter';
 import { GoogleMapsAdapter } from './map/GoogleMapsAdapter';
 import { createNavbar } from './components/Navbar';
@@ -352,6 +353,7 @@ class KhaddaApp {
       const card = document.getElementById('map-card-container');
       const isCssFs = card?.classList.contains('is-fullscreen');
       this.updateFullscreenUI(isNativeFs || isCssFs);
+      syncAllModalContainersMount();
       if (this.mapAdapter && this.mapAdapter.resize) {
         setTimeout(() => this.mapAdapter.resize(), 100);
         setTimeout(() => this.mapAdapter.resize(), 300);

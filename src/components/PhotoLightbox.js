@@ -1,22 +1,31 @@
 import { modalManager } from '../utils/modalManager';
+import { getModalParentContainer, isMapFullscreen } from '../utils/domUtils';
 
 export function openPhotoLightbox(images = [], initialIndex = 0, caption = '') {
   const photoList = Array.isArray(images) ? images.filter(Boolean) : (images ? [images] : []);
   if (photoList.length === 0) return;
 
   let currentIndex = Math.max(0, Math.min(initialIndex, photoList.length - 1));
+  const parent = getModalParentContainer();
+  const isFs = isMapFullscreen();
+
   let root = document.getElementById('photo-lightbox-container');
   if (!root) {
     root = document.createElement('div');
     root.id = 'photo-lightbox-container';
-    document.body.appendChild(root);
   }
+  root.className = isFs ? 'z-[100010] relative' : 'z-[100005] relative';
+  if (root.parentElement !== parent) {
+    parent.appendChild(root);
+  }
+
+  const lightboxZClass = isFs ? 'z-[100010]' : 'z-[100005]';
 
   const render = () => {
     root.innerHTML = `
       <div
         id="lightbox-backdrop"
-        class="fixed inset-0 z-[100005] bg-slate-950/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-in fade-in duration-200 select-none"
+        class="fixed inset-0 ${lightboxZClass} bg-slate-950/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 animate-in fade-in duration-200 select-none"
       >
         <!-- Top Action Bar -->
         <div class="flex items-center justify-between z-20 gap-3">

@@ -6,6 +6,7 @@ import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved } from '../ser
 import { showToast } from './Toast';
 import { openPhotoLightbox } from './PhotoLightbox';
 import { hasUserReportedOrUpvoted, hasUserUpvoted, getActionQuota, recordLocalCountedAction } from '../utils/upvoteStorage';
+import { getModalParentContainer, isMapFullscreen } from '../utils/domUtils';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -43,14 +44,17 @@ export function openPinDetailModal(pin) {
     window.__khaddaClosePanels();
   }
 
+  const parent = getModalParentContainer();
+  const isFs = isMapFullscreen();
+
   let container = document.getElementById('pin-detail-modal-container');
   if (!container) {
     container = document.createElement('div');
     container.id = 'pin-detail-modal-container';
-    container.className = 'z-[1200]';
-    document.getElementById('app')?.appendChild(container);
-  } else {
-    container.className = 'z-[1200]';
+  }
+  container.className = isFs ? 'z-[100005] relative' : 'z-[1200] relative';
+  if (container.parentElement !== parent) {
+    parent.appendChild(container);
   }
 
   const isHindi = getLanguage() === 'hindi';
@@ -97,10 +101,12 @@ export function openPinDetailModal(pin) {
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
 
   const isSevere = reportCount >= 3;
+  const backdropZClass = isFs ? 'z-[100005]' : 'z-[1200]';
+  const topPaddingClass = isFs ? 'pt-4 sm:pt-6' : 'pt-[calc(var(--header-h,80px)+12px)]';
 
   container.innerHTML = `
     <!-- Center Modal Overlay -->
-    <div id="pin-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1200] flex items-center justify-center pt-[calc(var(--header-h,80px)+12px)] pb-4 px-3 sm:px-6 transition-opacity duration-200">
+    <div id="pin-modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs ${backdropZClass} flex items-center justify-center ${topPaddingClass} pb-4 px-3 sm:px-6 transition-opacity duration-200">
       <!-- Centered Card (Reduced 20% in size & constrained below header) -->
       <div
         id="pin-modal-card"
