@@ -1,3 +1,13 @@
+/* Khand Devanagari (Designed by Indian Type Foundry - Regular 400) */
+@font-face {
+  font-family: 'Khand';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(/fonts/khand-devanagari-400.woff2) format('woff2');
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B09;
+}
+
 /* Genos SemiBold 600 Italic (Brand Font for RoadTok) */
 @font-face {
   font-family: 'Genos';
