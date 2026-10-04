@@ -166,7 +166,7 @@ function applyWatermark(ctx, width, height, timestampText) {
   ctx.font = `600 ${fontSize}px system-ui, -apple-system, sans-serif`;
   ctx.textBaseline = 'middle';
 
-  const fullText = `📅 ${timestampText} | Gaddhe Me Party`;
+  const fullText = `${timestampText} | RoadTok`;
   const metrics = ctx.measureText(fullText);
   const textWidth = metrics.width;
 

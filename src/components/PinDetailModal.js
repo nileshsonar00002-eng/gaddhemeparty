@@ -151,7 +151,7 @@ export function openPinDetailModal(pin) {
                 <!-- Multi-Photo Count Badge -->
                 ${allImages.length > 1 ? `
                   <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full text-[11px] font-heading font-bold text-white flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
-                    <span>📸</span>
+                    <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3" stroke-width="2"/></svg>
                     <span id="gallery-counter">1 / ${allImages.length} ${isHindi ? 'फ़ोटो' : 'Photos'}</span>
                   </div>
 
@@ -196,7 +196,7 @@ export function openPinDetailModal(pin) {
             <!-- Photo Under Review Card -->
             <div class="w-full p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col items-center justify-center text-center gap-2.5 relative overflow-hidden shadow-inner">
               <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center justify-center text-2xl animate-pulse">
-                ⏳
+                <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
               <div class="space-y-1">
                 <div class="text-sm font-heading font-bold text-amber-600 dark:text-amber-400">
@@ -215,7 +215,7 @@ export function openPinDetailModal(pin) {
             <!-- Photo Rejected Card -->
             <div class="w-full p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-3 text-left">
               <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-500 flex items-center justify-center text-lg shrink-0">
-                ❌
+                <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </div>
               <div>
                 <div class="text-xs sm:text-sm font-heading font-bold text-rose-600 dark:text-rose-400">
@@ -228,7 +228,7 @@ export function openPinDetailModal(pin) {
             </div>
           ` : `
             <div class="w-full h-28 rounded-2xl bg-[var(--surface-2)] border border-[var(--border)] flex flex-col items-center justify-center text-[var(--muted)] gap-1">
-              <span class="text-3xl">🕳️</span>
+              <svg class="w-8 h-8 text-[var(--muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
               <span class="text-xs font-medium">${isHindi ? 'फ़ोटो उपलब्ध नहीं है' : 'No photo uploaded'}</span>
             </div>
           `}
@@ -248,7 +248,7 @@ export function openPinDetailModal(pin) {
                 aria-label="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
                 class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--text)] border border-[var(--border)] transition cursor-pointer active:scale-95 group shadow-xs"
               >
-                <span class="group-hover:scale-110 transition">📍</span>
+                <svg class="w-3.5 h-3.5 text-[var(--primary-ink)] group-hover:scale-110 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 <span>${cityName}</span>
                 ${resolvedRank ? `
                   <span class="ml-0.5 px-1.5 py-0.2 rounded-md bg-[var(--primary)] text-[var(--primary-ink)] font-bold text-[10px] font-mono tabular-nums">
@@ -278,7 +278,7 @@ export function openPinDetailModal(pin) {
                 disabled
                 class="w-full py-3 px-4 bg-[var(--surface-2)] text-[var(--success)] border border-[var(--border)] font-heading font-bold text-sm rounded-2xl shadow-xs transition flex items-center justify-center gap-2 cursor-default disabled:opacity-90"
               >
-                <span class="text-base font-bold">✓</span>
+                <svg class="w-4 h-4 text-emerald-500 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                 <span>${t('alreadyReportedButton')}</span>
                 ${upvoteCount > 0 ? `<span class="bg-[var(--surface)] px-2.5 py-0.5 rounded-full text-xs font-bold border border-[var(--border)]">${upvoteCount}</span>` : ''}
               </button>
@@ -288,7 +288,7 @@ export function openPinDetailModal(pin) {
                 type="button"
                 class="btn-primary w-full py-3 px-4 font-heading font-bold text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span class="text-base">👍</span>
+                <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H8e1a2 2 0 01-2-2v-7a2 2 0 01.586-1.414l5-5L12 3a1 1 0 011 1v4.242M8 10V21"/></svg>
                 <span>${t('upvoteBtn')}</span>
                 ${upvoteCount > 0 ? `<span class="bg-[var(--primary-ink)] text-[var(--primary)] px-2.5 py-0.5 rounded-full text-xs font-bold">${upvoteCount}</span>` : ''}
               </button>
@@ -302,7 +302,7 @@ export function openPinDetailModal(pin) {
                 type="button"
                 class="btn-secondary flex-1 py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-xs"
               >
-                <span>📸</span>
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3" stroke-width="2"/></svg>
                 <span>${isHindi ? '+ फ़ोटो जोड़ें' : '+ Add Photo'}</span>
               </button>
 
@@ -313,7 +313,7 @@ export function openPinDetailModal(pin) {
                 rel="noopener noreferrer"
                 class="btn-secondary flex-1 py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-xs"
               >
-                <span class="text-sm">💬</span>
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                 <span>${t('shareWhatsapp')}</span>
               </a>
 
@@ -388,7 +388,7 @@ export function openPinDetailModal(pin) {
 
         // Persist to Firestore
         await attachPhotoToPin(pin.id, imgUrl, imgUrl);
-        showToast(isHindi ? '✅ नई फ़ोटो सफलतापूर्वक जुड़ गई!' : '✅ Photo added successfully!', 'success');
+        showToast(isHindi ? 'नई फ़ोटो सफलतापूर्वक जुड़ गई!' : 'Photo added successfully!', 'success');
         
         // Re-render pins so blinking/badges update immediately if 5+ photos/reports
         if (window.__khaddaReRenderPins) {

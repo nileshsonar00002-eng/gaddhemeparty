@@ -354,35 +354,35 @@ export class PanelManager {
   populatePanelData(panelId) {
     switch (panelId) {
       case 'leaderboard':
-        this.headerIcon.innerText = '🏆';
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15l-2 5l-1-2l-2 1l1-3l-2-1l3-1l-1-3l3 2l2-3l1 3l3-1l-1 3l2 1l-3 1l1 3l-2-1z"/></svg>`;
         this.headerTitle.innerText = t('leaderboardTitle');
         this.updateLeaderboardTimeAgo();
         this.renderLeaderboardBody();
         break;
 
       case 'mission':
-        this.headerIcon.innerText = '🎯';
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>`;
         this.headerTitle.innerText = t('missionTitle');
         this.headerSub.innerText = t('missionSubtitle');
         this.renderMissionBody();
         break;
 
       case 'how':
-        this.headerIcon.innerText = '⚡';
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
         this.headerTitle.innerText = t('howItWorksTitle');
         this.headerSub.innerText = t('howItWorksSubtitle');
         this.renderHowItWorksBody();
         break;
 
       case 'about':
-        this.headerIcon.innerText = '🇮🇳';
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>`;
         this.headerTitle.innerText = t('aboutTitle');
         this.headerSub.innerText = t('aboutSubtitle');
         this.renderAboutBody();
         break;
 
       case 'terms':
-        this.headerIcon.innerText = '📜';
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
         this.headerTitle.innerText = t('termsTitle');
         this.headerSub.innerText = t('termsSubtitle');
         this.renderTermsBody();
@@ -445,13 +445,13 @@ export class PanelManager {
       const isGeneric = !rawLandmark || genericList.includes(rawLandmark.toLowerCase());
       if (isGeneric) {
         return {
-          title: `📍 ${cityName}`,
+          title: cityName,
           subtitle: `${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}`
         };
       }
       return {
         title: rawLandmark,
-        subtitle: `📍 ${cityName} • ${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}`
+        subtitle: `${cityName} • ${pin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'reps'}`
       };
     };
 
@@ -463,7 +463,7 @@ export class PanelManager {
         <div class="p-4.5 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-500/20 via-amber-950/40 to-[#36140F] border-2 border-amber-500/40 space-y-3 relative overflow-hidden group shadow-md ring-1 ring-amber-500/20">
           <div class="flex items-center justify-between">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs tabular-nums font-mono font-black uppercase shadow-sm">
-              👑 #1 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
+              #1 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
             </span>
           </div>
 
@@ -471,14 +471,22 @@ export class PanelManager {
             ${heroPin.thumbnailUrl || heroPin.imageUrl ? `
               <img src="${heroPin.thumbnailUrl || heroPin.imageUrl}" alt="Hero Pothole" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-amber-500/50 shadow-sm flex-shrink-0" />
             ` : `
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 flex items-center justify-center text-3xl flex-shrink-0">🕳️</div>
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 flex items-center justify-center text-amber-400 flex-shrink-0">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+              </div>
             `}
             <div class="min-w-0 flex-1">
               <h3 class="font-heading font-extrabold text-sm sm:text-base text-[#F9F2E8] truncate leading-tight">${heroLabels.title}</h3>
               <p class="text-xs text-[#DDD0C2]/80 mt-0.5">${heroLabels.subtitle}</p>
               <div class="flex gap-2.5 text-xs text-[#DDD0C2] mt-1.5 tabular-nums font-mono font-medium">
-                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">📢 ${heroPin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'Reports'}</span>
-                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">👍 ${heroPin.upvotes || 0} ${isHindi ? 'वोट' : 'Votes'}</span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                  <svg class="w-3 h-3 text-rose-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  <span>${heroPin.reportCount || 1} ${isHindi ? 'रिपोर्ट्स' : 'Reports'}</span>
+                </span>
+                <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                  <svg class="w-3 h-3 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                  <span>${heroPin.upvotes || 0} ${isHindi ? 'वोट' : 'Votes'}</span>
+                </span>
               </div>
             </div>
           </div>
@@ -488,7 +496,7 @@ export class PanelManager {
             class="panel-pin-row-btn w-full py-2 px-3 rounded-none bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-heading font-extrabold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm active:scale-[0.99]"
             data-pin-id="${heroPin.id}"
           >
-            <span>🗺️</span>
+            <svg class="w-4 h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             <span>${isHindi ? 'मैप पर देखें' : 'View on Map'}</span>
           </button>
         </div>
@@ -530,7 +538,10 @@ export class PanelManager {
                   <p class="text-[11px] text-[#DDD0C2]/80">${c.count || 0} ${isHindi ? 'कुल रिपोर्ट्स' : 'Total Reports'}</p>
                 </div>
               </div>
-              <span class="text-xs ${isTop3 ? 'sm:text-sm font-black text-amber-400' : 'font-bold text-amber-400'} tabular-nums font-mono">🚨 ${c.count || 0}</span>
+              <span class="text-xs ${isTop3 ? 'sm:text-sm font-black text-amber-400' : 'font-bold text-amber-400'} tabular-nums font-mono flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>${c.count || 0}</span>
+              </span>
             </div>
           `;
         }).join('');
@@ -582,7 +593,9 @@ export class PanelManager {
                 ${pin.thumbnailUrl || pin.imageUrl ? `
                   <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="Pothole thumb" class="${thumbSize} rounded-xl object-cover border border-white/15 flex-shrink-0 shadow-xs" />
                 ` : `
-                  <div class="${thumbSize} rounded-xl bg-white/10 border border-white/15 flex items-center justify-center ${isTop3 ? 'text-lg' : 'text-sm'} flex-shrink-0">🕳️</div>
+                  <div class="${thumbSize} rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-xs text-[#DDD0C2]/80 flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                  </div>
                 `}
 
                 <div class="min-w-0">
@@ -592,8 +605,9 @@ export class PanelManager {
               </div>
 
               <div class="flex items-center gap-2 flex-shrink-0">
-                <span class="px-2.5 py-1 rounded-lg ${isTop3 ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-extrabold' : 'bg-amber-500/15 border-amber-500/30 text-amber-300 font-bold'} border tabular-nums font-mono text-xs">
-                  👍 ${pin.upvotes || 0}
+                <span class="px-2.5 py-1 rounded-lg ${isTop3 ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 font-extrabold' : 'bg-amber-500/15 border-amber-500/30 text-amber-300 font-bold'} border tabular-nums font-mono text-xs flex items-center gap-1">
+                  <svg class="w-3 h-3 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                  <span>${pin.upvotes || 0}</span>
                 </span>
                 <span class="text-[#DDD0C2]/60 group-hover:text-[#F9F2E8] transition text-xs">➔</span>
               </div>
@@ -649,27 +663,33 @@ export class PanelManager {
 
         <div class="space-y-3">
           <div class="p-4 rounded-2xl bg-[#36140F] border border-white/10 space-y-1.5 shadow-sm">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">👁️</span>
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
               <h3 class="font-heading font-bold text-sm text-[#F9F2E8]">${t('pillar1Title')}</h3>
             </div>
-            <p class="text-xs text-[#DDD0C2]/85 leading-relaxed">${t('pillar1Desc')}</p>
+            <p class="text-xs text-[#DDD0C2]/85 leading-relaxed pl-10">${t('pillar1Desc')}</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-[#36140F] border border-white/10 space-y-1.5 shadow-sm">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">📢</span>
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+              </div>
               <h3 class="font-heading font-bold text-sm text-[#F9F2E8]">${t('pillar2Title')}</h3>
             </div>
-            <p class="text-xs text-[#DDD0C2]/85 leading-relaxed">${t('pillar2Desc')}</p>
+            <p class="text-xs text-[#DDD0C2]/85 leading-relaxed pl-10">${t('pillar2Desc')}</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-[#36140F] border border-white/10 space-y-1.5 shadow-sm">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">🛠️</span>
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+              </div>
               <h3 class="font-heading font-bold text-sm text-[#F9F2E8]">${t('pillar3Title')}</h3>
             </div>
-            <p class="text-xs text-[#DDD0C2]/85 leading-relaxed">${t('pillar3Desc')}</p>
+            <p class="text-xs text-[#DDD0C2]/85 leading-relaxed pl-10">${t('pillar3Desc')}</p>
           </div>
         </div>
       </div>

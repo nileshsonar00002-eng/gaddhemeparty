@@ -68,7 +68,10 @@ export function openAboutModal() {
 
             ${activeTab === 'privacy' ? `
               <div class="space-y-1.5">
-                <p class="font-bold text-[var(--heading)]">🔒 गोपनीयता गारंटी (100% Privacy Guarantee):</p>
+                <p class="font-bold text-[var(--heading)] flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 002-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  <span>गोपनीयता गारंटी (100% Privacy Guarantee):</span>
+                </p>
                 <p>• <strong>बिना किसी लॉगिन:</strong> हम कभी भी आपका नाम, फोन नंबर या ईमेल नहीं मांगते।</p>
                 <p>• <strong>EXIF प्राइवेसी:</strong> आपकी फोटो से कैमरा मॉडल, डिवाइस आईडी और ओरिजिनल टाइमस्टैम्प फोटो अपलोड करने से पहले आपके फोन में ही डिलीट कर दिए जाते हैं।</p>
                 <p>• केवल सड़क के स्थान का GPS कोऑर्डिनेट सार्वजनिक मैप पर दिखता है।</p>
@@ -77,7 +80,10 @@ export function openAboutModal() {
 
             ${activeTab === 'terms' ? `
               <div class="space-y-1.5">
-                <p class="font-bold text-[var(--heading)]">📜 नागरिक आचार संहिता (Terms of Use):</p>
+                <p class="font-bold text-[var(--heading)] flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <span>नागरिक आचार संहिता (Terms of Use):</span>
+                </p>
                 <p>• केवल वास्तविक क्षतिग्रस्त सड़कों व गड्ढों की फोटो अपलोड करें।</p>
                 <p>• किसी भी व्यक्ति का चेहरा, निजी वाहन नंबर प्लेट या अश्लील सामग्री अपलोड करना पूर्णतः वर्जित है।</p>
                 <p>• गलत या स्पैम रिपोर्ट पाए जाने पर पिन को स्वतः हटा दिया जाएगा।</p>
@@ -86,7 +92,10 @@ export function openAboutModal() {
 
             ${activeTab === 'contact' ? `
               <div class="space-y-2">
-                <p class="font-bold text-[var(--heading)]">💻 ओपन सोर्स नागरिक पहल:</p>
+                <p class="font-bold text-[var(--heading)] flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  <span>ओपन सोर्स नागरिक पहल:</span>
+                </p>
                 <p><span class="brand-roadtok text-sm font-normal">RoadTok</span> एक 100% फ्री कम्युनिटी प्रोजेक्ट है। सर्वर और मैप खर्च नागरिक सहयोग से चलता है।</p>
                 <div class="pt-1 flex items-center gap-2">
                   <span class="px-2 py-1 bg-[var(--surface-2)] rounded-md text-[11px] font-mono text-[var(--text)] border border-[var(--border)]">contact@gaddhemeparty.in</span>
@@ -98,7 +107,10 @@ export function openAboutModal() {
           <!-- Footer -->
           <div class="pt-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--muted)]">
             <span class="text-[11px]">${t('footerCopyright')}</span>
-            <span class="text-[var(--primary)] font-bold">जय हिन्द 🇮🇳</span>
+            <span class="inline-flex items-center gap-1.5 font-bold text-[var(--primary)]">
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>जय हिन्द</span>
+            </span>
           </div>
         </div>
       </div>

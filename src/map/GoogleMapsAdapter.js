@@ -589,12 +589,12 @@ export class GoogleMapsAdapter extends MapAdapter {
     const isTop3 = hasRank && rankNumber === 3;
 
     const rankText = isTop1 
-      ? '👑 #1' 
+      ? '#1' 
       : isTop2 
-      ? '🥈 #2' 
+      ? '#2' 
       : isTop3 
-      ? '🥉 #3' 
-      : (hasRank ? `#${rankNumber}` : '📍');
+      ? '#3' 
+      : (hasRank ? `#${rankNumber}` : '');
 
     const badgeBg = isTop1
       ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black'
@@ -608,6 +608,7 @@ export class GoogleMapsAdapter extends MapAdapter {
       <div class="pin-rank-bounce relative flex flex-col items-center pointer-events-none select-none transform -translate-x-1/2 -translate-y-full" style="z-index: 999985;">
         <!-- Floating Rank Badge -->
         <div class="mb-1 px-3 py-1 text-xs font-heading tracking-wider uppercase rounded-full ${badgeBg} shadow-2xl ring-2 ring-white whitespace-nowrap flex items-center gap-1.5 transform hover:scale-110 transition">
+          <svg class="w-3.5 h-3.5 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <span>${rankText}</span>
           <span class="text-[10px] tracking-tight opacity-90">${hasRank ? 'RANK' : 'POTHOLE'}</span>
         </div>
@@ -617,7 +618,7 @@ export class GoogleMapsAdapter extends MapAdapter {
           <div class="absolute w-14 h-14 bg-amber-500 rounded-full animate-ping opacity-75"></div>
           <div class="absolute w-9 h-9 bg-amber-400/40 rounded-full animate-pulse"></div>
           <div class="relative w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-white ring-2 ring-amber-950/60 shadow-2xl flex items-center justify-center text-slate-950 font-black text-sm">
-            🕳️
+            <svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           </div>
         </div>
 

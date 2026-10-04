@@ -39,7 +39,7 @@ export function initPotholeCartoonAnimation(mountId = 'pothole-animation-mount')
 
         <!-- Warning Road Signboard -->
         <div class="absolute top-4 left-4 sm:left-8 z-10 bg-amber-500 text-slate-950 px-2.5 py-1 rounded-lg font-heading font-black text-[10px] sm:text-xs shadow-lg border-2 border-slate-950 flex items-center gap-1.5 animate-pulse">
-          <span>⚠️</span>
+          <svg class="w-3.5 h-3.5 text-slate-950 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
           <span>${isHindi ? 'आगे गड्ढा है: पार्टी स्पॉट!' : 'CAUTION: POTHOLE PARTY AHEAD!'}</span>
         </div>
 
@@ -73,13 +73,16 @@ export function initPotholeCartoonAnimation(mountId = 'pothole-animation-mount')
               </div>
 
               <!-- Pothole Party Flags -->
-              <div class="absolute -top-3 left-2 text-xs animate-bounce" style="animation-duration: 1.2s">🚩</div>
-              <div class="absolute -top-4 right-3 text-sm animate-bounce" style="animation-duration: 0.9s">🎉</div>
-              <div class="absolute -bottom-1 text-xs">🕳️</div>
+              <div class="absolute -top-3 left-2 animate-bounce" style="animation-duration: 1.2s">
+                <svg class="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M5 21V4h9l.4 2H20v10h-7l-.4-2H7v7H5z"/></svg>
+              </div>
+              <div class="absolute -top-4 right-3 animate-bounce" style="animation-duration: 0.9s">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+              </div>
 
               <!-- Water Splash Particles Ring -->
               <div id="pothole-splash-emitter" class="absolute -top-6 inset-x-0 flex justify-center items-center pointer-events-none opacity-0">
-                <span class="text-lg animate-ping">💦</span>
+                <svg class="w-5 h-5 text-amber-400 animate-ping" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/></svg>
               </div>
             </div>
           </div>
@@ -220,15 +223,14 @@ export function initPotholeCartoonAnimation(mountId = 'pothole-animation-mount')
     splashEmitter.classList.remove('opacity-0');
     splashEmitter.innerHTML = `
       <div class="flex items-center gap-2 -translate-y-4 transition-all duration-500">
-        <span class="text-2xl animate-bounce">💦</span>
-        <span class="text-2xl animate-bounce" style="animation-delay: 100ms">🎉</span>
-        <span class="text-2xl animate-bounce" style="animation-delay: 200ms">💥</span>
-        <span class="text-2xl animate-bounce" style="animation-delay: 300ms">💃</span>
+        <svg class="w-6 h-6 text-amber-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        <svg class="w-6 h-6 text-rose-500 animate-bounce" style="animation-delay: 100ms" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <svg class="w-6 h-6 text-emerald-400 animate-bounce" style="animation-delay: 200ms" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
       </div>
     `;
     setTimeout(() => {
       splashEmitter.classList.add('opacity-0');
-      splashEmitter.innerHTML = '<span class="text-lg animate-ping">💦</span>';
+      splashEmitter.innerHTML = '<svg class="w-5 h-5 text-amber-400 animate-ping" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/></svg>';
     }, 1200);
   };
 

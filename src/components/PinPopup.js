@@ -84,7 +84,9 @@ export function createPinPopupHtml(pin) {
         </div>
       ` : isPending ? `
         <div class="w-full py-2.5 px-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2.5 text-amber-700 dark:text-amber-300">
-          <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-sm animate-pulse shrink-0">⏳</div>
+          <div class="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-sm animate-pulse shrink-0">
+            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
           <div class="min-w-0 flex-1">
             <div class="text-xs font-bold truncate">${t('photoUnderReviewTitle')}</div>
             <div class="text-[10px] text-[var(--muted)] truncate">${t('photoUnderReviewBadge')}</div>
@@ -92,7 +94,7 @@ export function createPinPopupHtml(pin) {
         </div>
       ` : isRejected ? `
         <div class="w-full py-2 px-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-2 text-rose-600 dark:text-rose-400">
-          <span class="text-xs">❌</span>
+          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           <span class="text-xs font-bold">${t('photoRejectedTitle')}</span>
         </div>
       ` : ''}
@@ -118,7 +120,7 @@ export function createPinPopupHtml(pin) {
         <!-- +1 Button -->
         ${hasUserReportedOrUpvoted(pin.id) ? `
           <div class="w-full py-2.5 px-3 bg-[var(--surface-2)] text-[var(--success)] border border-[var(--border)] font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2">
-            <span>✓</span>
+            <svg class="w-4 h-4 text-emerald-500 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             <span>${t('alreadyReportedButton')}</span>
             ${upvoteCount > 0 ? `<span class="bg-[var(--surface)] px-2 py-0.5 rounded-full text-xs font-bold border border-[var(--border)]">${upvoteCount}</span>` : ''}
           </div>
@@ -127,7 +129,7 @@ export function createPinPopupHtml(pin) {
             onclick="window.__khaddaUpvotePin('${pin.id}')"
             class="btn-primary w-full py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>👍</span>
+            <svg class="w-4 h-4 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21H8e1a2 2 0 01-2-2v-7a2 2 0 01.586-1.414l5-5L12 3a1 1 0 011 1v4.242M8 10V21"/></svg>
             <span>${t('upvoteBtn')}</span>
             ${upvoteCount > 0 ? `<span class="bg-[var(--primary-ink)] text-[var(--primary)] px-2 py-0.5 rounded-full text-xs font-bold">${upvoteCount}</span>` : ''}
           </button>
@@ -141,7 +143,7 @@ export function createPinPopupHtml(pin) {
             rel="noopener noreferrer"
             class="btn-secondary flex-1 py-2 px-3 font-heading font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 text-center cursor-pointer"
           >
-            <span>💬</span>
+            <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             <span>${t('shareWhatsapp')}</span>
           </a>
 

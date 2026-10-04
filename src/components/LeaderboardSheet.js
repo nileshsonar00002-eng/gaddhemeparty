@@ -49,7 +49,7 @@ export class LeaderboardSection {
       ];
       const isGeneric = !rawLandmark || genericList.includes(rawLandmark.toLowerCase());
       if (isGeneric) {
-        return { title: `📍 ${city}`, city };
+        return { title: city, city };
       }
       return { title: rawLandmark, city };
     };
@@ -80,7 +80,7 @@ export class LeaderboardSection {
             id="btn-open-full-leaderboard"
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none btn-primary text-xs sm:text-sm font-heading font-extrabold shadow-md transition cursor-pointer"
           >
-            <span>🏆</span>
+            <svg class="w-4 h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15l-2 5l-1-2l-2 1l1-3l-2-1l3-1l-1-3l3 2l2-3l1 3l3-1l-1 3l2 1l-3 1l1 3l-2-1z"/></svg>
             <span>${isHindi ? 'पूरा लीडरबोर्ड देखें' : 'View Full Leaderboard'}</span>
             <span class="text-xs">➔</span>
           </button>
@@ -96,8 +96,9 @@ export class LeaderboardSection {
                   <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs">
                     ${t('heroBadgeRank')}
                   </span>
-                  <span class="badge-rank-gold text-xs tabular-nums font-mono font-bold px-3 py-0.5 rounded-lg">
-                    👑 #1 RANK
+                  <span class="badge-rank-gold text-xs tabular-nums font-mono font-bold px-3 py-0.5 rounded-lg flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-amber-900 fill-current" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+                    <span>#1 RANK</span>
                   </span>
                 </div>
 
@@ -107,8 +108,9 @@ export class LeaderboardSection {
                     alt="Hero Pothole"
                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />
-                  <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-white border border-white/20 shadow-xs">
-                    📍 ${heroLabels.city}
+                  <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-semibold text-white border border-white/20 shadow-xs flex items-center gap-1">
+                    <svg class="w-3 h-3 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>${heroLabels.city}</span>
                   </div>
                 </div>
 
@@ -132,7 +134,7 @@ export class LeaderboardSection {
                   onclick="window.__khaddaFlyToPin('${heroPin.id}')"
                   class="btn-primary flex-1 py-2.5 px-3 text-xs rounded-none flex items-center justify-center gap-1.5 shadow-md cursor-pointer font-bold"
                 >
-                  <span>📍</span>
+                  <svg class="w-3.5 h-3.5 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   <span>${t('tapToViewOnMap')}</span>
                 </button>
               </div>
@@ -160,7 +162,9 @@ export class LeaderboardSection {
                   ${pin.thumbnailUrl || pin.imageUrl ? `
                     <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="thumb" class="w-full h-full object-cover" />
                   ` : `
-                    <div class="w-full h-full flex items-center justify-center text-lg">🕳️</div>
+                    <div class="w-full h-full flex items-center justify-center text-xs text-[var(--muted)]">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                    </div>
                   `}
                 </div>
 
@@ -168,12 +172,19 @@ export class LeaderboardSection {
                   <h4 class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] truncate group-hover:text-[var(--primary)] transition">
                     ${pinLabels.title}
                   </h4>
-                  <p class="text-[11px] text-[var(--muted)] mt-0.5 truncate">
-                    📍 ${pinLabels.city}
+                  <p class="text-[11px] text-[var(--muted)] mt-0.5 truncate flex items-center gap-1">
+                    <svg class="w-3 h-3 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>${pinLabels.city}</span>
                   </p>
                   <div class="flex items-center gap-2 mt-1 text-[10px] tabular-nums font-mono text-[var(--primary)]">
-                    <span>🚨 ${pin.reportCount || 1} reps</span>
-                    <span>👍 ${pin.upvotes || 0} votes</span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3 h-3 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                      <span>${pin.reportCount || 1} reps</span>
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3 h-3 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                      <span>${pin.upvotes || 0} votes</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -225,8 +236,10 @@ export class LeaderboardSheet {
           </div>
 
           <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">🏆</span>
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-[var(--accent)] shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15l-2 5l-1-2l-2 1l1-3l-2-1l3-1l-1-3l3 2l2-3l1 3l3-1l-1 3l2 1l-3 1l1 3l-2-1z"/></svg>
+              </div>
               <div>
                 <h3 class="font-heading font-extrabold text-base sm:text-lg text-[var(--text)] leading-tight">
                   ${t('leaderboardTitle')}
@@ -391,7 +404,7 @@ export class LeaderboardSheet {
 
       const shareOrigin = window.location.origin;
       const shareUrl = `${shareOrigin}/#pin=${heroPin.id}`;
-      const whatsappText = `👑 ${isHindi ? 'गड्ढा ऑफ द वीक!' : 'Pothole of the Week!'}\n📍 ${isHindi ? 'जगह' : 'Location'}: ${area} (${city})\n👥 ${reports} ${isHindi ? 'रिपोर्ट्स' : 'reports'} | 👍 ${upvotes} ${isHindi ? 'वोट्स' : 'upvotes'}\n⏳ ${days} ${isHindi ? 'दिन से बिना मरम्मत के खुला है!' : 'days without repair!'}\n👉 ${isHindi ? 'लाइव मैप पर देखें' : 'View on live map'}: ${shareUrl}`;
+      const whatsappText = `${isHindi ? 'गड्ढा ऑफ द वीक!' : 'Pothole of the Week!'}\n📍 ${isHindi ? 'जगह' : 'Location'}: ${area} (${city})\n👥 ${reports} ${isHindi ? 'रिपोर्ट्स' : 'reports'} | 👍 ${upvotes} ${isHindi ? 'वोट्स' : 'upvotes'}\n⏳ ${days} ${isHindi ? 'दिन से बिना मरम्मत के खुला है!' : 'days without repair!'}\n👉 ${isHindi ? 'लाइव मैप पर देखें' : 'View on live map'}: ${shareUrl}`;
       const whatsappHref = `https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`;
 
       html += `
@@ -401,8 +414,9 @@ export class LeaderboardSheet {
             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-heading font-bold bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs">
               ${t('heroBadgeRank')}
             </span>
-            <span class="text-[11px] tabular-nums font-mono font-bold text-[var(--primary)] bg-[var(--surface-2)] px-2 py-0.5 rounded-md border border-[var(--border)]">
-              #1 RANK
+            <span class="text-[11px] tabular-nums font-mono font-bold text-[var(--primary)] bg-[var(--surface-2)] px-2 py-0.5 rounded-md border border-[var(--border)] flex items-center gap-1">
+              <svg class="w-3.5 h-3.5 text-amber-600 fill-current" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+              <span>#1 RANK</span>
             </span>
           </div>
 
@@ -417,8 +431,9 @@ export class LeaderboardSheet {
                 <p class="font-heading font-bold text-xs sm:text-sm text-[var(--text)] line-clamp-2 leading-snug">
                   ${area}
                 </p>
-                <p class="text-[11px] text-[var(--primary)] font-semibold mt-0.5">
-                  📍 ${city}
+                <p class="text-[11px] text-[var(--primary)] font-semibold mt-0.5 flex items-center gap-1">
+                  <svg class="w-3 h-3 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  <span>${city}</span>
                 </p>
               </div>
 
@@ -440,7 +455,7 @@ export class LeaderboardSheet {
               onclick="window.__khaddaFlyToPin('${heroPin.id}', 1)"
               class="btn-primary flex-1 py-2 px-3 text-xs rounded-none flex items-center justify-center gap-1.5 shadow-xs cursor-pointer font-bold"
             >
-              <span>📍</span>
+              <svg class="w-3.5 h-3.5 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               <span>${t('tapToViewOnMap')}</span>
             </button>
 
@@ -448,9 +463,9 @@ export class LeaderboardSheet {
               href="${whatsappHref}"
               target="_blank"
               rel="noopener noreferrer"
-              class="btn-secondary py-2 px-3 text-xs rounded-xl flex items-center justify-center gap-1 active:scale-95 cursor-pointer font-medium"
+              class="btn-secondary py-2 px-3 text-xs rounded-xl flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer font-medium"
             >
-              <span>💬</span>
+              <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
               <span class="hidden xs:inline">${t('shareHeroWhatsapp')}</span>
             </a>
           </div>
@@ -490,7 +505,9 @@ export class LeaderboardSheet {
               ${thumb ? `
                 <img src="${thumb}" alt="thumb" class="w-full h-full object-cover" />
               ` : `
-                <div class="w-full h-full flex items-center justify-center text-sm">🕳️</div>
+                <div class="w-full h-full flex items-center justify-center text-xs text-[var(--muted)]">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                </div>
               `}
             </div>
 
@@ -499,8 +516,9 @@ export class LeaderboardSheet {
               <p class="text-xs font-semibold text-[var(--text)] line-clamp-1 group-hover:text-[var(--accent)] transition">
                 ${area}
               </p>
-              <p class="text-[10px] text-[var(--muted)]">
-                📍 ${city}
+              <p class="text-[10px] text-[var(--muted)] flex items-center gap-1">
+                <svg class="w-3 h-3 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>${city}</span>
               </p>
             </div>
 
@@ -541,12 +559,12 @@ export class LeaderboardSheet {
 
     cities.forEach((city, idx) => {
       const cityName = isHindi ? city.nameHindi : city.nameEnglish;
-      const rankBadge = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`;
+      const rankBadgeHtml = idx === 0 ? `<span class="badge-rank-gold px-2 py-0.5 rounded text-[11px] font-bold">#1</span>` : idx === 1 ? `<span class="badge-rank-silver px-2 py-0.5 rounded text-[11px] font-bold">#2</span>` : idx === 2 ? `<span class="badge-rank-bronze px-2 py-0.5 rounded text-[11px] font-bold">#3</span>` : `<span class="text-xs font-mono font-bold text-[var(--muted)]">#${idx + 1}</span>`;
 
       html += `
         <div class="flex items-center justify-between p-3 rounded-2xl bg-[var(--surface)] border border-[var(--border)] hover:border-amber-500/40 transition">
           <div class="flex items-center gap-3">
-            <span class="text-base tabular-nums font-mono font-bold w-6 text-center">${rankBadge}</span>
+            <span class="tabular-nums font-mono font-bold w-7 text-center flex items-center justify-center">${rankBadgeHtml}</span>
             <div>
               <p class="font-heading font-bold text-sm text-[var(--text)]">${cityName}</p>
               <p class="text-[10px] text-[var(--muted)]">${city.totalUpvotes || 0} नागरिक सत्यापन</p>
@@ -603,7 +621,9 @@ export class LeaderboardSheet {
             ${thumb ? `
               <img src="${thumb}" alt="thumb" class="w-full h-full object-cover" />
             ` : `
-              <div class="w-full h-full flex items-center justify-center text-sm">🕳️</div>
+              <div class="w-full h-full flex items-center justify-center text-sm">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              </div>
             `}
           </div>
 
@@ -611,7 +631,7 @@ export class LeaderboardSheet {
             <p class="text-xs font-semibold text-slate-200 line-clamp-1 group-hover:text-rose-300 transition">
               ${area}
             </p>
-            <p class="text-[10px] text-slate-400">📍 ${city}</p>
+            <p class="text-[10px] text-slate-400 font-medium">${city}</p>
           </div>
 
           <div class="text-right flex-shrink-0">
@@ -644,11 +664,11 @@ export class LeaderboardSheet {
   renderEmptyState() {
     return `
       <div class="text-center py-12 px-4 space-y-3">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl">
-          🕳️
+        <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
         </div>
-        <h4 class="font-heading font-bold text-base text-white">${t('leaderboardEmptyTitle')}</h4>
-        <p class="text-xs text-slate-400 max-w-xs mx-auto">${t('leaderboardEmptyDesc')}</p>
+        <h4 class="font-heading font-bold text-base text-[var(--text)]">${t('leaderboardEmptyTitle')}</h4>
+        <p class="text-xs text-[var(--muted)] max-w-xs mx-auto">${t('leaderboardEmptyDesc')}</p>
       </div>
     `;
   }
