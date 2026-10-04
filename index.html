@@ -171,14 +171,14 @@
             </div>
 
             <!-- Floating Controls: Info & Primary Report Button (Anchored inside Card) -->
-            <div class="absolute bottom-3 sm:bottom-4 left-2.5 right-2.5 sm:left-6 sm:right-6 z-[400] flex items-center gap-2 sm:gap-3.5 pointer-events-none">
+            <div class="absolute bottom-3 sm:bottom-4 left-2.5 right-2.5 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-md z-[400] flex items-center justify-center gap-2.5 sm:gap-3.5 pointer-events-none">
               <!-- About / Info Modal Button (Min 40px tap target) -->
-              <button id="btn-open-about" type="button" class="pointer-events-auto btn-secondary w-10 h-10 sm:w-11 sm:h-11 p-0 flex items-center justify-center bg-[var(--surface)] shadow-md shrink-0 rounded-none" title="नागरिक पहल जानकारी" aria-label="About Gaddhe Me Party" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
+              <button id="btn-open-about" type="button" class="pointer-events-auto btn-secondary w-10 h-10 sm:w-11 sm:h-11 p-0 flex items-center justify-center bg-[var(--surface)] shadow-lg shrink-0 rounded-xl" title="नागरिक पहल जानकारी" aria-label="About RoadTok" data-i18n-title="aboutBtnTooltip" data-i18n-aria="aboutBtnTooltip">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               </button>
 
               <!-- Primary Floating Pill Button: "खराब रास्ता रिपोर्ट करें" -->
-              <button id="btn-open-report" type="button" class="pointer-events-auto flex-1 min-w-0 btn-primary py-2.5 sm:py-3.5 px-3 sm:px-6 shadow-md text-xs sm:text-base font-semibold truncate rounded-none">
+              <button id="btn-open-report" type="button" class="pointer-events-auto flex-1 sm:flex-initial sm:w-auto min-w-0 btn-primary py-2.5 sm:py-3 px-4 sm:px-8 shadow-lg text-xs sm:text-base font-bold truncate rounded-xl">
                 <svg class="w-4 h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
                 <span id="fab-text" data-i18n="reportBtn" class="truncate">खराब रास्ता रिपोर्ट करें</span>
               </button>
