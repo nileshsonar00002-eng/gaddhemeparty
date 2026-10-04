@@ -93,6 +93,17 @@ export function createReportCardHtml(pin, isSelected = false) {
               class="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105 cursor-pointer"
               data-action="open-lightbox"
             />
+            <!-- Edit Image Button -->
+            <button
+              type="button"
+              data-action="edit-image"
+              data-id="${pin.id}"
+              class="absolute top-2 right-2 px-2 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-[10px] font-bold text-amber-400 border border-amber-500/40 flex items-center gap-1 shadow-lg cursor-pointer hover:bg-amber-500 hover:text-slate-950 transition z-10"
+              title="Blur sensitive areas or draw on photo"
+            >
+              <span>🎨 Edit Photo</span>
+            </button>
+
             <!-- Click to Zoom Badge -->
             <button
               type="button"

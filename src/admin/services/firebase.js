@@ -13,6 +13,8 @@ import {
 } from 'firebase/firestore';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyFakeKeyForLocalDevAndDemo12345',
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'khaddawaliparty.firebaseapp.com',
@@ -26,6 +28,7 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 // Ensure anonymous session for Firestore rules access
 export function initAdminAuth() {
@@ -201,6 +204,43 @@ export async function archivePin(pinId) {
 }
 
 /**
+ * Upload edited photo blob to Firebase Storage
+ */
+export async function uploadAdminEditedPhoto(blob) {
+  try {
+    const timestamp = Date.now();
+    const fileName = `edited_pothole_${timestamp}.jpg`;
+    const fileRef = ref(storage, `potholes/admin/${fileName}`);
+    await uploadBytes(fileRef, blob, {
+      contentType: 'image/jpeg',
+      cacheControl: 'public, max-age=31536000'
+    });
+    return await getDownloadURL(fileRef);
+  } catch (err) {
+    console.warn('[Admin Storage] Storage upload fallback to DataURL:', err.message || err);
+    return null;
+  }
+}
+
+/**
+ * Update Pin photo image URL in Firestore
+ */
+export async function updatePinImage(pinId, newImageUrl, imageIndex = 0) {
+  if (!pinId || !newImageUrl) return false;
+  const pinRef = doc(db, 'pins', pinId);
+
+  await updateDoc(pinRef, {
+    imageUrl: newImageUrl,
+    thumbnailUrl: newImageUrl,
+    photoApproved: true,
+    photoStatus: 'approved',
+    photoApprovedAt: serverTimestamp(),
+    moderatedBy: 'admin'
+  });
+  return true;
+}
+
+/**
  * Permanent Delete pin
  */
 export async function hardDeletePin(pinId) {
@@ -209,4 +249,5 @@ export async function hardDeletePin(pinId) {
   await deleteDoc(pinRef);
   return true;
 }
+
 

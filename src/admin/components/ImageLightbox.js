@@ -1,6 +1,6 @@
 // Image Fullscreen Lightbox with Multi-Photo Gallery & Zoom Support
 
-export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex = 0) {
+export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex = 0, onEditPhoto = null) {
   let images = [];
   if (Array.isArray(imagesInput)) {
     images = imagesInput.filter((img) => img && typeof img === 'string');
@@ -30,6 +30,15 @@ export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex 
           ${images.length > 1 ? `<span class="ml-1.5 font-mono text-amber-400 bg-slate-800 px-2 py-0.5 rounded-full text-[11px] border border-slate-700">${currentIndex + 1} / ${images.length}</span>` : ''}
         </div>
         <div class="flex items-center gap-2">
+          ${onEditPhoto ? `
+            <button
+              id="btn-edit-lightbox-photo"
+              type="button"
+              class="px-3 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 text-xs font-bold border border-amber-500/40 transition cursor-pointer flex items-center gap-1"
+            >
+              🎨 Edit Photo
+            </button>
+          ` : ''}
           <a
             href="${currentImg}"
             target="_blank"
@@ -106,6 +115,11 @@ export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex 
 
   const attachListeners = () => {
     modal.querySelector('#btn-close-lightbox')?.addEventListener('click', close);
+
+    modal.querySelector('#btn-edit-lightbox-photo')?.addEventListener('click', () => {
+      close();
+      if (onEditPhoto) onEditPhoto(currentIndex);
+    });
 
     modal.querySelector('#btn-prev-lightbox')?.addEventListener('click', (e) => {
       e.stopPropagation();

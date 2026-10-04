@@ -22,6 +22,7 @@ import { createReportCardHtml } from './components/ReportCard';
 import { openLightbox } from './components/ImageLightbox';
 import { openRejectModal } from './components/RejectModal';
 import { openEditModal } from './components/EditModal';
+import { openImageEditModal } from './components/ImageEditModal';
 import { showToast } from './components/Toast';
 import { playNewPendingChime, playApprovePing, playRejectWoosh } from './utils/audio';
 import { initMiniMap, cleanupAllMiniMaps } from './utils/leafletMap';
@@ -378,7 +379,9 @@ class AdminApp {
 
       const triggerLightbox = () => {
         if (images.length > 0) {
-          openLightbox(images, pin.landmark || 'Pothole Image', cardActiveImgIndex);
+          openLightbox(images, pin.landmark || 'Pothole Image', cardActiveImgIndex, (targetIdx) => {
+            openImageEditModal(pin, targetIdx);
+          });
         }
       };
 
@@ -387,6 +390,14 @@ class AdminApp {
         el.addEventListener('click', (e) => {
           e.stopPropagation();
           triggerLightbox();
+        });
+      });
+
+      // Edit Image Button click handler
+      card.querySelectorAll('[data-action="edit-image"]').forEach((el) => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openImageEditModal(pin, cardActiveImgIndex);
         });
       });
 
