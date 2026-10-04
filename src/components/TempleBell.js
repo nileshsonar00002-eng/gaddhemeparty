@@ -1,4 +1,5 @@
 import { t, getLanguage } from '../utils/i18n';
+import { subscribeToBellRings, recordBellRing } from '../services/firebase';
 
 /**
  * Interactive 3D Animated Temple Bell (Ghanta) Widget
@@ -80,6 +81,26 @@ export class TempleBellWidget {
     this.ringCount = this.getSavedRings();
     this.isRinging = false;
     this.animTimer = null;
+    this.unsubscribeRealtime = null;
+    this.initRealtimeSync();
+  }
+
+  initRealtimeSync() {
+    if (this.unsubscribeRealtime) return;
+    this.unsubscribeRealtime = subscribeToBellRings((serverCount) => {
+      if (typeof serverCount === 'number' && serverCount > 0) {
+        this.ringCount = Math.max(this.ringCount, serverCount);
+        this.saveRings(this.ringCount);
+        this.updateCounterDOM();
+      }
+    });
+  }
+
+  updateCounterDOM() {
+    const counterText = document.getElementById('bell-counter-text');
+    if (counterText) {
+      counterText.textContent = this.ringCount.toLocaleString('en-IN');
+    }
   }
 
   getSavedRings() {
@@ -338,9 +359,12 @@ export class TempleBellWidget {
     // 1. Play Authentic Web Audio Harmonic Chime
     this.audio.playChime();
 
-    // 2. Increment & persist counter
+    // 2. Increment & persist counter locally
     this.ringCount += 1;
     this.saveRings(this.ringCount);
+
+    // 3. Atomically update Firestore counter for all connected users
+    recordBellRing();
 
     // Update Counter UI
     const counterText = document.getElementById('bell-counter-text');

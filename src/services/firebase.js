@@ -581,4 +581,41 @@ export async function recordVisitorSession() {
   }
 }
 
+/**
+ * Record a bell ring atomically in Firestore for multi-user sync
+ */
+export async function recordBellRing() {
+  try {
+    const statsRef = doc(db, 'stats', 'global');
+    await setDoc(statsRef, { bellRings: increment(1) }, { merge: true });
+  } catch (err) {
+    console.warn('[Firebase] Bell ring increment notice:', err);
+  }
+}
+
+/**
+ * Real-time listener for Temple Bell ring counter
+ */
+export function subscribeToBellRings(onCountUpdated) {
+  try {
+    const statsDoc = doc(db, 'stats', 'global');
+    return onSnapshot(
+      statsDoc,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (typeof data.bellRings === 'number') {
+            onCountUpdated(data.bellRings);
+          }
+        }
+      },
+      (err) => {
+        console.warn('[Firestore] Bell rings subscription notice:', err);
+      }
+    );
+  } catch (e) {
+    return () => {};
+  }
+}
+
 
