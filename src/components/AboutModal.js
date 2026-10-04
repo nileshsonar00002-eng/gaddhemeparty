@@ -98,7 +98,7 @@ export function openAboutModal() {
                 </p>
                 <p><span class="brand-roadtok text-sm font-normal">RoadTok</span> एक 100% फ्री कम्युनिटी प्रोजेक्ट है। सर्वर और मैप खर्च नागरिक सहयोग से चलता है।</p>
                 <div class="pt-1 flex items-center gap-2">
-                  <span class="px-2 py-1 bg-[var(--surface-2)] rounded-md text-[11px] font-mono text-[var(--text)] border border-[var(--border)]">contact@gaddhemeparty.in</span>
+                  <span class="px-2 py-1 bg-[var(--surface-2)] rounded-md text-[11px] font-mono text-[var(--text)] border border-[var(--border)]">contact@roadtok.in</span>
                 </div>
               </div>
             ` : ''}

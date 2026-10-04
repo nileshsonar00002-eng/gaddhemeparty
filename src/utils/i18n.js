@@ -181,8 +181,8 @@ export const translations = {
     aboutDisclaimerHindi: '• "यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।"',
     aboutDisclaimerEnglish: '• "This is a citizen initiative, not a political party."',
     aboutDisclaimer: 'यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।',
-    aboutContactBtn: 'संपर्क करें (contact@gaddhemeparty.in)',
-    contactEmail: 'contact@gaddhemeparty.in',
+    aboutContactBtn: 'संपर्क करें (contact@roadtok.in)',
+    contactEmail: 'contact@roadtok.in',
 
     // Terms & Privacy
     termsBadge: 'कानूनी व पारदर्शिता',
@@ -196,7 +196,7 @@ export const translations = {
     legalDataRetentionHeader: '३. डेटा संग्रह और प्राइवेसी (What We Collect)',
     legalDataRetentionText: 'हम कोई व्यक्तिगत नाम या ईमेल स्टोर नहीं करते। केवल फोटो, गड्ढे के GPS निर्देशांक, सुरक्षा के लिए हैशेड IP और अनाम सेशन आईडी दर्ज की जाती है।',
     legalRemovalHeader: '४. सामग्री हटाने का अनुरोध (Removal Requests)',
-    legalRemovalText: 'यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या contact@gaddhemeparty.in पर हटाए जाने का अनुरोध भेज सकते हैं।',
+    legalRemovalText: 'यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या contact@roadtok.in पर हटाए जाने का अनुरोध भेज सकते हैं।',
     
     // Footer
     footerCopyright: '© 2026 गड्ढे में पार्टी • 100% Free Civic Tech',
@@ -400,8 +400,8 @@ export const translations = {
     aboutDisclaimerHindi: '• "यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।"',
     aboutDisclaimerEnglish: '• "This is a citizen initiative, not a political party."',
     aboutDisclaimer: 'This is a citizen initiative, not a political party.',
-    aboutContactBtn: 'Contact Us (contact@gaddhemeparty.in)',
-    contactEmail: 'contact@gaddhemeparty.in',
+    aboutContactBtn: 'Contact Us (contact@roadtok.in)',
+    contactEmail: 'contact@roadtok.in',
 
     // Terms & Privacy
     termsBadge: 'Legal & Transparency',
@@ -415,7 +415,7 @@ export const translations = {
     legalDataRetentionHeader: '3. Data Collection & Privacy',
     legalDataRetentionText: 'We do not collect names or emails. Only the hazard image, GPS coordinates, hashed IP for anti-spam limits, and anonymous session IDs are stored.',
     legalRemovalHeader: '4. Content Removal Requests',
-    legalRemovalText: 'If you believe a photo violates guidelines or needs removal, use the Flag button or email contact@gaddhemeparty.in with the pin details.',
+    legalRemovalText: 'If you believe a photo violates guidelines or needs removal, use the Flag button or email contact@roadtok.in with the pin details.',
     
     // Footer
     footerCopyright: '© 2026 Gaddhe Me Party • 100% Free Civic Tech',
