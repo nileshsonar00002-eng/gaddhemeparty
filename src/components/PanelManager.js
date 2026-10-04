@@ -760,7 +760,7 @@ export class PanelManager {
     this.bodyContainer.innerHTML = `
       <div class="space-y-4 text-[#F9F2E8]">
         <div class="flex flex-col items-center text-center p-5 rounded-2xl bg-[#36140F] border border-white/10 shadow-sm">
-          <img src="/logo.svg" alt="RoadTok Logo" class="w-14 h-14 rounded-2xl mb-2.5 shadow-md" />
+          <img src="/logo.png" alt="RoadTok Logo" class="w-14 h-14 rounded-2xl mb-2.5 shadow-md object-contain" />
           <div>
             <h3 class="brand-roadtok text-2xl text-[#F9F2E8] leading-none mb-1">RoadTok</h3>
             <p class="text-xs text-amber-300 font-semibold mt-0.5">${t('aboutSubtitle')}</p>

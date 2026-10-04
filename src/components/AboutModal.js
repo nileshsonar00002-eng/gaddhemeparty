@@ -29,7 +29,7 @@ export function openAboutModal() {
 
           <!-- Header -->
           <div class="flex flex-col items-center text-center gap-1.5">
-            <img src="/logo.svg" alt="Logo" class="w-12 h-12 rounded-2xl drop-shadow-md mx-auto" />
+            <img src="/logo.png" alt="Logo" class="w-12 h-12 rounded-2xl drop-shadow-md mx-auto" />
             <div>
               <h3 class="brand-roadtok text-2xl sm:text-3xl text-[var(--heading)] leading-none">RoadTok</h3>
               <p class="font-heading text-xs text-[var(--muted)] font-semibold mt-1">"${t('tagline')}"</p>

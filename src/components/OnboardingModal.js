@@ -17,7 +17,7 @@ export function checkAndShowOnboarding() {
 
         <!-- Brand Icon -->
         <div class="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-amber-500 to-rose-600 flex items-center justify-center shadow-lg p-2.5">
-          <img src="/logo.svg" alt="गड्ढे में पार्टी" class="w-full h-full" />
+          <img src="/logo.png" alt="RoadTok Logo" class="w-full h-full object-contain rounded-2xl" />
         </div>
 
         <div>

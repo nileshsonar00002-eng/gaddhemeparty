@@ -31,7 +31,7 @@ export function createNavbar(options = {}) {
       <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
       <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
         <button type="button" id="nav-brand-btn" class="shrink-0 cursor-pointer focus:outline-none flex items-center justify-center" title="${t('appNameHindi')}">
-          <img src="/logo.svg" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full transition transform duration-150 hover:scale-105" />
+          <img src="/logo.png" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full transition transform duration-150 hover:scale-105" />
         </button>
 
         <div class="flex flex-col justify-center min-w-0 overflow-hidden">
@@ -178,7 +178,7 @@ export function createNavbar(options = {}) {
           <!-- Drawer Top Header -->
           <div class="flex items-center justify-between pb-3 border-b border-[var(--border)]">
             <div class="flex items-center gap-2.5">
-              <img src="/logo.svg" alt="Logo" class="w-8 h-8 rounded-lg" />
+              <img src="/logo.png" alt="Logo" class="w-8 h-8 rounded-lg" />
               <div class="flex flex-col">
                 <span class="font-heading font-bold text-sm text-[var(--text)]">${t('appNameHindi')}</span>
                 <span class="text-[11px] text-[var(--muted)]">"${t('tagline')}"</span>
