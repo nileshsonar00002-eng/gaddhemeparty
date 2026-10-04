@@ -6,6 +6,7 @@ import {
   limit,
   onSnapshot,
   doc,
+  getDoc,
   updateDoc,
   deleteDoc,
   serverTimestamp,
@@ -229,15 +230,57 @@ export async function updatePinImage(pinId, newImageUrl, imageIndex = 0) {
   if (!pinId || !newImageUrl) return false;
   const pinRef = doc(db, 'pins', pinId);
 
-  await updateDoc(pinRef, {
-    imageUrl: newImageUrl,
-    thumbnailUrl: newImageUrl,
-    photoApproved: true,
-    photoStatus: 'approved',
-    photoApprovedAt: serverTimestamp(),
-    moderatedBy: 'admin'
-  });
-  return true;
+  try {
+    const snap = await getDoc(pinRef);
+    if (!snap.exists()) return false;
+
+    const data = snap.data();
+    let currentImages = Array.isArray(data.images) ? [...data.images] : [];
+    let currentThumbs = Array.isArray(data.thumbnails) ? [...data.thumbnails] : [];
+
+    if (currentImages.length > 0 && imageIndex >= 0 && imageIndex < currentImages.length) {
+      currentImages[imageIndex] = newImageUrl;
+    } else {
+      currentImages = [newImageUrl];
+    }
+
+    if (currentThumbs.length > 0 && imageIndex >= 0 && imageIndex < currentThumbs.length) {
+      currentThumbs[imageIndex] = newImageUrl;
+    } else {
+      currentThumbs = [newImageUrl];
+    }
+
+    const updates = {
+      images: currentImages,
+      thumbnails: currentThumbs,
+      photoApproved: true,
+      photoStatus: 'approved',
+      photoApprovedAt: serverTimestamp(),
+      moderatedBy: 'admin'
+    };
+
+    if (imageIndex === 0 || !data.imageUrl || data.imageUrl === (data.images && data.images[0])) {
+      updates.imageUrl = currentImages[0] || newImageUrl;
+      updates.thumbnailUrl = currentThumbs[0] || newImageUrl;
+    }
+
+    await updateDoc(pinRef, updates);
+    return true;
+  } catch (err) {
+    console.error('[Admin Firebase] Error updating pin image:', err);
+    // Fallback direct update
+    await updateDoc(pinRef, {
+      imageUrl: newImageUrl,
+      thumbnailUrl: newImageUrl,
+      images: [newImageUrl],
+      thumbnails: [newImageUrl],
+      photoApproved: true,
+      photoStatus: 'approved',
+      photoApprovedAt: serverTimestamp(),
+      moderatedBy: 'admin'
+    });
+    return true;
+  }
 }
 
 /**
