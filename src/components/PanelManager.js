@@ -1,6 +1,7 @@
 import { t, getLanguage } from '../utils/i18n';
 import { prefersReducedMotion } from '../utils/deviceTier';
 import { subscribeToLeaderboard, callRefreshLeaderboard } from '../services/firebase';
+import { modalManager } from '../utils/modalManager';
 
 /**
  * Slide-Over Panel Manager
@@ -230,15 +231,24 @@ export class PanelManager {
 
     setTimeout(() => this.closeBtn.focus(), 150);
 
+    // Register panel with modalManager for mobile back button support
+    modalManager.openModal('panel-' + panelId, () => this.close(false));
+
     this.onPanelStateChange(panelId, true);
   }
 
-  close() {
+  close(notifyManager = true) {
     if (!this.isOpen && !this.activePanelId) return;
+
+    const currentPanelId = this.activePanelId;
 
     this.isOpen = false;
     this.activePanelId = null;
     this.setMobilePeek(false);
+
+    if (notifyManager && currentPanelId) {
+      modalManager.notifyClosed('panel-' + currentPanelId);
+    }
 
     this.drawer.classList.add('pointer-events-none', 'lg:translate-x-full', 'max-lg:translate-y-full');
     this.drawer.classList.remove('pointer-events-auto', 'lg:translate-x-0', 'max-lg:translate-y-0');

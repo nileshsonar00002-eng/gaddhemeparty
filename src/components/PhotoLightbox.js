@@ -126,8 +126,10 @@ export function openPhotoLightbox(images = [], initialIndex = 0, caption = '') {
     attachHandlers();
   };
 
-  const closeLightbox = () => {
-    modalManager.notifyClosed('photo-lightbox');
+  const closeLightbox = (notifyManager = true) => {
+    if (notifyManager) {
+      modalManager.notifyClosed('photo-lightbox');
+    }
     window.removeEventListener('keydown', handleKeyDown);
     root.innerHTML = '';
   };
@@ -217,7 +219,7 @@ export function openPhotoLightbox(images = [], initialIndex = 0, caption = '') {
     }, { passive: true });
   };
 
-  modalManager.openModal('photo-lightbox', () => closeLightbox());
+  modalManager.openModal('photo-lightbox', () => closeLightbox(false));
   window.addEventListener('keydown', handleKeyDown);
   render();
 }

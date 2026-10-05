@@ -201,9 +201,7 @@ export class BottomSheet {
 
     const isDesktop = window.innerWidth >= 768;
 
-    if (notifyManager && !isDesktop) {
-      modalManager.closeActiveModal();
-    } else {
+    if (notifyManager) {
       modalManager.notifyClosed('report-bottom-sheet');
     }
 

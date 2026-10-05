@@ -694,8 +694,6 @@ export class LeaderboardSheet {
     this.isOpen = false;
 
     if (notifyManager) {
-      modalManager.closeActiveModal();
-    } else {
       modalManager.notifyClosed('leaderboard-sheet');
     }
 

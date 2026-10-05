@@ -486,21 +486,23 @@ export function openPinDetailModal(pin) {
     }
   });
 
-  const closeModal = () => {
-    modalManager.notifyClosed('pin-detail-modal');
+  const closeModal = (notifyManager = true) => {
     container.innerHTML = '';
+    if (notifyManager) {
+      modalManager.notifyClosed('pin-detail-modal');
+    }
   };
 
-  modalManager.openModal('pin-detail-modal', () => closeModal());
+  modalManager.openModal('pin-detail-modal', () => closeModal(false));
 
   backdrop?.addEventListener('click', (e) => {
     if (e.target === backdrop) {
-      closeModal();
+      closeModal(true);
     }
   });
 
   closeBtn?.addEventListener('click', () => {
-    closeModal();
+    closeModal(true);
   });
 
   const locationBtn = container.querySelector('#pin-modal-location-btn');
