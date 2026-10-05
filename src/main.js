@@ -305,7 +305,7 @@ class KhaddaApp {
     // Open Bottom Sheet Report Form
     const openReportBtn = document.getElementById('btn-open-report');
     openReportBtn?.addEventListener('click', () => {
-      this.openReportDrawer();
+      this.handleOpenReportClick();
     });
 
     // Locate Me Button
@@ -323,7 +323,7 @@ class KhaddaApp {
     // Sticky Mobile Floating Report Button
     const stickyReportBtn = document.getElementById('btn-sticky-report');
     stickyReportBtn?.addEventListener('click', () => {
-      this.openReportDrawer();
+      this.handleOpenReportClick();
     });
 
     // Card Zoom Controls
@@ -912,7 +912,8 @@ class KhaddaApp {
         baseGps: realGps,
         isLocationConfirmed: true,
         imageData,
-        landmark
+        landmark,
+        autoTriggerPhoto: formState.autoTriggerPhoto || (window.innerWidth < 768 && !imageData)
       });
     };
 
@@ -934,6 +935,16 @@ class KhaddaApp {
 
     doneBtn?.addEventListener('click', handleDone, { once: true });
     cancelBtn?.addEventListener('click', handleCancel, { once: true });
+  }
+
+  handleOpenReportClick() {
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      // Mobile Step 1: Open Full Screen Map Location Confirmation first
+      this.startMapLocationConfirm({ autoTriggerPhoto: true });
+    } else {
+      this.openReportDrawer();
+    }
   }
 
   openReportDrawer(initialState = {}) {
@@ -978,6 +989,16 @@ class KhaddaApp {
         await this.handleReportSubmit(formData);
       }
     });
+
+    // Auto-trigger photo capture if requested (e.g. on mobile after location confirm)
+    if (initialState.autoTriggerPhoto && !initialState.imageData) {
+      setTimeout(() => {
+        const photoInput = document.getElementById('photo-input');
+        if (photoInput && typeof photoInput.click === 'function') {
+          photoInput.click();
+        }
+      }, 350);
+    }
   }
 
   async handleReportSubmit(formData) {
