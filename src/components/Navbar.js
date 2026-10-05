@@ -45,11 +45,11 @@ export function createNavbar(options = {}) {
       </div>
 
       <!-- Center Nav Links (Desktop >= 1024px) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/60 backdrop-blur-xs p-1 rounded-full border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
+      <nav class="hidden lg:flex items-center gap-1 xl:gap-1.5 bg-[var(--band)]/60 backdrop-blur-xs p-1 rounded-full border border-[var(--band-ink)]/25 select-none shrink-0 z-10">
         <button
           type="button"
           data-nav-panel="map"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('map', 'w-3.5 h-3.5')}
           <span>${t('navMap')}</span>
@@ -58,7 +58,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="leaderboard"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('trophy', 'w-3.5 h-3.5')}
           <span>${t('navLeaderboard')}</span>
@@ -67,7 +67,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="mission"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('target', 'w-3.5 h-3.5')}
           <span>${t('navMission')}</span>
@@ -76,7 +76,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="how"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('zap', 'w-3.5 h-3.5')}
           <span>${t('navHowItWorks')}</span>
@@ -85,7 +85,7 @@ export function createNavbar(options = {}) {
         <button
           type="button"
           data-nav-panel="about"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
+          class="nav-panel-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
         >
           ${getLucideIcon('info', 'w-3.5 h-3.5')}
           <span>${t('navAbout')}</span>
@@ -169,10 +169,10 @@ export function createNavbar(options = {}) {
 
   drawerPortal.innerHTML = `
     <!-- Mobile Full-Height Navigation Drawer Overlay -->
-    <div id="mobile-nav-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[99999] hidden transition-opacity duration-200">
+    <div id="mobile-nav-drawer" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1040] hidden transition-opacity duration-200">
       <div
         id="mobile-nav-panel"
-        class="fixed top-0 right-0 w-[85%] max-w-sm h-full bg-[var(--surface)] border-l border-[var(--border)] p-5 flex flex-col justify-between shadow-2xl overflow-y-auto transform transition-transform duration-250 ease-out translate-x-full z-[99999]"
+        class="fixed top-0 right-0 w-[85%] max-w-sm h-full bg-[var(--surface)] border-l border-[var(--border)] p-5 flex flex-col justify-between shadow-2xl overflow-y-auto transform transition-transform duration-250 ease-out translate-x-full z-[1040]"
       >
         <div class="space-y-5">
           <!-- Drawer Top Header -->

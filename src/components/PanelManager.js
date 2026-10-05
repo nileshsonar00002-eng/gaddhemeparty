@@ -216,8 +216,8 @@ export class PanelManager {
     this.backdrop.classList.add('opacity-100', 'pointer-events-auto');
     this.lockBodyScroll();
 
-    this.drawer.classList.remove('pointer-events-none', 'lg:translate-x-full', 'max-lg:translate-y-full');
-    this.drawer.classList.add('pointer-events-auto', 'lg:translate-x-0', 'max-lg:translate-y-0');
+    this.drawer.classList.remove('pointer-events-none', 'lg:translate-x-full', 'max-lg:translate-y-full', 'translate-x-full', 'translate-y-full');
+    this.drawer.classList.add('pointer-events-auto', 'lg:translate-x-0', 'max-lg:translate-y-0', 'translate-x-0', 'translate-y-0');
 
     if (panelId === 'leaderboard') {
       this.refreshLbBtn.classList.remove('hidden');
@@ -251,7 +251,7 @@ export class PanelManager {
     }
 
     this.drawer.classList.add('pointer-events-none', 'lg:translate-x-full', 'max-lg:translate-y-full');
-    this.drawer.classList.remove('pointer-events-auto', 'lg:translate-x-0', 'max-lg:translate-y-0');
+    this.drawer.classList.remove('pointer-events-auto', 'lg:translate-x-0', 'max-lg:translate-y-0', 'translate-x-0', 'translate-y-0');
 
     this.backdrop.classList.add('opacity-0', 'pointer-events-none');
     this.backdrop.classList.remove('opacity-100', 'pointer-events-auto');
