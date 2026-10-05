@@ -75,6 +75,7 @@ class Router {
         this.handleHashChange();
       } else {
         window.location.hash = targetHash;
+        this.handleHashChange();
       }
     } else {
       this.handleHashChange();
