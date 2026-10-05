@@ -9,6 +9,7 @@ import { LeaderboardSection } from './components/LeaderboardSheet';
 import { renderReportForm } from './components/ReportForm';
 import { openPinDetailModal } from './components/PinDetailModal';
 import { openChaiTipModal } from './components/ChaiTipModal';
+import { openThankYouModal } from './components/ThankYouModal';
 import { showToast } from './components/Toast';
 import { t, getLanguage, renderAllPageI18n } from './utils/i18n';
 import { modalManager } from './utils/modalManager';
@@ -941,6 +942,12 @@ class KhaddaApp {
       showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
     }
 
+    // Scroll map into view so map is full screen behind report bottom sheet
+    const mapSection = document.getElementById('map-section');
+    if (mapSection) {
+      mapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     this.bottomSheet.open('<div id="report-form-mount" class="h-full"></div>');
 
     // On Desktop / Tablet (>= 768px), shift map center so the pin stays visible in the remaining viewport
@@ -1111,6 +1118,22 @@ class KhaddaApp {
       if (window.__khaddaTriggerPartyExplosion) {
         window.__khaddaTriggerPartyExplosion();
       }
+
+      // Open Thank You feedback modal popup
+      openThankYouModal({
+        landmark: formData.landmark || targetPin?.landmark || '',
+        cityName: targetPin?.cityNameEnglish || targetPin?.cityNameHindi || nearestCity?.nameEnglish || '',
+        isDeduplicated: Boolean(result.deduplicated),
+        onClose: () => {
+          if (this.panelManager) {
+            this.panelManager.close();
+          }
+          const mapSec = document.getElementById('map-section');
+          if (mapSec) {
+            mapSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
     } catch (err) {
       console.error('[App] Report submission error:', err);
       showToast(err.message || t('submitError'), 'error');
