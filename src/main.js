@@ -241,11 +241,6 @@ class KhaddaApp {
         }
       } else if (route.type === 'panel') {
         if (route.name) {
-          const sectionId = route.name === 'how' ? 'how' : route.name;
-          const targetEl = document.getElementById(sectionId);
-          if (targetEl) {
-            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
           this.panelManager.open(route.name);
         } else {
           this.panelManager.close();
