@@ -245,7 +245,7 @@ export class GoogleMapsAdapter extends MapAdapter {
       streetViewControl: false,
       fullscreenControl: false,
       clickableIcons: false, // Strictly prevents POIs from intercepting clicks
-      gestureHandling: 'cooperative', // 2-finger pan on mobile, Ctrl+scroll on desktop
+      gestureHandling: 'greedy', // 1-finger pan on mobile without 2-finger popup overlay
       backgroundColor: '#F8FAFC',
       minZoom: 4,
       maxZoom: 19,

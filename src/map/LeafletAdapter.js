@@ -37,8 +37,8 @@ export class LeafletAdapter extends MapAdapter {
       zoom: options.zoom || this.defaultZoom,
       zoomControl: false,
       attributionControl: true,
-      scrollWheelZoom: false, // Cooperative zoom: requires Ctrl on desktop
-      dragging: !isTouch,      // Single touch does not drag, 2 fingers drag
+      scrollWheelZoom: true,
+      dragging: true, // Single finger drag enabled on mobile
       maxBounds: [
         [4.0, 65.0],  // Southwest India buffer
         [39.0, 100.0] // Northeast India buffer
@@ -132,26 +132,7 @@ export class LeafletAdapter extends MapAdapter {
       }, 1200);
     };
 
-    // Mobile touch handling: 2 fingers pan, 1 finger scrolls page & shows hint
-    container.addEventListener('touchstart', (e) => {
-      if (e.touches.length >= 2) {
-        this.map.dragging.enable();
-      } else {
-        this.map.dragging.disable();
-      }
-    }, { passive: true });
-
-    container.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 1) {
-        showHint(t('gestureHintMobile'));
-      }
-    }, { passive: true });
-
-    container.addEventListener('touchend', () => {
-      this.map.dragging.disable();
-    }, { passive: true });
-
-    // Desktop wheel handling: Ctrl+wheel zooms, wheel alone scrolls page smoothly without showing popup message
+    // Desktop wheel handling
     container.addEventListener('wheel', (e) => {
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
