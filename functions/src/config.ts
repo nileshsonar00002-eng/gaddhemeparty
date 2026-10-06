@@ -3,14 +3,14 @@
  * Single file to easily adjust limits, cooldowns, and thresholds across Cloud Functions.
  */
 export const ANTI_SPAM_CONFIG = {
-  // Maximum total counted actions (new pin OR +1 upvote OR 20m duplicate report) per user in rolling 24 hours
-  MAX_ACTIONS_PER_USER_PER_24H: 5,
+  // Maximum total counted actions (new pin OR +1 upvote OR 20m duplicate report) per user in rolling 24 hours (disabled temporarily as requested)
+  MAX_ACTIONS_PER_USER_PER_24H: 999999,
 
   // Cooldown window before a user can report or +1 the same pin again (in hours)
   SAME_PIN_COOLDOWN_HOURS: 24,
 
   // Maximum total actions allowed per IP address in rolling 24 hours (shared carrier/Wi-Fi friendly)
-  MAX_ACTIONS_PER_IP_PER_24H: 30,
+  MAX_ACTIONS_PER_IP_PER_24H: 999999,
 
   // Deduplication radius: a new report within 5 meters of an existing pin is converted to a +1
   DUPLICATE_RADIUS_M: 5,

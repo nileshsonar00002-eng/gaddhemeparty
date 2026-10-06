@@ -84,7 +84,7 @@ export function renderReportForm(container, options = {}) {
               ? 'bg-[var(--danger)]/15 text-[var(--danger)] border border-[var(--danger)]/30'
               : 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
           }">
-            ${t('reportsRemainingBadge', { count: quota.remaining })}
+            ${quota.isUnlimited ? (isHindi ? 'असीमित रिपोर्ट' : 'Unlimited Reports') : t('reportsRemainingBadge', { count: quota.remaining })}
           </span>
         </div>
 

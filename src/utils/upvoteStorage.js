@@ -1,5 +1,6 @@
 const ACTIONS_KEY = 'khadda_user_actions_v2';
 const UPVOTES_KEY = 'khadda_user_upvoted_pins_v1';
+export const REPORT_LIMIT_ENABLED = false; // Daily 5-report limit disabled for now as requested
 const MAX_ACTIONS_PER_DAY = 5;
 const ROLLING_24H_MS = 24 * 60 * 60 * 1000;
 
@@ -18,8 +19,22 @@ function getStoredActions() {
 
 export function getActionQuota() {
   const actions = getStoredActions();
-  const used = Math.min(MAX_ACTIONS_PER_DAY, actions.length);
-  const remaining = Math.max(0, MAX_ACTIONS_PER_DAY - used);
+  const used = actions.length;
+
+  if (!REPORT_LIMIT_ENABLED) {
+    return {
+      totalLimit: null,
+      used,
+      remaining: Infinity,
+      nextAvailableAt: null,
+      waitFormatted: '',
+      isLimitReached: false,
+      isUnlimited: true,
+    };
+  }
+
+  const cappedUsed = Math.min(MAX_ACTIONS_PER_DAY, actions.length);
+  const remaining = Math.max(0, MAX_ACTIONS_PER_DAY - cappedUsed);
 
   let nextAvailableAt = null;
   let waitFormatted = '';
@@ -39,11 +54,12 @@ export function getActionQuota() {
 
   return {
     totalLimit: MAX_ACTIONS_PER_DAY,
-    used,
+    used: cappedUsed,
     remaining,
     nextAvailableAt,
     waitFormatted,
     isLimitReached: remaining === 0,
+    isUnlimited: false,
   };
 }
 
