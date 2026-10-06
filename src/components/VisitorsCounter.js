@@ -28,9 +28,9 @@ export function initVisitorsCounter(mountId = 'visitors-counter-mount') {
     // Clean dark color theme text, NO background box, NO emoji, CAPITAL text
     container.innerHTML = `
       <div class="w-full py-3 px-4 text-center select-none bg-transparent">
-        <p class="inline-flex items-center justify-center gap-2 text-sm sm:text-base font-heading font-black text-[#2B100C] dark:text-[#F9F2E8] tracking-wider uppercase">
-          <span>${label}:</span>
-          <span class="font-mono font-black text-amber-700 dark:text-amber-400 tabular-nums">${formattedCount}</span>
+        <p class="inline-flex items-center justify-center gap-2 text-sm sm:text-base font-heading font-black text-[#2B100C] tracking-wider uppercase" style="color: #2B100C !important;">
+          <span class="inline-block" style="color: #2B100C !important;">${label}:</span>
+          <span class="font-mono font-black text-amber-700 tabular-nums" style="color: #B45309 !important;">${formattedCount}</span>
         </p>
       </div>
     `;
