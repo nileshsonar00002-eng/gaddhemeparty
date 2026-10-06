@@ -7,9 +7,9 @@ export async function openChaiTipModal(options = {}) {
   const container = document.getElementById('chai-modal-container');
   if (!container) return;
 
-  const upiId = import.meta.env.VITE_UPI_ID || 'khaddawali@upi';
-  const payeeName = import.meta.env.VITE_UPI_PAYEE_NAME || 'GaddheMeParty';
-  const upiDeepLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&cu=INR&tn=Tip%20Server%20Chai`;
+  const upiId = import.meta.env.VITE_UPI_ID || 'nileshbagulkhan763100.rzp@rxairtel';
+  const payeeName = import.meta.env.VITE_UPI_PAYEE_NAME || 'ROADTOK NILESH BAGUL';
+  const upiDeepLink = import.meta.env.VITE_UPI_DEEPLINK || 'upi://pay?cu=INR&mc=7311&mode=19&pa=nileshbagulkhan763100.rzp@rxairtel&tn=Payment%20To%20ROADTOK%20NILESH%20BAGUL&tr=TkbO63RygIJr6zqrv2';
 
   const closeModal = (notifyManager = true) => {
     container.innerHTML = '';
