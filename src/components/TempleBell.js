@@ -89,17 +89,24 @@ export class TempleBellWidget {
     if (this.unsubscribeRealtime) return;
     this.unsubscribeRealtime = subscribeToBellRings((serverCount) => {
       if (typeof serverCount === 'number' && serverCount > 0) {
+        const hasIncreased = serverCount > this.ringCount;
         this.ringCount = Math.max(this.ringCount, serverCount);
         this.saveRings(this.ringCount);
-        this.updateCounterDOM();
+        this.updateCounterDOM(hasIncreased);
       }
     });
   }
 
-  updateCounterDOM() {
+  updateCounterDOM(animate = false) {
     const counterText = document.getElementById('bell-counter-text');
     if (counterText) {
       counterText.textContent = this.ringCount.toLocaleString('en-IN');
+      if (animate) {
+        counterText.classList.add('text-[var(--primary)]', 'scale-110');
+        setTimeout(() => {
+          counterText.classList.remove('text-[var(--primary)]', 'scale-110');
+        }, 300);
+      }
     }
   }
 
@@ -109,8 +116,8 @@ export class TempleBellWidget {
       const num = parseInt(saved, 10);
       if (!isNaN(num) && num > 0) return num;
     }
-    // Realistic default baseline visitor count
-    return 1248;
+    // Baseline visitor count matching live Firestore sync
+    return 1282;
   }
 
   saveRings(count) {
@@ -366,15 +373,8 @@ export class TempleBellWidget {
     // 3. Atomically update Firestore counter for all connected users
     recordBellRing();
 
-    // Update Counter UI
-    const counterText = document.getElementById('bell-counter-text');
-    if (counterText) {
-      counterText.textContent = this.ringCount.toLocaleString('en-IN');
-      counterText.classList.add('text-[var(--primary)]', 'scale-110');
-      setTimeout(() => {
-        counterText.classList.remove('text-[var(--primary)]', 'scale-110');
-      }, 300);
-    }
+    // Update Counter UI with animation
+    this.updateCounterDOM(true);
 
     // 3. Trigger Physics Pendulum Swing Animation on Bell Assembly & Clapper
     const bellAssembly = document.getElementById('bell-pendulum-assembly');

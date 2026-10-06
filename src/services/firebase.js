@@ -15,6 +15,7 @@ import {
   doc,
   addDoc,
   getDocs,
+  getDoc,
   updateDoc,
   setDoc,
   increment,
@@ -583,23 +584,94 @@ export async function recordVisitorSession() {
 
 /**
  * Record a bell ring atomically in Firestore for multi-user sync
+ * Uses Firestore SDK with atomic REST commit transform fallback
  */
 export async function recordBellRing() {
+  let recorded = false;
   try {
     const statsRef = doc(db, 'stats', 'global');
     await setDoc(statsRef, { bellRings: increment(1) }, { merge: true });
+    recorded = true;
   } catch (err) {
-    console.warn('[Firebase] Bell ring increment notice:', err);
+    console.warn('[Firebase] Bell ring SDK notice, using atomic REST fallback:', err);
+  }
+
+  // Resilient fallback: Firestore REST documents:commit atomic field transform
+  if (!recorded) {
+    try {
+      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'mahareel-2f558';
+      await fetch(
+        `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:commit`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            writes: [
+              {
+                transform: {
+                  document: `projects/${projectId}/databases/(default)/documents/stats/global`,
+                  fieldTransforms: [
+                    {
+                      fieldPath: 'bellRings',
+                      increment: { integerValue: '1' }
+                    }
+                  ]
+                }
+              }
+            ]
+          })
+        }
+      );
+    } catch (restErr) {
+      console.warn('[Firebase] Bell ring REST fallback notice:', restErr);
+    }
   }
 }
 
 /**
  * Real-time listener for Temple Bell ring counter
+ * Combines instant onSnapshot push updates with immediate initial fetch & background poll
  */
 export function subscribeToBellRings(onCountUpdated) {
+  let isCleanedUp = false;
+  let pollTimer = null;
+
+  const fetchDirect = async () => {
+    if (isCleanedUp) return;
+    try {
+      const statsDoc = doc(db, 'stats', 'global');
+      const snap = await getDoc(statsDoc);
+      if (snap.exists() && typeof snap.data().bellRings === 'number') {
+        onCountUpdated(snap.data().bellRings);
+        return;
+      }
+    } catch (_) {}
+
+    // REST fallback if SDK offline
+    try {
+      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'mahareel-2f558';
+      const res = await fetch(`https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/stats/global`);
+      if (res.ok) {
+        const data = await res.json();
+        const rings = Number(data.fields?.bellRings?.integerValue);
+        if (!isNaN(rings) && rings > 0) {
+          onCountUpdated(rings);
+        }
+      }
+    } catch (_) {}
+  };
+
+  // Immediate initial load
+  fetchDirect();
+
+  // Background poll every 8s in case socket is throttled
+  pollTimer = setInterval(fetchDirect, 8000);
+
+  // Real-time Firestore snapshot listener
+  let unsubSnapshot = () => {};
   try {
     const statsDoc = doc(db, 'stats', 'global');
-    return onSnapshot(
+    unsubSnapshot = onSnapshot(
       statsDoc,
       (snap) => {
         if (snap.exists()) {
@@ -614,8 +686,14 @@ export function subscribeToBellRings(onCountUpdated) {
       }
     );
   } catch (e) {
-    return () => {};
+    // onSnapshot failed, polling handles it
   }
+
+  return () => {
+    isCleanedUp = true;
+    if (pollTimer) clearInterval(pollTimer);
+    try { unsubSnapshot(); } catch (_) {}
+  };
 }
 
 
