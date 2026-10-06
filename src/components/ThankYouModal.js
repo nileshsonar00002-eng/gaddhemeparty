@@ -50,7 +50,9 @@ export function openThankYouModal(options = {}) {
 
         <!-- Success Animated Badge / Icon -->
         <div class="w-16 h-16 mx-auto rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-lg animate-bounce">
-          ${getLucideIcon('check-circle-2', 'w-9 h-9')}
+          <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
         </div>
 
         <!-- Text Header -->
