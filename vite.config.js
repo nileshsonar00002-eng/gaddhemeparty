@@ -15,8 +15,8 @@ export default defineConfig({
         enabled: false
       },
       manifest: {
-        name: 'Gaddhe Me Party - Road Pothole Tracker',
-        short_name: 'GaddheMeParty',
+        name: 'RoadTok',
+        short_name: 'RoadTok',
         description: 'Report & track road potholes across India with zero login.',
         theme_color: '#521F17',
         background_color: '#F9F2E8',
