@@ -62,9 +62,6 @@ export async function openChaiTipModal(options = {}) {
           <div class="bg-white p-2.5 rounded-xl inline-block shadow-xs border border-[var(--border)]">
             <canvas id="upi-qr-canvas" class="w-32 h-32 mx-auto"></canvas>
           </div>
-          <div class="text-[10px] font-mono text-[var(--muted)]">
-            UPI: <span class="text-[var(--text)] font-semibold">${upiId}</span>
-          </div>
         </div>
       </div>
     </div>
