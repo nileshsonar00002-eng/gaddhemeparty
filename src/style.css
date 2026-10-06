@@ -1004,9 +1004,8 @@ html, body {
   z-index: 999990 !important;
 }
 
-/* Lock page scroll during map location picking so only map is interactive */
+/* Keep touch interaction smooth during map location picking */
 body.map-confirm-active {
-  overflow: hidden !important;
   touch-action: pan-x pan-y pinch-zoom;
 }
 

@@ -159,6 +159,9 @@ export async function getLiveUserLocation(options = {}) {
     fallbackToCache = true
   } = options;
 
+  const effectiveMaxAge = fallbackToCache ? maximumAge : 0;
+  const gpsTimeout = Math.max(timeout, 7500);
+
   // If a request is already running, reuse it
   if (activeLocationPromise) {
     return activeLocationPromise;
@@ -169,7 +172,7 @@ export async function getLiveUserLocation(options = {}) {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
       try {
         const highAccCoords = await new Promise((resolve, reject) => {
-          const timer = setTimeout(() => reject(new Error('GPS Timeout')), Math.min(timeout, 5000));
+          const timer = setTimeout(() => reject(new Error('GPS Timeout')), gpsTimeout + 500);
           navigator.geolocation.getCurrentPosition(
             (pos) => {
               clearTimeout(timer);
@@ -185,7 +188,7 @@ export async function getLiveUserLocation(options = {}) {
               clearTimeout(timer);
               reject(err);
             },
-            { enableHighAccuracy: true, timeout: Math.min(timeout, 5000), maximumAge }
+            { enableHighAccuracy: true, timeout: gpsTimeout, maximumAge: effectiveMaxAge }
           );
         });
 
@@ -198,7 +201,7 @@ export async function getLiveUserLocation(options = {}) {
         // Tier 2: Try Browser Geolocation (Standard Accuracy - Wi-Fi/Cell)
         try {
           const stdCoords = await new Promise((resolve, reject) => {
-            const timer = setTimeout(() => reject(new Error('Wi-Fi Geolocation Timeout')), 4000);
+            const timer = setTimeout(() => reject(new Error('Wi-Fi Geolocation Timeout')), 4500);
             navigator.geolocation.getCurrentPosition(
               (pos) => {
                 clearTimeout(timer);
@@ -214,7 +217,7 @@ export async function getLiveUserLocation(options = {}) {
                 clearTimeout(timer);
                 reject(err);
               },
-              { enableHighAccuracy: false, timeout: 4000, maximumAge: 300000 }
+              { enableHighAccuracy: false, timeout: 4000, maximumAge: effectiveMaxAge || 300000 }
             );
           });
 

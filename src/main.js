@@ -736,14 +736,38 @@ class KhaddaApp {
   async locateUserAndCenter() {
     showToast(t('locating'), 'info', 2000);
     try {
-      const coords = await getLiveUserLocation({ enableHighAccuracy: true, timeout: 12000, fallbackToCache: false });
+      const coords = await getLiveUserLocation({ enableHighAccuracy: true, timeout: 10000, fallbackToCache: false });
       this.userCoords = coords;
       this.realDeviceGps = coords;
       setRealDeviceGps(coords, coords.source || 'gps');
       if (this.mapAdapter) {
         this.mapAdapter.setUserLocationMarker(coords.lat, coords.lng);
-        this.mapAdapter.setView(coords.lat, coords.lng, 16);
+        this.mapAdapter.setView(coords.lat, coords.lng, 18, true);
+        this.mapAdapter.resize();
       }
+
+      // If adjust-on-map / confirm bar is currently active, immediately snap confirm marker and bar display
+      const confirmBarEl = document.getElementById('map-confirm-bar');
+      if (confirmBarEl && !confirmBarEl.classList.contains('hidden')) {
+        if (this.mapAdapter) {
+          this.mapAdapter.setConfirmMarkerPosition?.(coords.lat, coords.lng);
+          this.mapAdapter.setAccuracyCircle?.(coords.lat, coords.lng, 20000);
+        }
+        const coordsDisplay = document.getElementById('confirm-bar-coords');
+        if (coordsDisplay) {
+          coordsDisplay.textContent = `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
+        }
+        const accDisplay = document.getElementById('confirm-bar-acc');
+        if (accDisplay) {
+          accDisplay.textContent = 'सटीक पिन / Pin Placed';
+          accDisplay.className = 'tabular-nums text-[10px] font-medium px-2 py-0.5 rounded-md bg-red-900/80 text-red-200 border border-red-700/60';
+        }
+        const doneBtn = document.getElementById('btn-done-confirm-map');
+        if (doneBtn) {
+          doneBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }
+
       showToast(t('locationFound'), 'success');
     } catch (err) {
       console.warn('[App] Locate user failed:', err);
@@ -762,10 +786,8 @@ class KhaddaApp {
     // 1. Close / hide bottom sheet temporarily
     this.bottomSheet.close(false);
 
-    // 2. Lock page background scrolling so only the map section is visible & interactive
+    // 2. Mark confirm mode
     document.body.classList.add('map-confirm-active');
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
 
     // 3. Show floating confirm bar
     const confirmBarEl = document.getElementById('map-confirm-bar');
@@ -778,10 +800,25 @@ class KhaddaApp {
       confirmBarEl.classList.remove('hidden');
     }
 
-    // 4. Scroll to map section smoothly
+    // 4. Scroll to map section smoothly with header offset (never cut off map or hero)
     const mapSection = document.getElementById('map-section');
     if (mapSection) {
-      mapSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const navHeader = document.querySelector('header');
+      const headerOffset = navHeader ? navHeader.offsetHeight : 64;
+      const elementPosition = mapSection.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth'
+      });
+    }
+
+    // Multi-stage resize triggers so all Google Maps tiles load 100% full without blank areas
+    if (this.mapAdapter) {
+      this.mapAdapter.resize();
+      setTimeout(() => this.mapAdapter?.resize(), 150);
+      setTimeout(() => this.mapAdapter?.resize(), 350);
+      setTimeout(() => this.mapAdapter?.resize(), 600);
     }
 
     // 5. Target initial position
@@ -819,7 +856,7 @@ class KhaddaApp {
 
     // 6. Place interactive draggable pin marker & 20km boundary circle on main map
     if (this.mapAdapter) {
-      this.mapAdapter.setView(activeCoords.lat, activeCoords.lng, 18);
+      this.mapAdapter.setView(activeCoords.lat, activeCoords.lng, 18, true);
       if (realGps && typeof realGps.lat === 'number') {
         this.mapAdapter.setUserLocationMarker?.(realGps.lat, realGps.lng);
         this.mapAdapter.setAccuracyCircle?.(realGps.lat, realGps.lng, 20000);
@@ -827,20 +864,32 @@ class KhaddaApp {
         this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, 20000);
       }
 
+      let userHasMovedPin = false;
+
       // Background fresh live GPS query to ensure latest live position is rendered
-      getLiveUserLocation({ enableHighAccuracy: true, timeout: 5000, fallbackToCache: true })
+      getLiveUserLocation({ enableHighAccuracy: true, timeout: 8000, fallbackToCache: false })
         .then((freshGps) => {
           if (freshGps && freshGps.lat && freshGps.lng) {
             realGps = freshGps;
             this.realDeviceGps = freshGps;
+            this.userCoords = freshGps;
             setRealDeviceGps(freshGps, freshGps.source || 'gps');
             this.mapAdapter?.setUserLocationMarker?.(freshGps.lat, freshGps.lng);
             this.mapAdapter?.setAccuracyCircle?.(freshGps.lat, freshGps.lng, 20000);
+
+            // If user has not dragged or moved the pin yet, snap pin and view to live GPS
+            if (!userHasMovedPin) {
+              activeCoords = { lat: freshGps.lat, lng: freshGps.lng };
+              this.mapAdapter?.setConfirmMarkerPosition?.(freshGps.lat, freshGps.lng);
+              this.mapAdapter?.setView?.(freshGps.lat, freshGps.lng, 18, true);
+              updateBarDisplay(activeCoords);
+            }
           }
         })
         .catch(() => {});
 
       this.mapAdapter.setConfirmLocationMarker?.(activeCoords.lat, activeCoords.lng, (newPos, isEnd) => {
+        userHasMovedPin = true;
         const distFromOrigin = (realGps && typeof realGps.lat === 'number') 
           ? haversineDistanceKm(realGps.lat, realGps.lng, newPos.lat, newPos.lng) 
           : 0;
@@ -850,7 +899,7 @@ class KhaddaApp {
           if (realGps && typeof realGps.lat === 'number') {
             activeCoords = { lat: realGps.lat, lng: realGps.lng };
             this.mapAdapter?.setConfirmMarkerPosition?.(realGps.lat, realGps.lng);
-            this.mapAdapter?.setView(realGps.lat, realGps.lng, 17);
+            this.mapAdapter?.setView(realGps.lat, realGps.lng, 17, true);
           }
           updateBarDisplay(activeCoords);
           return;
@@ -864,8 +913,6 @@ class KhaddaApp {
     // Cleanup & Exit Confirm Mode - Restore page scrolling
     const cleanupConfirmMode = () => {
       document.body.classList.remove('map-confirm-active');
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
       if (confirmBarEl) {
         confirmBarEl.classList.add('hidden');
       }
@@ -885,7 +932,7 @@ class KhaddaApp {
         if (realGps && typeof realGps.lat === 'number') {
           activeCoords = { lat: realGps.lat, lng: realGps.lng };
           this.mapAdapter?.setConfirmMarkerPosition?.(realGps.lat, realGps.lng);
-          this.mapAdapter?.setView(realGps.lat, realGps.lng, 17);
+          this.mapAdapter?.setView(realGps.lat, realGps.lng, 17, true);
         }
         updateBarDisplay(activeCoords);
         return;

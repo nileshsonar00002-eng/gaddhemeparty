@@ -347,10 +347,15 @@ export class GoogleMapsAdapter extends MapAdapter {
     }
   }
 
-  setView(lat, lng, zoom = 16) {
+  setView(lat, lng, zoom = 16, immediate = false) {
     if (!this.map) return;
-    this.map.panTo({ lat, lng });
+    if (immediate) {
+      this.map.setCenter({ lat, lng });
+    } else {
+      this.map.panTo({ lat, lng });
+    }
     this.map.setZoom(zoom);
+    this.resize();
   }
 
   zoomIn() {
@@ -683,6 +688,7 @@ export class GoogleMapsAdapter extends MapAdapter {
   setConfirmLocationMarker(lat, lng, onPositionChange) {
     this.clearConfirmLocationMarker();
     if (!this.map || !window.google || !window.google.maps) return;
+    this.resize();
 
     // Pulsing / Blinking aura overlay behind the manual draggable pin
     const pulseHtml = `
