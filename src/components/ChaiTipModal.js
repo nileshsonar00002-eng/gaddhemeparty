@@ -12,13 +12,21 @@ export async function openChaiTipModal(options = {}) {
   const upiDeepLink = import.meta.env.VITE_UPI_DEEPLINK || 'upi://pay?cu=INR&mc=7311&mode=19&pa=nileshbagulkhan763100.rzp@rxairtel&tn=Payment%20To%20ROADTOK%20NILESH%20BAGUL&tr=TkbO63RygIJr6zqrv2';
 
   const closeModal = (notifyManager = true) => {
-    container.innerHTML = '';
+    const backdrop = document.getElementById('chai-backdrop');
+    if (backdrop) backdrop.classList.add('hidden');
     if (notifyManager) {
       modalManager.closeActiveModal();
     } else {
       modalManager.notifyClosed('chai-tip-modal');
     }
   };
+
+  const existingBackdrop = document.getElementById('chai-backdrop');
+  if (existingBackdrop) {
+    existingBackdrop.classList.remove('hidden');
+    modalManager.openModal('chai-tip-modal', () => closeModal(false));
+    return;
+  }
 
   modalManager.openModal('chai-tip-modal', () => closeModal(false));
 
@@ -45,15 +53,18 @@ export async function openChaiTipModal(options = {}) {
           </div>
         </div>
 
-        <!-- Mobile: Direct UPI Deep Link -->
-        <div class="pt-1">
-          <a
-            href="${upiDeepLink}"
-            class="btn-primary w-full py-2.5 px-4 text-sm font-semibold"
-          >
-            ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
-            <span>${t('payViaUpi')}</span>
-          </a>
+        <!-- Razorpay Official Payment Button -->
+        <div class="pt-1 flex items-center justify-center w-full min-h-[44px]">
+          <form id="razorpay-button-form" class="w-full flex items-center justify-center relative">
+            <a
+              id="razorpay-btn-placeholder"
+              href="${upiDeepLink}"
+              class="btn-primary w-full py-2.5 px-4 text-sm font-semibold flex items-center justify-center gap-2"
+            >
+              ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
+              <span>${t('payViaUpi')}</span>
+            </a>
+          </form>
         </div>
 
         <!-- Desktop QR Code Fallback -->
@@ -66,6 +77,30 @@ export async function openChaiTipModal(options = {}) {
       </div>
     </div>
   `;
+
+  // Dynamically load Razorpay Payment Button into the form
+  const rzpForm = document.getElementById('razorpay-button-form');
+  if (rzpForm && !rzpForm.querySelector('script')) {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
+    script.setAttribute('data-payment_button_id', 'pl_Tkbbd7Fd2tkHSN');
+    script.async = true;
+    script.onload = () => {
+      const placeholder = document.getElementById('razorpay-btn-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+    };
+    rzpForm.appendChild(script);
+
+    // Mutation observer in case Razorpay mounts slightly after script load
+    const observer = new MutationObserver(() => {
+      if (rzpForm.querySelector('.razorpay-payment-button')) {
+        const placeholder = document.getElementById('razorpay-btn-placeholder');
+        if (placeholder) placeholder.style.display = 'none';
+        observer.disconnect();
+      }
+    });
+    observer.observe(rzpForm, { childList: true, subtree: true });
+  }
 
   // Generate QR Code on canvas
   const canvas = document.getElementById('upi-qr-canvas');
