@@ -2,14 +2,14 @@ import { t, getLanguage } from '../utils/i18n';
 import { subscribeToBellRings, recordBellRing } from '../services/firebase';
 
 /**
- * Interactive 3D Animated Temple Bell (Ghanta) Widget
- * - Pure SVG & CSS 3D metallic brass textures (zero external image assets)
- * - Authentic Temple Bell acoustic synthesis via Web Audio API (zero external MP3)
- * - Realistic counter-swing pendulum physics (dome + clapper counter-motion)
- * - Divine shockwave ripples & persistent visitor chime counter
+ * Modern Interactive 3D Road Warning Beacon Widget
+ * - Industrial amber/yellow hazard warning beacon (replaces religious temple bell)
+ * - Revolving internal reflector beam & smooth pulsing amber glow
+ * - Synthesized crisp electronic radar alert audio via Web Audio API
+ * - Interactive click strobe flash & realtime synced community alert counter
  */
 
-class TempleBellAudio {
+class WarningBeaconAudio {
   constructor() {
     this.ctx = null;
   }
@@ -26,50 +26,46 @@ class TempleBellAudio {
     }
   }
 
-  playChime() {
+  playAlert() {
     try {
       this.initContext();
       if (!this.ctx) return;
 
       const now = this.ctx.currentTime;
-      const masterGain = this.ctx.createGain();
-      masterGain.gain.setValueAtTime(0.85, now);
-      masterGain.gain.exponentialRampToValueAtTime(0.0008, now + 3.8);
-      masterGain.connect(this.ctx.destination);
 
-      // Authentic Temple Bell partials (Hum tone, Prime, Tierce, Quint, Nominal, Strike transient)
-      const harmonics = [
-        { freq: 220, gain: 0.45, decay: 3.6 },   // Hum tone
-        { freq: 440, gain: 0.90, decay: 3.2 },   // Fundamental prime tone
-        { freq: 528, gain: 0.65, decay: 2.6 },   // Tierce (minor 3rd)
-        { freq: 660, gain: 0.50, decay: 2.2 },   // Quint (5th)
-        { freq: 880, gain: 0.70, decay: 1.8 },   // Nominal octave
-        { freq: 1320, gain: 0.35, decay: 1.2 },  // Upper harmonic
-        { freq: 1760, gain: 0.40, decay: 0.9 },  // Super octave
-        { freq: 2640, gain: 0.30, decay: 0.35 }, // Clapper metallic strike
-        { freq: 3520, gain: 0.18, decay: 0.12 }  // High sparkle ping
-      ];
+      // Crisp high-tech road hazard radar chirp
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-      harmonics.forEach(({ freq, gain, decay }) => {
-        const osc = this.ctx.createOscillator();
-        const oscGain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(580, now);
+      osc.frequency.exponentialRampToValueAtTime(940, now + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(480, now + 0.32);
 
-        // Slight frequency spread for rich brass resonance
-        const detune = (Math.random() - 0.5) * 3.5;
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq + detune, now);
+      gain.gain.setValueAtTime(0.38, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
 
-        oscGain.gain.setValueAtTime(gain, now);
-        oscGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+      // Secondary overtone for warm metallic presence
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(1160, now);
+      osc2.frequency.exponentialRampToValueAtTime(880, now + 0.22);
 
-        osc.connect(oscGain);
-        oscGain.connect(masterGain);
+      gain2.gain.setValueAtTime(0.16, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
 
-        osc.start(now);
-        osc.stop(now + decay);
-      });
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc2.connect(gain2);
+      gain2.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.38);
+      osc2.start(now);
+      osc2.stop(now + 0.28);
     } catch (e) {
-      console.warn('[TempleBell] Audio playback notice:', e);
+      console.warn('[WarningBeacon] Audio playback notice:', e);
     }
   }
 }
@@ -77,9 +73,9 @@ class TempleBellAudio {
 export class TempleBellWidget {
   constructor(mountId = 'temple-bell-mount') {
     this.mountId = mountId;
-    this.audio = new TempleBellAudio();
+    this.audio = new WarningBeaconAudio();
     this.ringCount = this.getSavedRings();
-    this.isRinging = false;
+    this.isAlerting = false;
     this.animTimer = null;
     this.unsubscribeRealtime = null;
     this.initRealtimeSync();
@@ -102,9 +98,9 @@ export class TempleBellWidget {
     if (counterText) {
       counterText.textContent = this.ringCount.toLocaleString('en-IN');
       if (animate) {
-        counterText.classList.add('text-[var(--primary)]', 'scale-110');
+        counterText.classList.add('text-amber-500', 'scale-110');
         setTimeout(() => {
-          counterText.classList.remove('text-[var(--primary)]', 'scale-110');
+          counterText.classList.remove('text-amber-500', 'scale-110');
         }, 300);
       }
     }
@@ -134,212 +130,195 @@ export class TempleBellWidget {
     const isHindi = getLanguage() === 'hindi';
 
     container.innerHTML = `
-      <div class="temple-bell-wrapper relative flex flex-col items-center justify-center select-none py-2 cursor-pointer group" title="${isHindi ? 'घंटी बजाएं (Click to Ring)' : 'Ring Temple Bell'}">
+      <div class="road-beacon-wrapper relative flex flex-col items-center justify-center select-none py-2 cursor-pointer group" title="${isHindi ? 'सड़क सुरक्षा अलर्ट (Click for Road Alert)' : 'Trigger Road Safety Alert'}">
         
-        <!-- Divine Golden Glow & Shockwave Emitter -->
-        <div id="bell-glow-emitter" class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-          <div class="bell-divine-aura w-44 h-44 rounded-full bg-amber-400/20 blur-xl opacity-0 transition-opacity duration-300"></div>
-          <div id="bell-shockwave" class="absolute w-20 h-20 rounded-full border-2 border-amber-300/80 opacity-0 pointer-events-none"></div>
+        <!-- Ambient Amber Glow & Circular Warning Pulse Emitter -->
+        <div id="beacon-glow-emitter" class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+          <div class="beacon-ambient-glow w-44 h-44 rounded-full bg-amber-500/20 blur-2xl transition-opacity duration-300"></div>
+          <div id="beacon-warning-wave" class="beacon-pulse-ring absolute w-24 h-24 rounded-full border-2 border-amber-400/70 pointer-events-none"></div>
+          <div id="beacon-strobe-shockwave" class="absolute w-20 h-20 rounded-full border-2 border-amber-300 opacity-0 pointer-events-none"></div>
         </div>
 
-        <!-- Floating +1 Sparkle Burst Container -->
-        <div id="bell-sparkles-container" class="absolute inset-0 pointer-events-none z-40 overflow-visible flex items-center justify-center"></div>
+        <!-- Floating +1 Alert Particle Burst Container -->
+        <div id="beacon-sparkles-container" class="absolute inset-0 pointer-events-none z-40 overflow-visible flex items-center justify-center"></div>
 
-        <!-- Hanging Rig: Unified 3D Brass Chain + Bell Dome + Internal Clapper Assembly -->
-        <div id="bell-pendulum-assembly" class="relative z-10 flex flex-col items-center transform-origin-top transition-transform duration-100">
-          <svg class="w-40 h-52 sm:w-48 sm:h-60 overflow-visible drop-shadow-2xl" viewBox="0 0 160 210" fill="none">
+        <!-- 3D Realistic Road Hazard Warning Beacon Rig -->
+        <div id="beacon-assembly" class="relative z-10 flex flex-col items-center animate-beacon-float transition-transform duration-150">
+          <svg class="w-36 h-44 sm:w-44 sm:h-52 overflow-visible drop-shadow-2xl" viewBox="0 0 160 180" fill="none">
             <defs>
-              <!-- 3D Cylindrical Brass Body Gradient -->
-              <linearGradient id="brassBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#4A2E05" />
-                <stop offset="15%" stop-color="#9C6B17" />
-                <stop offset="35%" stop-color="#D4AF37" />
-                <stop offset="52%" stop-color="#FFF6BA" />
-                <stop offset="70%" stop-color="#D4AF37" />
-                <stop offset="88%" stop-color="#8C5C10" />
-                <stop offset="100%" stop-color="#382003" />
+              <!-- Amber Lens Cylindrical Gradient -->
+              <linearGradient id="amberLensGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#92400E" />
+                <stop offset="15%" stop-color="#D97706" />
+                <stop offset="35%" stop-color="#F59E0B" />
+                <stop offset="50%" stop-color="#FEF08A" />
+                <stop offset="68%" stop-color="#F59E0B" />
+                <stop offset="85%" stop-color="#D97706" />
+                <stop offset="100%" stop-color="#78350F" />
               </linearGradient>
 
-              <!-- Flared Rim Bevel Gradient -->
-              <linearGradient id="brassRimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#331A02" />
-                <stop offset="20%" stop-color="#B8860B" />
-                <stop offset="50%" stop-color="#FFF8D0" />
-                <stop offset="80%" stop-color="#B8860B" />
-                <stop offset="100%" stop-color="#241201" />
-              </linearGradient>
-
-              <!-- Chain Gold Gradient -->
-              <linearGradient id="chainGold" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#5B3A07" />
-                <stop offset="25%" stop-color="#D4AF37" />
-                <stop offset="50%" stop-color="#FFF3A8" />
-                <stop offset="75%" stop-color="#AA771C" />
-                <stop offset="100%" stop-color="#3D2502" />
-              </linearGradient>
-
-              <!-- Crown Ring Radial -->
-              <radialGradient id="brassCrownRadial" cx="50%" cy="30%" r="60%">
-                <stop offset="0%" stop-color="#FFF6BA" />
-                <stop offset="60%" stop-color="#D4AF37" />
-                <stop offset="100%" stop-color="#5B3A07" />
+              <!-- Amber Dome Top Radial Gradient -->
+              <radialGradient id="amberDomeGrad" cx="50%" cy="30%" r="65%">
+                <stop offset="0%" stop-color="#FFFBEB" />
+                <stop offset="35%" stop-color="#FEF08A" />
+                <stop offset="65%" stop-color="#F59E0B" />
+                <stop offset="100%" stop-color="#92400E" />
               </radialGradient>
 
-              <!-- Clapper Ball Radial Gradient -->
-              <radialGradient id="clapperBallGrad" cx="35%" cy="35%" r="65%">
-                <stop offset="0%" stop-color="#FFF8D0" />
-                <stop offset="45%" stop-color="#D4AF37" />
-                <stop offset="80%" stop-color="#8C5C10" />
-                <stop offset="100%" stop-color="#2E1801" />
-              </radialGradient>
-
-              <!-- Clapper Rod Gradient -->
-              <linearGradient id="clapperRodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#4A2E05" />
-                <stop offset="40%" stop-color="#D4AF37" />
-                <stop offset="70%" stop-color="#FFF3A8" />
-                <stop offset="100%" stop-color="#382003" />
+              <!-- Revolving Core Spotlight Beam Gradient -->
+              <linearGradient id="revolvingBeamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255, 255, 255, 0)" />
+                <stop offset="50%" stop-color="rgba(255, 255, 255, 0.95)" />
+                <stop offset="100%" stop-color="rgba(255, 255, 255, 0)" />
               </linearGradient>
 
-              <!-- Dark Inner Cavity Gradient -->
-              <radialGradient id="innerCavityGrad" cx="50%" cy="40%" r="60%">
-                <stop offset="0%" stop-color="#080400" />
-                <stop offset="65%" stop-color="#180C02" />
-                <stop offset="100%" stop-color="#361C04" />
+              <!-- Dark Metallic Heavy Industrial Base Gradient -->
+              <linearGradient id="metalBaseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#0F172A" />
+                <stop offset="15%" stop-color="#1E293B" />
+                <stop offset="45%" stop-color="#334155" />
+                <stop offset="58%" stop-color="#475569" />
+                <stop offset="85%" stop-color="#1E293B" />
+                <stop offset="100%" stop-color="#090E17" />
+              </linearGradient>
+
+              <!-- Industrial Hex Bolt Radial -->
+              <radialGradient id="hexBoltGrad" cx="35%" cy="35%" r="60%">
+                <stop offset="0%" stop-color="#F1F5F9" />
+                <stop offset="50%" stop-color="#64748B" />
+                <stop offset="100%" stop-color="#0F172A" />
+              </radialGradient>
+
+              <!-- Internal Central Bulb Glow -->
+              <radialGradient id="internalBulbGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#FFFFFF" />
+                <stop offset="30%" stop-color="#FEF08A" />
+                <stop offset="70%" stop-color="#F59E0B" />
+                <stop offset="100%" stop-color="#B45309" />
               </radialGradient>
             </defs>
 
-            <!-- 1. Top Chain Links (Unified directly with bell crown) -->
-            <!-- Top Ceiling Hook -->
-            <path d="M68 0 H92 V6 H68 Z" fill="url(#chainGold)" />
-            <!-- Chain Link 1 -->
-            <rect x="74" y="5" width="12" height="17" rx="6" fill="none" stroke="url(#chainGold)" stroke-width="3" />
-            <!-- Chain Link 2 -->
-            <rect x="74" y="18" width="12" height="17" rx="6" fill="none" stroke="url(#chainGold)" stroke-width="3" />
-            <!-- Crown Top Ring Loop (Interlocked with Link 2 and Crown Cap) -->
-            <circle cx="80" cy="38" r="8" fill="none" stroke="url(#chainGold)" stroke-width="3.5" />
-            <circle cx="80" cy="38" r="4" fill="#FFE082" opacity="0.5" />
+            <!-- 1. HEAVY INDUSTRIAL MOUNTING BASE (Dark Slate / Charcoal) -->
+            <!-- Lower Mounting Flange -->
+            <path d="M18 132 C18 126, 142 126, 142 132 L140 148 C140 156, 20 156, 20 148 Z" fill="url(#metalBaseGrad)" stroke="#090D16" stroke-width="1.5" />
+            <!-- Flange Top Bevel Ellipse -->
+            <ellipse cx="80" cy="132" rx="61" ry="11" fill="url(#metalBaseGrad)" stroke="#475569" stroke-width="1" />
 
-            <!-- 2. Crown Base Cap & Upper Neck -->
-            <path d="M72 46 C72 40, 88 40, 88 46 Z" fill="url(#brassBodyGrad)" />
-            <ellipse cx="80" cy="46" rx="13" ry="4.5" fill="url(#brassCrownRadial)" stroke="#382003" stroke-width="1" />
+            <!-- Industrial Hex Bolts (4 Rugged Screws on the Base Flange) -->
+            <circle cx="32" cy="132" r="3.5" fill="url(#hexBoltGrad)" stroke="#090D16" stroke-width="0.8" />
+            <circle cx="58" cy="137" r="3.5" fill="url(#hexBoltGrad)" stroke="#090D16" stroke-width="0.8" />
+            <circle cx="102" cy="137" r="3.5" fill="url(#hexBoltGrad)" stroke="#090D16" stroke-width="0.8" />
+            <circle cx="128" cy="132" r="3.5" fill="url(#hexBoltGrad)" stroke="#090D16" stroke-width="0.8" />
 
-            <!-- 3. Main Bell Dome Body -->
-            <path
-              d="M72 46
-                 C72 62, 58 84, 50 106
-                 C42 124, 28 135, 24 138
-                 C22 140, 25 142, 30 142
-                 L130 142
-                 C135 142, 138 140, 136 138
-                 C132 135, 118 124, 110 106
-                 C102 84, 88 62, 88 46
-                 Z"
-              fill="url(#brassBodyGrad)"
-              stroke="#3D2502"
-              stroke-width="1.5"
-            />
+            <!-- Middle Collar Stepped Ring -->
+            <rect x="28" y="112" width="104" height="15" fill="url(#metalBaseGrad)" stroke="#090D16" stroke-width="1" />
+            <ellipse cx="80" cy="112" rx="52" ry="8" fill="url(#metalBaseGrad)" stroke="#475569" stroke-width="1" />
+            <!-- Micro Amber Safety Accent Line -->
+            <path d="M30 119 C50 125, 110 125, 130 119" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity="0.9" />
 
-            <!-- Specular Highlight Sheen -->
-            <path
-              d="M81 48
-                 C81 62, 75 82, 71 106
-                 C67 122, 60 133, 56 140
-                 L64 140
-                 C68 133, 76 122, 80 106
-                 C84 82, 88 62, 88 48
-                 Z"
-              fill="#FFF8D0"
-              opacity="0.35"
-            />
-
-            <!-- Traditional Decorative Ribs & Auspicious Dots -->
-            <!-- Ring 1 (Upper) -->
-            <path d="M63 72 C71 76, 89 76, 97 72" stroke="#5B3A07" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.65" />
-            <path d="M63 73 C71 77, 89 77, 97 73" stroke="#FFF6BA" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.8" />
-
-            <!-- Ring 2 (Middle) -->
-            <path d="M54 98 C68 104, 92 104, 106 98" stroke="#5B3A07" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.7" />
-            <path d="M54 99 C68 105, 92 105, 106 99" stroke="#FFF6BA" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85" />
-            
-            <!-- Auspicious Embossed Dots Pattern -->
-            <circle cx="62" cy="101" r="1.8" fill="#5B3A07" />
-            <circle cx="71" cy="103" r="1.8" fill="#5B3A07" />
-            <circle cx="80" cy="103.5" r="1.8" fill="#5B3A07" />
-            <circle cx="89" cy="103" r="1.8" fill="#5B3A07" />
-            <circle cx="98" cy="101" r="1.8" fill="#5B3A07" />
-
-            <!-- Ring 3 (Lower Waist) -->
-            <path d="M38 126 C58 134, 102 134, 122 126" stroke="#4A2E05" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.75" />
-            <path d="M38 127.5 C58 135.5, 102 135.5, 122 127.5" stroke="#FFF6BA" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9" />
-
-            <!-- 4. Deep Hollow Cavity (Interior Dark Depth) -->
-            <ellipse cx="80" cy="142" rx="55" ry="12" fill="#120801" />
-            <ellipse cx="80" cy="142" rx="50" ry="9" fill="url(#innerCavityGrad)" />
-
-            <!-- 5. Clapper Assembly (Latkan) - SUSPENDED FROM INSIDE THE HOLLOW CAVITY -->
-            <g id="bell-clapper-assembly" class="transition-transform duration-100">
-              <!-- Internal Hanging Joint Loop inside dark cavity -->
-              <circle cx="80" cy="137" r="2.5" fill="#4A2E05" />
-              
-              <!-- Clapper Brass Rod (Originates inside the dark hollow cavity) -->
-              <rect x="78" y="137" width="4" height="30" rx="2" fill="url(#clapperRodGrad)" stroke="#2E1801" stroke-width="0.75" />
-              
-              <!-- Weighted Brass Latkan Ball (Ghanti ka Gola) -->
-              <circle cx="80" cy="168" r="10.5" fill="url(#clapperBallGrad)" stroke="#2E1801" stroke-width="1.2" />
-              <!-- Specular Light Reflection on Ball -->
-              <ellipse cx="77" cy="164" rx="4" ry="2.5" fill="#FFFDE0" opacity="0.7" />
-              
-              <!-- Bottom Pendant Ring & Tag -->
-              <rect x="78.5" y="178" width="3" height="8" rx="1.5" fill="url(#clapperRodGrad)" stroke="#2E1801" stroke-width="0.5" />
-              <circle cx="80" cy="189" r="4.5" fill="url(#clapperBallGrad)" stroke="#382003" stroke-width="1" />
-              <circle cx="80" cy="189" r="1.8" fill="#1A0D01" />
+            <!-- 2. INTERNAL REFLECTOR CORE & BULB (Behind Fresnel Lens) -->
+            <g id="beacon-core-reflector" class="animate-beacon-core-pulse">
+              <!-- Central Halogen / LED Strobe Lamp Column -->
+              <rect x="74" y="52" width="12" height="52" rx="6" fill="url(#internalBulbGrad)" />
+              <circle cx="80" cy="74" r="10" fill="#FFFBEB" opacity="0.95" />
+              <!-- Rotating Reflector Mirror Simulation -->
+              <ellipse cx="80" cy="74" rx="34" ry="26" fill="url(#revolvingBeamGrad)" class="animate-beacon-reflector-spin" />
             </g>
 
-            <!-- 6. Front Lower Rim (Foreground Lip: sits in front of the clapper root) -->
+            <!-- 3. AMBER POLYCARBONATE FRESNEL LENS CYLINDER -->
+            <!-- Main Transparent Amber Cylinder Shell -->
             <path
-              d="M24 140
-                 C28 152, 132 152, 136 140
-                 C136 145, 132 156, 80 156
-                 C28 156, 24 145, 24 140
+              d="M32 46
+                 C32 34, 128 34, 128 46
+                 L128 112
+                 C128 124, 32 124, 32 112
                  Z"
-              fill="url(#brassRimGrad)"
-              stroke="#2E1801"
+              fill="url(#amberLensGrad)"
+              opacity="0.88"
+              stroke="#B45309"
+              stroke-width="1.8"
+            />
+
+            <!-- Optical Fresnel Horizontal Ribs (Distinctive Hazard Warning Grooves) -->
+            <path d="M34 54 C52 61, 108 61, 126 54" stroke="#FFFBEB" stroke-width="1.8" fill="none" opacity="0.75" />
+            <path d="M33 66 C52 73, 108 73, 127 66" stroke="#FEF08A" stroke-width="2" fill="none" opacity="0.70" />
+            <path d="M33 67.5 C52 74.5, 108 74.5, 127 67.5" stroke="#78350F" stroke-width="1" fill="none" opacity="0.6" />
+
+            <path d="M32 79 C52 86, 108 86, 128 79" stroke="#FFFBEB" stroke-width="2" fill="none" opacity="0.75" />
+            <path d="M32 80.5 C52 87.5, 108 87.5, 128 80.5" stroke="#78350F" stroke-width="1" fill="none" opacity="0.6" />
+
+            <path d="M33 92 C52 99, 108 99, 127 92" stroke="#FEF08A" stroke-width="2" fill="none" opacity="0.70" />
+            <path d="M33 93.5 C52 100.5, 108 100.5, 127 93.5" stroke="#78350F" stroke-width="1" fill="none" opacity="0.6" />
+
+            <path d="M34 104 C52 111, 108 111, 126 104" stroke="#FFFBEB" stroke-width="1.8" fill="none" opacity="0.75" />
+
+            <!-- 4. TOP DOME CAP (Smooth Amber Rounded Polycarbonate Crown) -->
+            <ellipse cx="80" cy="46" rx="48" ry="14" fill="url(#amberDomeGrad)" stroke="#B45309" stroke-width="1.2" />
+            <path
+              d="M32 46
+                 C32 20, 128 20, 128 46
+                 Z"
+              fill="url(#amberDomeGrad)"
+              stroke="#B45309"
               stroke-width="1.5"
             />
-            <!-- Front Rim Top Highlight Streak -->
+
+            <!-- Top Glossy Curved Glass Reflection -->
             <path
-              d="M27 141
-                 C48 150, 112 150, 133 141
-                 C112 147, 48 147, 27 141
+              d="M44 42
+                 C44 26, 116 26, 116 42
+                 C100 34, 60 34, 44 42
                  Z"
-              fill="#FFF9D6"
-              opacity="0.9"
+              fill="#FFFFFF"
+              opacity="0.55"
+            />
+
+            <!-- Side Vertical Glass Specular Sheen Streaks -->
+            <path
+              d="M42 46
+                 C42 40, 52 40, 52 46
+                 L50 112
+                 C50 115, 41 115, 41 112
+                 Z"
+              fill="#FFFFFF"
+              opacity="0.45"
+            />
+            <path
+              d="M72 40
+                 C72 36, 88 36, 88 40
+                 L86 114
+                 C86 117, 72 117, 72 114
+                 Z"
+              fill="#FFFBEB"
+              opacity="0.30"
             />
           </svg>
         </div>
 
-        <!-- Dynamic Ground Contact Shadow (Synchronizes with swing) -->
-        <div id="bell-ground-shadow" class="w-28 h-4 rounded-full bg-amber-950/20 blur-[3px] transition-all duration-300 -mt-2"></div>
+        <!-- Realistic Soft Ground Drop Shadow -->
+        <div id="beacon-ground-shadow" class="w-32 sm:w-40 h-4 rounded-full bg-slate-950/25 blur-[4px] transition-all duration-300 -mt-2"></div>
 
-        <!-- Interactive Chime Counter & Prompt Badge -->
+        <!-- Interactive Road Alert Counter & Trigger Badge -->
         <div class="mt-3 flex flex-col items-center gap-1.5 z-20">
           <button
             type="button"
             id="btn-ring-bell"
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-[var(--primary)] group-hover:shadow-lg"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-amber-500 group-hover:shadow-lg"
           >
-            <svg class="w-4 h-4 text-amber-500 animate-pulse shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <!-- Road Hazard Alert Beacon Icon -->
+            <svg class="w-4 h-4 text-amber-500 animate-pulse shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             <span id="bell-counter-text" class="tabular-nums font-mono text-[var(--text)] font-extrabold">
               ${this.ringCount.toLocaleString('en-IN')}
             </span>
             <span class="text-[11px] text-[var(--muted)] font-normal border-l border-[var(--border)] pl-2">
-              ${isHindi ? 'बजाएं' : 'Ring'}
+              ${isHindi ? 'अलर्ट' : 'Alert'}
             </span>
           </button>
           
           <span class="text-[10px] text-[var(--muted)] font-medium tracking-tight">
-            ${isHindi ? 'सड़क सुधार की घंटी बजाएं!' : 'Ring for safer Indian roads!'}
+            ${isHindi ? 'सड़क सुरक्षा अलर्ट दर्ज करें!' : 'Alert for safer Indian roads!'}
           </span>
         </div>
       </div>
@@ -349,22 +328,22 @@ export class TempleBellWidget {
   }
 
   attachEvents() {
-    const wrapper = document.querySelector('.temple-bell-wrapper');
+    const wrapper = document.querySelector('.road-beacon-wrapper');
     const ringBtn = document.getElementById('btn-ring-bell');
 
-    const handleRing = (e) => {
+    const handleAlert = (e) => {
       e?.preventDefault?.();
       e?.stopPropagation?.();
       this.ring();
     };
 
-    wrapper?.addEventListener('click', handleRing);
-    ringBtn?.addEventListener('click', handleRing);
+    wrapper?.addEventListener('click', handleAlert);
+    ringBtn?.addEventListener('click', handleAlert);
   }
 
   ring() {
-    // 1. Play Authentic Web Audio Harmonic Chime
-    this.audio.playChime();
+    // 1. Play Modern Electronic Road Safety Radar Chirp
+    this.audio.playAlert();
 
     // 2. Increment & persist counter locally
     this.ringCount += 1;
@@ -376,57 +355,49 @@ export class TempleBellWidget {
     // Update Counter UI with animation
     this.updateCounterDOM(true);
 
-    // 3. Trigger Physics Pendulum Swing Animation on Bell Assembly & Clapper
-    const bellAssembly = document.getElementById('bell-pendulum-assembly');
-    const clapper = document.getElementById('bell-clapper-assembly');
-    const aura = document.querySelector('.bell-divine-aura');
-    const shockwave = document.getElementById('bell-shockwave');
+    // 4. Trigger High-Intensity Strobe Flash on Beacon
+    const assembly = document.getElementById('beacon-assembly');
+    const strobeWave = document.getElementById('beacon-strobe-shockwave');
+    const ambientGlow = document.querySelector('.beacon-ambient-glow');
 
-    if (bellAssembly && clapper) {
-      // Clear ongoing animation class to allow rapid re-triggers
-      bellAssembly.classList.remove('animate-bell-swing');
-      clapper.classList.remove('animate-clapper-counter-swing');
-      void bellAssembly.offsetWidth; // Force reflow
-      void clapper.offsetWidth;
-
-      bellAssembly.classList.add('animate-bell-swing');
-      clapper.classList.add('animate-clapper-counter-swing');
+    if (assembly) {
+      assembly.classList.remove('animate-beacon-strobe-burst');
+      void assembly.offsetWidth; // Force reflow
+      assembly.classList.add('animate-beacon-strobe-burst');
 
       if (this.animTimer) clearTimeout(this.animTimer);
       this.animTimer = setTimeout(() => {
-        bellAssembly.classList.remove('animate-bell-swing');
-        clapper.classList.remove('animate-clapper-counter-swing');
-      }, 2400);
+        assembly.classList.remove('animate-beacon-strobe-burst');
+      }, 800);
     }
 
-    // 4. Divine Aura Flash & Ripple Shockwave Burst
-    if (aura) {
-      aura.classList.add('opacity-100', 'scale-125');
+    if (ambientGlow) {
+      ambientGlow.classList.add('opacity-100', 'scale-135', 'bg-amber-400/40');
       setTimeout(() => {
-        aura.classList.remove('opacity-100', 'scale-125');
-      }, 600);
+        ambientGlow.classList.remove('opacity-100', 'scale-135', 'bg-amber-400/40');
+      }, 550);
     }
 
-    if (shockwave) {
-      shockwave.classList.remove('animate-shockwave-burst');
-      void shockwave.offsetWidth;
-      shockwave.classList.add('animate-shockwave-burst');
+    if (strobeWave) {
+      strobeWave.classList.remove('animate-beacon-shockwave-burst');
+      void strobeWave.offsetWidth;
+      strobeWave.classList.add('animate-beacon-shockwave-burst');
     }
 
-    // 5. Spawn Floating +1 Particle Sparkle
+    // 5. Spawn Floating +1 Alert Particle
     this.spawnSparkle();
   }
 
   spawnSparkle() {
-    const container = document.getElementById('bell-sparkles-container');
+    const container = document.getElementById('beacon-sparkles-container');
     if (!container) return;
 
     const sparkle = document.createElement('div');
-    const randomX = (Math.random() - 0.5) * 48;
+    const randomX = (Math.random() - 0.5) * 44;
     sparkle.className = 'absolute text-xs font-heading font-black text-amber-500 select-none pointer-events-none animate-sparkle-float';
     sparkle.style.left = `calc(50% + ${randomX}px)`;
-    sparkle.style.top = '45%';
-    sparkle.innerHTML = '✨ +1';
+    sparkle.style.top = '40%';
+    sparkle.innerHTML = '⚠️ +1';
 
     container.appendChild(sparkle);
     setTimeout(() => {
