@@ -1249,113 +1249,85 @@ body.map-confirm-active {
 }
 
 /* ========================================================
-   Modern Road Hazard Warning Beacon Animations
+   Interactive 3D Temple Bell (Ghanta) Animations
    ======================================================== */
-@keyframes beaconFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+.transform-origin-top {
+  transform-origin: 50% 0%;
 }
 
-.animate-beacon-float {
-  animation: beaconFloat 3.8s ease-in-out infinite;
+#bell-clapper-assembly {
+  transform-origin: 80px 137px;
+  transform-box: view-box;
 }
 
-@keyframes beaconCorePulse {
-  0%, 100% {
-    opacity: 0.85;
-    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.6));
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 22px rgba(245, 158, 11, 0.95));
-  }
-}
-
-.animate-beacon-core-pulse {
-  animation: beaconCorePulse 2.2s ease-in-out infinite;
-}
-
-@keyframes beaconReflectorSpin {
+@keyframes templeBellSwing {
   0% {
-    transform: scaleX(1);
-    opacity: 0.9;
+    transform: rotate(0deg);
   }
-  25% {
-    transform: scaleX(0.2);
-    opacity: 0.45;
+  10% {
+    transform: rotate(18deg);
   }
-  50% {
-    transform: scaleX(-1);
-    opacity: 0.85;
+  24% {
+    transform: rotate(-14deg);
   }
-  75% {
-    transform: scaleX(-0.2);
-    opacity: 0.45;
+  38% {
+    transform: rotate(10deg);
+  }
+  52% {
+    transform: rotate(-6deg);
+  }
+  68% {
+    transform: rotate(3deg);
+  }
+  84% {
+    transform: rotate(-1.5deg);
+  }
+  95% {
+    transform: rotate(0.5deg);
   }
   100% {
-    transform: scaleX(1);
-    opacity: 0.9;
+    transform: rotate(0deg);
   }
 }
 
-.animate-beacon-reflector-spin {
-  transform-origin: 80px 74px;
-  animation: beaconReflectorSpin 2.4s linear infinite;
-}
-
-@keyframes beaconPulseRing {
+@keyframes clapperCounterSwing {
   0% {
-    transform: scale(0.65);
-    opacity: 0.85;
-    border-color: rgba(245, 158, 11, 0.85);
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(-24deg);
+  }
+  24% {
+    transform: rotate(18deg);
+  }
+  38% {
+    transform: rotate(-12deg);
+  }
+  52% {
+    transform: rotate(8deg);
+  }
+  68% {
+    transform: rotate(-4deg);
+  }
+  84% {
+    transform: rotate(2deg);
   }
   100% {
-    transform: scale(2.3);
-    opacity: 0;
-    border-color: rgba(245, 158, 11, 0);
+    transform: rotate(0deg);
   }
 }
 
-.beacon-pulse-ring {
-  animation: beaconPulseRing 3.2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite;
-}
-
-@keyframes beaconStrobeBurst {
-  0%, 100% {
-    filter: brightness(1);
-  }
-  15%, 50% {
-    filter: brightness(2.1) drop-shadow(0 0 35px #FBBF24);
-    transform: scale(1.04);
-  }
-  30%, 70% {
-    filter: brightness(1.6);
-  }
-}
-
-.animate-beacon-strobe-burst {
-  animation: beaconStrobeBurst 0.75s ease-out forwards;
-}
-
-@keyframes beaconShockwaveBurst {
+@keyframes shockwaveBurst {
   0% {
     transform: scale(0.6);
     opacity: 0.95;
-    border-color: rgba(251, 191, 36, 0.95);
+    border-color: rgba(255, 215, 0, 0.9);
   }
   100% {
     transform: scale(2.8);
     opacity: 0;
-    border-color: rgba(251, 191, 36, 0);
+    border-color: rgba(255, 215, 0, 0);
   }
-}
-
-.animate-beacon-shockwave-burst {
-  animation: beaconShockwaveBurst 0.85s ease-out forwards;
 }
 
 @keyframes sparkleFloat {
@@ -1369,17 +1341,26 @@ body.map-confirm-active {
   }
 }
 
+.animate-bell-swing {
+  animation: templeBellSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-clapper-counter-swing {
+  animation: clapperCounterSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-shockwave-burst {
+  animation: shockwaveBurst 0.9s ease-out forwards;
+}
+
 .animate-sparkle-float {
   animation: sparkleFloat 1.1s ease-out forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-beacon-float,
-  .animate-beacon-core-pulse,
-  .animate-beacon-reflector-spin,
-  .beacon-pulse-ring,
-  .animate-beacon-strobe-burst,
-  .animate-beacon-shockwave-burst,
+  .animate-bell-swing,
+  .animate-clapper-counter-swing,
+  .animate-shockwave-burst,
   .animate-sparkle-float {
     animation: none !important;
   }
