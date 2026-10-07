@@ -495,7 +495,10 @@
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(249, 242, 232, 0.22);
   border-radius: 9999px;
-  box-shadow: 0 4px 20px rgba(82, 31, 23, 0.18), 0 2px 6px rgba(82, 31, 23, 0.10);
+  box-shadow:
+    0 10px 24px -2px rgba(55, 25, 18, 0.20),
+    0 4px 10px rgba(55, 25, 18, 0.12),
+    0 1px 3px rgba(55, 25, 18, 0.08);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -580,7 +583,10 @@
 }
 
 #navbar-container.is-scrolled > div {
-  box-shadow: 0 8px 32px rgba(82, 31, 23, 0.32), 0 3px 10px rgba(82, 31, 23, 0.20);
+  box-shadow:
+    0 14px 32px -2px rgba(55, 25, 18, 0.30),
+    0 6px 14px rgba(55, 25, 18, 0.18),
+    0 2px 4px rgba(55, 25, 18, 0.10);
   border-color: rgba(249, 242, 232, 0.35);
 }
 
