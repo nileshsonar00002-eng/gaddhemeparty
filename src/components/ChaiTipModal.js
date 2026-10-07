@@ -45,17 +45,6 @@ export async function openChaiTipModal(options = {}) {
           </div>
         </div>
 
-        <!-- Mobile: Direct UPI Deep Link -->
-        <div class="pt-1">
-          <a
-            href="${upiDeepLink}"
-            class="btn-primary w-full py-2.5 px-4 text-sm font-semibold"
-          >
-            ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
-            <span>${t('payViaUpi')}</span>
-          </a>
-        </div>
-
         <!-- Desktop QR Code Fallback -->
         <div class="pt-2 border-t border-[var(--border)] space-y-2">
           <p class="text-[11px] font-medium text-[var(--muted)]">${t('scanQr')}</p>
