@@ -482,6 +482,7 @@
 
 #navbar-container > div {
   pointer-events: auto;
+  position: relative;
   width: 100%;
   max-width: 1488px;
   margin-left: auto;
@@ -496,6 +497,86 @@
   border-radius: 9999px;
   box-shadow: 0 4px 20px rgba(82, 31, 23, 0.18), 0 2px 6px rgba(82, 31, 23, 0.10);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ========================================================
+   Navbar Traveling Snake Glow Border Animation
+   ======================================================== */
+@property --nav-snake-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes nav-snake-travel {
+  0% {
+    --nav-snake-angle: 0deg;
+  }
+  100% {
+    --nav-snake-angle: 360deg;
+  }
+}
+
+/* 1. Crisp traveling glowing snake segment with trailing fade */
+#navbar-container > div::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 1;
+  background: conic-gradient(
+    from var(--nav-snake-angle, 0deg),
+    transparent 0deg,
+    transparent 280deg,
+    rgba(249, 242, 232, 0.08) 295deg,
+    rgba(217, 140, 60, 0.28) 315deg,
+    rgba(245, 185, 105, 0.65) 335deg,
+    rgba(255, 230, 165, 0.92) 352deg,
+    rgba(255, 252, 242, 1) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: nav-snake-travel 5s linear infinite;
+  will-change: --nav-snake-angle;
+}
+
+/* 2. Soft warm ambient glow trailing behind the moving snake */
+#navbar-container > div::after {
+  content: '';
+  position: absolute;
+  inset: -2.5px;
+  border-radius: inherit;
+  padding: 2.5px;
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 0;
+  background: conic-gradient(
+    from var(--nav-snake-angle, 0deg),
+    transparent 0deg,
+    transparent 300deg,
+    rgba(217, 140, 60, 0.15) 325deg,
+    rgba(245, 185, 105, 0.40) 345deg,
+    rgba(255, 240, 200, 0.70) 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  filter: blur(4px);
+  animation: nav-snake-travel 5s linear infinite;
+  will-change: --nav-snake-angle;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #navbar-container > div::before,
+  #navbar-container > div::after {
+    animation: none !important;
+  }
 }
 
 #navbar-container.is-scrolled > div {
