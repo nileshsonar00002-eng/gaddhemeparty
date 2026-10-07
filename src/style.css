@@ -1036,6 +1036,37 @@ body.panel-scroll-locked {
 .vehicle-jeep { animation: vehicleDriveRightToLeft 12.8s linear infinite -9.6s; }
 .vehicle-jeep .comic-bubble { animation: comicBubblePop 12.8s ease-out infinite -9.6s; }
 
+/* Mobile View: vehicles dip upon entering the pothole and jump in the pothole */
+@keyframes vehicleDriveRightToLeftMobile {
+  0% { right: -25%; transform: translateY(0) rotate(0deg); }
+  36% { right: 29%; transform: translateY(0) rotate(0deg); }
+  40% { right: 35%; transform: translateY(12px) rotate(-14deg); }
+  44% { right: 41%; transform: translateY(-16px) rotate(12deg); }
+  48% { right: 47%; transform: translateY(4px) rotate(-4deg); }
+  52% { right: 53%; transform: translateY(0) rotate(0deg); }
+  100% { right: 125%; transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes comicBubblePopMobile {
+  0%, 36% { opacity: 0; transform: scale(0.3) translateY(8px); }
+  39%, 47% { opacity: 1; transform: scale(1.1) translateY(-6px); }
+  51%, 100% { opacity: 0; transform: scale(0.5) translateY(-14px); }
+}
+
+@media (max-width: 768px) {
+  .vehicle-bike { animation-name: vehicleDriveRightToLeftMobile; }
+  .vehicle-bike .comic-bubble { animation-name: comicBubblePopMobile; }
+
+  .vehicle-auto { animation-name: vehicleDriveRightToLeftMobile; }
+  .vehicle-auto .comic-bubble { animation-name: comicBubblePopMobile; }
+
+  .vehicle-car { animation-name: vehicleDriveRightToLeftMobile; }
+  .vehicle-car .comic-bubble { animation-name: comicBubblePopMobile; }
+
+  .vehicle-jeep { animation-name: vehicleDriveRightToLeftMobile; }
+  .vehicle-jeep .comic-bubble { animation-name: comicBubblePopMobile; }
+}
+
 /* Strict horizontal overflow prevention on mobile viewports */
 html, body {
   width: 100% !important;
