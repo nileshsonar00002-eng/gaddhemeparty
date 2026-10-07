@@ -11,8 +11,9 @@ export class LeafletAdapter extends MapAdapter {
     this.clusterGroup = null;
     this.markersMap = new Map();
     this.userMarker = null;
-    this.defaultCenter = [22.5937, 78.9629]; // Center of India
-    this.defaultZoom = 5;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    this.defaultCenter = isMobile ? [21.8, 77.5] : [22.5937, 78.9629];
+    this.defaultZoom = isMobile ? 4.5 : 5;
     this.theme = 'light';
     this.lastGestureEndTime = 0;
     this.isGestureActive = false;
@@ -203,14 +204,19 @@ export class LeafletAdapter extends MapAdapter {
     }
   }
 
-  cinematicFlyIn(callback) {
+  cinematicFlyIn(callback, targetCoords = null) {
     if (!this.map) return;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const destLat = targetCoords?.lat ?? (isMobile ? 21.8 : 22.5937);
+    const destLng = targetCoords?.lng ?? (isMobile ? 77.5 : 78.9629);
+    const destZoom = targetCoords ? (isMobile ? 6 : 7) : (isMobile ? 4.5 : 5);
+
     // Start at high-altitude world view
     this.map.setView([20.5937, 78.9629], 3.5, { animate: false });
-    // Smoothly fly in to India view with cubic easing
+    // Smoothly fly in to target view with cubic easing
     setTimeout(() => {
       if (!this.map) return;
-      this.map.flyTo([22.5937, 78.9629], 5, {
+      this.map.flyTo([destLat, destLng], destZoom, {
         animate: true,
         duration: 2.2,
         easeLinearity: 0.25

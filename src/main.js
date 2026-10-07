@@ -188,7 +188,10 @@ class KhaddaApp {
           if (entry.isIntersecting && !this.hasFlownIn) {
             this.hasFlownIn = true;
             if (this.mapAdapter && this.mapAdapter.cinematicFlyIn) {
-              this.mapAdapter.cinematicFlyIn();
+              const liveTarget = (this.userCoords && this.userCoords.lat && this.userCoords.lng)
+                ? this.userCoords
+                : null;
+              this.mapAdapter.cinematicFlyIn(null, liveTarget);
             }
             observer.unobserve(entry.target);
           }
@@ -365,6 +368,14 @@ class KhaddaApp {
     document.addEventListener('webkitfullscreenchange', onFullscreenChange);
     document.addEventListener('mozfullscreenchange', onFullscreenChange);
     document.addEventListener('MSFullscreenChange', onFullscreenChange);
+
+    // Map User Interaction Tracking (Prevents programmatic auto-centering after manual user pan/drag)
+    const mapEl = document.getElementById('map');
+    if (mapEl) {
+      const markInteracted = () => { this.userInteractedWithMap = true; };
+      mapEl.addEventListener('touchstart', markInteracted, { passive: true });
+      mapEl.addEventListener('mousedown', markInteracted, { passive: true });
+    }
 
     // Global Pin Navigation & Rank Handlers
     window.__khaddaGetPinRank = (pinId) => {
@@ -725,6 +736,14 @@ class KhaddaApp {
           setRealDeviceGps(coords, coords.source || 'gps');
           if (this.mapAdapter && this.mapAdapter.setUserLocationMarker) {
             this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
+          }
+          // Center the map on live user location if user has not manually dragged or zoomed the map
+          if (this.mapAdapter && !this.userInteractedWithMap) {
+            const isMobile = window.innerWidth <= 768;
+            const targetZoom = isMobile ? 6 : 7;
+            if (this.mapAdapter.setView) {
+              this.mapAdapter.setView(this.userCoords.lat, this.userCoords.lng, targetZoom);
+            }
           }
         }
       })

@@ -189,8 +189,9 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.markersMap = new Map();
     this.infoWindow = null;
     this.userMarker = null;
-    this.defaultCenter = { lat: 22.5937, lng: 78.9629 };
-    this.defaultZoom = 5;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    this.defaultCenter = isMobile ? { lat: 21.8, lng: 77.5 } : { lat: 22.5937, lng: 78.9629 };
+    this.defaultZoom = isMobile ? 4.5 : 5;
     this.theme = 'light';
     this.lastGestureEndTime = 0;
     this.isGestureActive = false;
@@ -382,17 +383,22 @@ export class GoogleMapsAdapter extends MapAdapter {
     }
   }
 
-  cinematicFlyIn(callback) {
+  cinematicFlyIn(callback, targetCoords = null) {
     if (!this.map) return;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const destLat = targetCoords?.lat ?? (isMobile ? 21.8 : 22.5937);
+    const destLng = targetCoords?.lng ?? (isMobile ? 77.5 : 78.9629);
+    const destZoom = targetCoords ? (isMobile ? 6 : 7) : (isMobile ? 4.5 : 5);
+
     // Set initial altitude (world view)
     this.map.setCenter({ lat: 20.5937, lng: 78.9629 });
     this.map.setZoom(3);
     
-    // Smoothly zoom in to India bounds
+    // Smoothly zoom in to target bounds
     setTimeout(() => {
       if (!this.map) return;
-      this.map.panTo({ lat: 22.5937, lng: 78.9629 });
-      this.map.setZoom(5);
+      this.map.panTo({ lat: destLat, lng: destLng });
+      this.map.setZoom(destZoom);
       if (callback) setTimeout(callback, 2200);
     }, 200);
   }
