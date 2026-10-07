@@ -1249,131 +1249,71 @@ body.map-confirm-active {
 }
 
 /* ========================================================
-   Interactive Brass Handbell Pendulum Physics Animations
+   Interactive 3D Temple Bell (Ghanta) Animations
    ======================================================== */
-.transform-origin-bell-loop {
-  transform-origin: 63.3% 18.0%;
+.transform-origin-top {
+  transform-origin: 50% 0%;
 }
 
-.transform-origin-bell-clapper {
-  transform-origin: 45.7% 63.7%;
+#bell-clapper-assembly {
+  transform-origin: 80px 137px;
+  transform-box: view-box;
 }
 
-/* 
-  Handbell Physical Swing Sequence:
-  0° -> quickly to -12° -> +10° -> -7° -> +4° -> settles to 0°
-  with micro-vibration/shake immediately after clapper impact
-*/
-@keyframes handbellPhysicalSwing {
+@keyframes templeBellSwing {
   0% {
     transform: rotate(0deg);
   }
-  11% {
-    /* Peak first swing to approximately -12deg */
-    transform: rotate(-12deg);
+  10% {
+    transform: rotate(18deg);
   }
-  12.5% {
-    /* Clapper metal impact acoustic micro-vibration / shake */
-    transform: rotate(-11.8deg) translate(0.7px, -0.5px);
+  24% {
+    transform: rotate(-14deg);
   }
-  14% {
-    transform: rotate(-11.2deg) translate(-0.5px, 0.4px);
-  }
-  15.5% {
-    transform: rotate(-10.5deg) translate(0.2px, -0.2px);
-  }
-  30% {
-    /* Reverse swing to +10deg */
+  38% {
     transform: rotate(10deg);
   }
-  48% {
-    /* Swing to -7deg */
-    transform: rotate(-7deg);
+  52% {
+    transform: rotate(-6deg);
   }
   68% {
-    /* Swing to +4deg */
-    transform: rotate(4deg);
+    transform: rotate(3deg);
   }
   84% {
-    /* Gradually settle */
     transform: rotate(-1.5deg);
   }
-  94% {
+  95% {
     transform: rotate(0.5deg);
   }
   100% {
-    /* Completely settle to 0deg */
     transform: rotate(0deg);
   }
 }
 
-/* 
-  Clapper Counter-Momentum & Delay:
-  Lags behind, swings opposite to bell, and hits inner rim at peak swing
-*/
-@keyframes handbellClapperSwing {
+@keyframes clapperCounterSwing {
   0% {
     transform: rotate(0deg);
   }
-  6% {
-    /* Slight delay, starting opposite inertia */
-    transform: rotate(5deg);
+  10% {
+    transform: rotate(-24deg);
   }
-  11% {
-    /* Hits inside right wall of the bell at strongest swing */
-    transform: rotate(16deg);
+  24% {
+    transform: rotate(18deg);
   }
-  13% {
-    /* Impact rebound off the metal rim */
-    transform: rotate(13deg);
-  }
-  30% {
-    /* Opposite momentum as bell swings to +10deg */
+  38% {
     transform: rotate(-12deg);
   }
-  48% {
-    /* Opposite momentum as bell swings to -7deg */
+  52% {
     transform: rotate(8deg);
   }
   68% {
-    /* Opposite momentum as bell swings to +4deg */
     transform: rotate(-4deg);
   }
   84% {
-    transform: rotate(1.5deg);
-  }
-  94% {
-    transform: rotate(-0.5deg);
+    transform: rotate(2deg);
   }
   100% {
     transform: rotate(0deg);
-  }
-}
-
-@keyframes handbellShadowSwing {
-  0%, 100% {
-    transform: translateX(0) scaleX(1);
-    opacity: 0.22;
-  }
-  11% {
-    transform: translateX(-14px) scaleX(1.12);
-    opacity: 0.16;
-  }
-  30% {
-    transform: translateX(12px) scaleX(1.08);
-    opacity: 0.17;
-  }
-  48% {
-    transform: translateX(-8px) scaleX(1.05);
-    opacity: 0.19;
-  }
-  68% {
-    transform: translateX(4px) scaleX(1.02);
-    opacity: 0.20;
-  }
-  84% {
-    transform: translateX(-1.5px) scaleX(1);
-    opacity: 0.21;
   }
 }
 
@@ -1401,18 +1341,12 @@ body.map-confirm-active {
   }
 }
 
-.animate-handbell-swing,
 .animate-bell-swing {
-  animation: handbellPhysicalSwing 1.5s cubic-bezier(0.28, 0.95, 0.35, 1) forwards;
+  animation: templeBellSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-.animate-handbell-clapper,
 .animate-clapper-counter-swing {
-  animation: handbellClapperSwing 1.5s cubic-bezier(0.28, 0.95, 0.35, 1) forwards;
-}
-
-.animate-handbell-shadow {
-  animation: handbellShadowSwing 1.5s ease-in-out forwards;
+  animation: clapperCounterSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .animate-shockwave-burst {
@@ -1424,11 +1358,8 @@ body.map-confirm-active {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-handbell-swing,
   .animate-bell-swing,
-  .animate-handbell-clapper,
   .animate-clapper-counter-swing,
-  .animate-handbell-shadow,
   .animate-shockwave-burst,
   .animate-sparkle-float {
     animation: none !important;
