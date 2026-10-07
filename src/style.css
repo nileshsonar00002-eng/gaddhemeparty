@@ -385,12 +385,33 @@
   padding: 0.3125rem 0.75rem;
 }
 
-/* Hero swatch accent underline */
+/* Hero swatch accent underline & subtle focal pulse animation */
+@keyframes fixItAccentPulse {
+  0%, 100% {
+    transform: scale(1) translateZ(0);
+    filter: drop-shadow(0 0 0 rgba(122, 35, 21, 0));
+    text-decoration-color: var(--primary);
+  }
+  50% {
+    transform: scale(1.04) translateZ(0);
+    filter: drop-shadow(0 2px 8px rgba(122, 35, 21, 0.22));
+    text-decoration-color: #962E1E;
+  }
+}
+
 .hero-highlight-word {
+  display: inline-block;
+  vertical-align: baseline;
   text-decoration: underline;
   text-decoration-color: var(--primary);
   text-decoration-thickness: 3px;
   text-underline-offset: 4px;
+  transform: translateZ(0);
+  transform-origin: center;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  animation: fixItAccentPulse 2.5s ease-in-out infinite;
 }
 
 /* Hero Ambient Soft Lighting Shapes (Radial Gradients - No Heavy Blur) */
@@ -451,6 +472,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-highlight-word,
   .animate-gentle-float,
   .mascot-ground-shadow {
     animation: none !important;
