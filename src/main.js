@@ -329,6 +329,12 @@ class KhaddaApp {
       this.handleOpenReportClick();
     });
 
+    // Hero Section Quick Report Button
+    const heroReportBtn = document.getElementById('btn-hero-report');
+    heroReportBtn?.addEventListener('click', () => {
+      this.handleOpenReportClick();
+    });
+
     // Card Zoom Controls
     const zoomInBtn = document.getElementById('btn-zoom-in');
     const zoomOutBtn = document.getElementById('btn-zoom-out');

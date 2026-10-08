@@ -662,8 +662,30 @@ main {
 
 body.map-confirm-active #btn-open-report,
 body.map-confirm-active #btn-open-about,
+body.map-confirm-active #btn-hero-report,
 body.map-confirm-active #sticky-mobile-cta {
   display: none !important;
+}
+
+/* Continuous gentle popup pulse animation for Hero Report Button */
+@keyframes heroPopupPulse {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 14px rgba(82, 31, 23, 0.25);
+  }
+  50% {
+    transform: scale(1.06) translateY(-3px);
+    box-shadow: 0 12px 28px rgba(82, 31, 23, 0.45);
+  }
+}
+
+.btn-hero-pulse {
+  animation: heroPopupPulse 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, box-shadow;
+}
+
+.btn-hero-pulse:hover {
+  animation-play-state: paused;
 }
 
 /* Modal Scroll Lock */
