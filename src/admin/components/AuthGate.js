@@ -116,7 +116,7 @@ export function renderAuthGate(container, onSuccess) {
                 <input
                   id="admin-email"
                   type="email"
-                  placeholder="admin@roadtok.in"
+                  placeholder="admin@roadtok.com"
                   autocomplete="username email"
                   required
                   class="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"

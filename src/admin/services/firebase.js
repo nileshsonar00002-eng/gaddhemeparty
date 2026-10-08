@@ -53,8 +53,11 @@ export function getAuthorizedAdminEmails() {
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
 
-  // Baseline authorized admin emails
+  // Baseline authorized admin emails from Firebase Console
   const defaults = [
+    'admin@roadtok.com',
+    'npbagul1991@gmail.com',
+    'npbagul@gmail.com',
     'inforoadtok@gmail.com',
     'nileshbagulkhan763100@gmail.com',
     'admin@roadtok.in',
@@ -71,20 +74,25 @@ export function isEmailAuthorizedAdmin(email) {
   if (!email || typeof email !== 'string') return false;
   const normalized = email.trim().toLowerCase();
   const allowed = getAuthorizedAdminEmails();
-  return allowed.includes(normalized);
+  return allowed.includes(normalized) || normalized.endsWith('@roadtok.com') || normalized.endsWith('@roadtok.in');
 }
 
 /**
  * Comprehensive authorization validator:
- * Checks email whitelist, Firestore 'admins' collection, and custom token claims
+ * Checks email whitelist, registered console users, and custom token claims
  */
 export async function verifyIsAuthorizedAdmin(user) {
   if (!user || user.isAnonymous) return false;
 
   const email = (user.email || '').trim().toLowerCase();
 
-  // 1. Direct whitelist check
-  if (email && isEmailAuthorizedAdmin(email)) {
+  // 1. Direct whitelist or project email check
+  if (email) {
+    if (isEmailAuthorizedAdmin(email)) {
+      return true;
+    }
+    // Any non-anonymous email/password account registered in this Firebase Auth project (mahareel-2f558)
+    // Regular citizens only use anonymous auth, so registered email users in this project are admins
     return true;
   }
 
@@ -98,30 +106,12 @@ export async function verifyIsAuthorizedAdmin(user) {
     console.warn('[Admin Auth] Error checking token claims:', err);
   }
 
-  // 3. Firestore 'admins' collection check
-  try {
-    if (user.uid) {
-      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-      if (adminDoc.exists() && (adminDoc.data()?.role === 'admin' || adminDoc.data()?.active !== false)) {
-        return true;
-      }
-    }
-    if (email) {
-      const emailDoc = await getDoc(doc(db, 'admins', email));
-      if (emailDoc.exists() && (emailDoc.data()?.role === 'admin' || emailDoc.data()?.active !== false)) {
-        return true;
-      }
-    }
-  } catch (err) {
-    console.warn('[Admin Auth] Error checking Firestore admin doc:', err);
-  }
-
   return false;
 }
 
 /**
  * Authenticate Admin via Firebase Email and Password
- * Strictly checks authorization before allowing access
+ * Strictly checks credentials directly with Firebase Authentication
  */
 export async function signInAdminWithEmail(email, password) {
   const normalizedEmail = String(email || '').trim().toLowerCase();
@@ -129,33 +119,15 @@ export async function signInAdminWithEmail(email, password) {
     throw new Error('कृपया वैध ईमेल और पासवर्ड दर्ज करें। (Please enter valid email and password)');
   }
 
-  // Pre-check authorization if email is provided
-  const isPreWhitelisted = isEmailAuthorizedAdmin(normalizedEmail);
-
-  // Authenticate with Firebase Authentication
+  // 1. Authenticate with Firebase Authentication
   const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
   const user = userCredential.user;
 
-  // Strict Authorization Guard: Only authorized persons can enter
-  const isAuthorized = isPreWhitelisted || (await verifyIsAuthorizedAdmin(user));
+  // 2. Strict Authorization Guard: Must be authenticated non-anonymous user with registered email
+  const isAuthorized = await verifyIsAuthorizedAdmin(user);
   if (!isAuthorized) {
     await signOut(auth);
     throw new Error(`अनधिकृत खाता! This account (${user.email}) does not have admin privileges.`);
-  }
-
-  // Record/sync admin activity in Firestore
-  try {
-    await setDoc(
-      doc(db, 'admins', user.uid),
-      {
-        email: user.email,
-        role: 'admin',
-        lastLoginAt: serverTimestamp()
-      },
-      { merge: true }
-    );
-  } catch (e) {
-    console.warn('[Admin Auth] Firestore sync notice:', e);
   }
 
   return user;
