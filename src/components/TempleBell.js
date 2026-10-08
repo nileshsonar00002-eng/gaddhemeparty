@@ -134,200 +134,41 @@ export class TempleBellWidget {
     const isHindi = getLanguage() === 'hindi';
 
     container.innerHTML = `
-      <div class="temple-bell-wrapper relative flex flex-col items-center justify-center select-none py-2 cursor-pointer group" title="${isHindi ? 'घंटी बजाएं (Click to Ring)' : 'Ring Temple Bell'}">
+      <div class="hero-pothole-card group relative w-full max-w-[580px] rounded-3xl overflow-hidden shadow-2xl border border-[var(--border)]/40 bg-[var(--surface-2)] transition-all duration-300">
         
-        <!-- Divine Golden Glow & Shockwave Emitter -->
-        <div id="bell-glow-emitter" class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+        <!-- Divine Golden Glow & Ring Shockwave Emitter -->
+        <div id="bell-glow-emitter" class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
           <div class="bell-divine-aura w-44 h-44 rounded-full bg-amber-400/20 blur-xl opacity-0 transition-opacity duration-300"></div>
-          <div id="bell-shockwave" class="absolute w-20 h-20 rounded-full border-2 border-amber-300/80 opacity-0 pointer-events-none"></div>
+          <div id="bell-shockwave" class="absolute w-24 h-24 rounded-full border-2 border-amber-300/80 opacity-0 pointer-events-none"></div>
         </div>
 
         <!-- Floating +1 Sparkle Burst Container -->
         <div id="bell-sparkles-container" class="absolute inset-0 pointer-events-none z-40 overflow-visible flex items-center justify-center"></div>
 
-        <!-- Hanging Rig: Unified 3D Brass Chain + Bell Dome + Internal Clapper Assembly -->
-        <div id="bell-pendulum-assembly" class="relative z-10 flex flex-col items-center transform-origin-top transition-transform duration-100">
-          <svg class="w-32 h-[168px] sm:w-48 sm:h-60 overflow-visible drop-shadow-2xl" viewBox="0 0 160 210" fill="none">
-            <defs>
-              <!-- 3D Cylindrical Brass Body Gradient -->
-              <linearGradient id="brassBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#4A2E05" />
-                <stop offset="15%" stop-color="#9C6B17" />
-                <stop offset="35%" stop-color="#D4AF37" />
-                <stop offset="52%" stop-color="#FFF6BA" />
-                <stop offset="70%" stop-color="#D4AF37" />
-                <stop offset="88%" stop-color="#8C5C10" />
-                <stop offset="100%" stop-color="#382003" />
-              </linearGradient>
+        <!-- Photographic Pothole Hero Image Wrapper with Organic Gradient Edge Blends -->
+        <div class="hero-pothole-image-wrapper relative w-full h-56 xs:h-64 sm:h-76 md:h-80 lg:h-[380px] overflow-hidden cursor-pointer" title="${isHindi ? 'घंटी बजाएं (Click to Ring)' : 'Ring for safer roads'}">
+          <img
+            src="/hero-pothole.jpg"
+            alt="Damaged road with potholes"
+            class="hero-pothole-img w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+            loading="eager"
+            fetchpriority="high"
+          />
 
-              <!-- Flared Rim Bevel Gradient -->
-              <linearGradient id="brassRimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#331A02" />
-                <stop offset="20%" stop-color="#B8860B" />
-                <stop offset="50%" stop-color="#FFF8D0" />
-                <stop offset="80%" stop-color="#B8860B" />
-                <stop offset="100%" stop-color="#241201" />
-              </linearGradient>
-
-              <!-- Chain Gold Gradient -->
-              <linearGradient id="chainGold" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#5B3A07" />
-                <stop offset="25%" stop-color="#D4AF37" />
-                <stop offset="50%" stop-color="#FFF3A8" />
-                <stop offset="75%" stop-color="#AA771C" />
-                <stop offset="100%" stop-color="#3D2502" />
-              </linearGradient>
-
-              <!-- Crown Ring Radial -->
-              <radialGradient id="brassCrownRadial" cx="50%" cy="30%" r="60%">
-                <stop offset="0%" stop-color="#FFF6BA" />
-                <stop offset="60%" stop-color="#D4AF37" />
-                <stop offset="100%" stop-color="#5B3A07" />
-              </radialGradient>
-
-              <!-- Clapper Ball Radial Gradient -->
-              <radialGradient id="clapperBallGrad" cx="35%" cy="35%" r="65%">
-                <stop offset="0%" stop-color="#FFF8D0" />
-                <stop offset="45%" stop-color="#D4AF37" />
-                <stop offset="80%" stop-color="#8C5C10" />
-                <stop offset="100%" stop-color="#2E1801" />
-              </radialGradient>
-
-              <!-- Clapper Rod Gradient -->
-              <linearGradient id="clapperRodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#4A2E05" />
-                <stop offset="40%" stop-color="#D4AF37" />
-                <stop offset="70%" stop-color="#FFF3A8" />
-                <stop offset="100%" stop-color="#382003" />
-              </linearGradient>
-
-              <!-- Dark Inner Cavity Gradient -->
-              <radialGradient id="innerCavityGrad" cx="50%" cy="40%" r="60%">
-                <stop offset="0%" stop-color="#080400" />
-                <stop offset="65%" stop-color="#180C02" />
-                <stop offset="100%" stop-color="#361C04" />
-              </radialGradient>
-            </defs>
-
-            <!-- 1. Top Chain Links (Unified directly with bell crown) -->
-            <!-- Top Ceiling Hook -->
-            <path d="M68 0 H92 V6 H68 Z" fill="url(#chainGold)" />
-            <!-- Chain Link 1 -->
-            <rect x="74" y="5" width="12" height="17" rx="6" fill="none" stroke="url(#chainGold)" stroke-width="3" />
-            <!-- Chain Link 2 -->
-            <rect x="74" y="18" width="12" height="17" rx="6" fill="none" stroke="url(#chainGold)" stroke-width="3" />
-            <!-- Crown Top Ring Loop (Interlocked with Link 2 and Crown Cap) -->
-            <circle cx="80" cy="38" r="8" fill="none" stroke="url(#chainGold)" stroke-width="3.5" />
-            <circle cx="80" cy="38" r="4" fill="#FFE082" opacity="0.5" />
-
-            <!-- 2. Crown Base Cap & Upper Neck -->
-            <path d="M72 46 C72 40, 88 40, 88 46 Z" fill="url(#brassBodyGrad)" />
-            <ellipse cx="80" cy="46" rx="13" ry="4.5" fill="url(#brassCrownRadial)" stroke="#382003" stroke-width="1" />
-
-            <!-- 3. Main Bell Dome Body -->
-            <path
-              d="M72 46
-                 C72 62, 58 84, 50 106
-                 C42 124, 28 135, 24 138
-                 C22 140, 25 142, 30 142
-                 L130 142
-                 C135 142, 138 140, 136 138
-                 C132 135, 118 124, 110 106
-                 C102 84, 88 62, 88 46
-                 Z"
-              fill="url(#brassBodyGrad)"
-              stroke="#3D2502"
-              stroke-width="1.5"
-            />
-
-            <!-- Specular Highlight Sheen -->
-            <path
-              d="M81 48
-                 C81 62, 75 82, 71 106
-                 C67 122, 60 133, 56 140
-                 L64 140
-                 C68 133, 76 122, 80 106
-                 C84 82, 88 62, 88 48
-                 Z"
-              fill="#FFF8D0"
-              opacity="0.35"
-            />
-
-            <!-- Traditional Decorative Ribs & Auspicious Dots -->
-            <!-- Ring 1 (Upper) -->
-            <path d="M63 72 C71 76, 89 76, 97 72" stroke="#5B3A07" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.65" />
-            <path d="M63 73 C71 77, 89 77, 97 73" stroke="#FFF6BA" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.8" />
-
-            <!-- Ring 2 (Middle) -->
-            <path d="M54 98 C68 104, 92 104, 106 98" stroke="#5B3A07" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.7" />
-            <path d="M54 99 C68 105, 92 105, 106 99" stroke="#FFF6BA" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85" />
-            
-            <!-- Auspicious Embossed Dots Pattern -->
-            <circle cx="62" cy="101" r="1.8" fill="#5B3A07" />
-            <circle cx="71" cy="103" r="1.8" fill="#5B3A07" />
-            <circle cx="80" cy="103.5" r="1.8" fill="#5B3A07" />
-            <circle cx="89" cy="103" r="1.8" fill="#5B3A07" />
-            <circle cx="98" cy="101" r="1.8" fill="#5B3A07" />
-
-            <!-- Ring 3 (Lower Waist) -->
-            <path d="M38 126 C58 134, 102 134, 122 126" stroke="#4A2E05" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.75" />
-            <path d="M38 127.5 C58 135.5, 102 135.5, 122 127.5" stroke="#FFF6BA" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.9" />
-
-            <!-- 4. Deep Hollow Cavity (Interior Dark Depth) -->
-            <ellipse cx="80" cy="142" rx="55" ry="12" fill="#120801" />
-            <ellipse cx="80" cy="142" rx="50" ry="9" fill="url(#innerCavityGrad)" />
-
-            <!-- 5. Clapper Assembly (Latkan) - SUSPENDED FROM INSIDE THE HOLLOW CAVITY -->
-            <g id="bell-clapper-assembly" class="transition-transform duration-100">
-              <!-- Internal Hanging Joint Loop inside dark cavity -->
-              <circle cx="80" cy="137" r="2.5" fill="#4A2E05" />
-              
-              <!-- Clapper Brass Rod (Originates inside the dark hollow cavity) -->
-              <rect x="78" y="137" width="4" height="30" rx="2" fill="url(#clapperRodGrad)" stroke="#2E1801" stroke-width="0.75" />
-              
-              <!-- Weighted Brass Latkan Ball (Ghanti ka Gola) -->
-              <circle cx="80" cy="168" r="10.5" fill="url(#clapperBallGrad)" stroke="#2E1801" stroke-width="1.2" />
-              <!-- Specular Light Reflection on Ball -->
-              <ellipse cx="77" cy="164" rx="4" ry="2.5" fill="#FFFDE0" opacity="0.7" />
-              
-              <!-- Bottom Pendant Ring & Tag -->
-              <rect x="78.5" y="178" width="3" height="8" rx="1.5" fill="url(#clapperRodGrad)" stroke="#2E1801" stroke-width="0.5" />
-              <circle cx="80" cy="189" r="4.5" fill="url(#clapperBallGrad)" stroke="#382003" stroke-width="1" />
-              <circle cx="80" cy="189" r="1.8" fill="#1A0D01" />
-            </g>
-
-            <!-- 6. Front Lower Rim (Foreground Lip: sits in front of the clapper root) -->
-            <path
-              d="M24 140
-                 C28 152, 132 152, 136 140
-                 C136 145, 132 156, 80 156
-                 C28 156, 24 145, 24 140
-                 Z"
-              fill="url(#brassRimGrad)"
-              stroke="#2E1801"
-              stroke-width="1.5"
-            />
-            <!-- Front Rim Top Highlight Streak -->
-            <path
-              d="M27 141
-                 C48 150, 112 150, 133 141
-                 C112 147, 48 147, 27 141
-                 Z"
-              fill="#FFF9D6"
-              opacity="0.9"
-            />
-          </svg>
+          <!-- Left Edge Soft Fade Mask into Cream Background -->
+          <div class="hero-pothole-blend-left"></div>
+          
+          <!-- Top & Bottom Soft Vignette Integration Overlays -->
+          <div class="hero-pothole-blend-top"></div>
+          <div class="hero-pothole-blend-bottom"></div>
         </div>
 
-        <!-- Dynamic Ground Contact Shadow (Synchronizes with swing) -->
-        <div id="bell-ground-shadow" class="w-24 sm:w-28 h-3.5 sm:h-4 rounded-full bg-amber-950/20 blur-[3px] transition-all duration-300 -mt-1 sm:-mt-2"></div>
-
-        <!-- Interactive Chime Counter & Prompt Badge -->
-        <div class="mt-3 flex flex-col items-center gap-1.5 z-20">
+        <!-- Positioned Chime Counter Badge (Floating neatly in bottom right without obscuring main pothole) -->
+        <div class="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-30 flex flex-col items-end gap-1">
           <button
             type="button"
             id="btn-ring-bell"
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-[var(--primary)] group-hover:shadow-lg"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)]/95 backdrop-blur-md hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] text-[var(--heading)] font-heading font-bold text-xs shadow-lg transition-all cursor-pointer group-hover:border-[var(--primary)] group-hover:shadow-xl"
           >
             <svg class="w-4 h-4 text-amber-500 animate-pulse shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             <span id="bell-counter-text" class="tabular-nums font-mono text-[var(--text)] font-extrabold">
@@ -338,7 +179,7 @@ export class TempleBellWidget {
             </span>
           </button>
           
-          <span class="text-[10px] text-[var(--muted)] font-medium tracking-tight">
+          <span class="text-[10px] text-[var(--muted)] font-medium tracking-tight bg-[var(--surface)]/85 backdrop-blur-xs px-2.5 py-0.5 rounded-md border border-[var(--border)]/60 shadow-xs">
             ${isHindi ? 'सड़क सुधार की घंटी बजाएं!' : 'Ring for safer Indian roads!'}
           </span>
         </div>
@@ -349,7 +190,7 @@ export class TempleBellWidget {
   }
 
   attachEvents() {
-    const wrapper = document.querySelector('.temple-bell-wrapper');
+    const wrapper = document.querySelector('.hero-pothole-card');
     const ringBtn = document.getElementById('btn-ring-bell');
 
     const handleRing = (e) => {
@@ -358,8 +199,12 @@ export class TempleBellWidget {
       this.ring();
     };
 
-    wrapper?.addEventListener('click', handleRing);
     ringBtn?.addEventListener('click', handleRing);
+    wrapper?.addEventListener('click', (e) => {
+      if (!e.target.closest('#btn-ring-bell')) {
+        handleRing(e);
+      }
+    });
   }
 
   ring() {
@@ -376,30 +221,10 @@ export class TempleBellWidget {
     // Update Counter UI with animation
     this.updateCounterDOM(true);
 
-    // 3. Trigger Physics Pendulum Swing Animation on Bell Assembly & Clapper
-    const bellAssembly = document.getElementById('bell-pendulum-assembly');
-    const clapper = document.getElementById('bell-clapper-assembly');
+    // 4. Divine Aura Flash & Ripple Shockwave Burst
     const aura = document.querySelector('.bell-divine-aura');
     const shockwave = document.getElementById('bell-shockwave');
 
-    if (bellAssembly && clapper) {
-      // Clear ongoing animation class to allow rapid re-triggers
-      bellAssembly.classList.remove('animate-bell-swing');
-      clapper.classList.remove('animate-clapper-counter-swing');
-      void bellAssembly.offsetWidth; // Force reflow
-      void clapper.offsetWidth;
-
-      bellAssembly.classList.add('animate-bell-swing');
-      clapper.classList.add('animate-clapper-counter-swing');
-
-      if (this.animTimer) clearTimeout(this.animTimer);
-      this.animTimer = setTimeout(() => {
-        bellAssembly.classList.remove('animate-bell-swing');
-        clapper.classList.remove('animate-clapper-counter-swing');
-      }, 2400);
-    }
-
-    // 4. Divine Aura Flash & Ripple Shockwave Burst
     if (aura) {
       aura.classList.add('opacity-100', 'scale-125');
       setTimeout(() => {
