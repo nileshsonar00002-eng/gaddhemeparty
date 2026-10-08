@@ -664,7 +664,7 @@ export class PanelManager {
         <div class="space-y-3">
           <div class="p-4 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1.5 shadow-sm">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-[#8CFF3F]/15 border border-[#8CFF3F]/30 flex items-center justify-center text-[#8CFF3F] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-[#94A3B8]/15 border border-[#94A3B8]/30 flex items-center justify-center text-[#94A3B8] shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
               </div>
               <h3 class="font-heading font-bold text-sm text-[#F5F7FA]">${t('pillar1Title')}</h3>
@@ -674,7 +674,7 @@ export class PanelManager {
 
           <div class="p-4 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1.5 shadow-sm">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-[#8CFF3F]/15 border border-[#8CFF3F]/30 flex items-center justify-center text-[#8CFF3F] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-[#94A3B8]/15 border border-[#94A3B8]/30 flex items-center justify-center text-[#94A3B8] shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
               </div>
               <h3 class="font-heading font-bold text-sm text-[#F5F7FA]">${t('pillar2Title')}</h3>
@@ -684,7 +684,7 @@ export class PanelManager {
 
           <div class="p-4 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1.5 shadow-sm">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-[#8CFF3F]/15 border border-[#8CFF3F]/30 flex items-center justify-center text-[#8CFF3F] shrink-0">
+              <div class="w-8 h-8 rounded-xl bg-[#94A3B8]/15 border border-[#94A3B8]/30 flex items-center justify-center text-[#94A3B8] shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
               </div>
               <h3 class="font-heading font-bold text-sm text-[#F5F7FA]">${t('pillar3Title')}</h3>

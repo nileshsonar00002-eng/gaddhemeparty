@@ -26,7 +26,7 @@ export function openHowItWorksModal() {
 
         <!-- Header -->
         <div class="flex items-center gap-3">
-          <div class="icon-tile-cream w-12 h-12 flex items-center justify-center text-[var(--heading)]">
+          <div class="icon-tile-cream w-12 h-12 flex items-center justify-center text-[var(--muted)]">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-2m0-4V7m-6 9.85a9 9 0 1 1 12 0"/></svg>
           </div>
           <div>
