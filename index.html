@@ -67,13 +67,8 @@
           <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               
-              <!-- Left Column: Short Chip, Balanced H1, Concrete Description & Translucent Stat Chips -->
+              <!-- Left Column: Balanced H1, Concrete Description, Stat Chips, Report Button & Free/No Login Chip -->
               <div class="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 sm:space-y-5">
-                <!-- Short Concrete Badge Chip -->
-                <div class="chip-neutral">
-                  <span data-i18n="heroBadge">मुफ़्त • बिना लॉगिन</span>
-                </div>
-
                 <!-- Balanced H1 without quotation marks -->
                 <h1 id="hero-title" class="w-full font-heading font-bold text-[var(--heading)] tracking-tight text-[clamp(1.75rem,7vw,2.25rem)] leading-[1.15] break-words" data-i18n-html="heroTitleHtml">
                   Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>
@@ -87,8 +82,8 @@
                 <!-- Translucent Stat Chips Container -->
                 <div id="stats-strip-container" class="pt-2 flex flex-wrap justify-center lg:justify-start gap-2.5"></div>
 
-                <!-- Hero Section Quick Report Action Button -->
-                <div class="pt-2 flex justify-center lg:justify-start w-full">
+                <!-- Hero Section Quick Report Action Button & Free/No Login Badge -->
+                <div class="pt-2 flex flex-col items-center lg:items-start gap-2.5 w-full">
                   <button
                     id="btn-hero-report"
                     type="button"
@@ -104,6 +99,11 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
                     </svg>
                   </button>
+
+                  <!-- Short Concrete Badge Chip (Free / No login) -->
+                  <div class="chip-neutral mt-0.5">
+                    <span data-i18n="heroBadge">मुफ़्त • बिना लॉगिन</span>
+                  </div>
                 </div>
               </div>
 
