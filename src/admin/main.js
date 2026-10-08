@@ -12,9 +12,11 @@ import {
   bulkDeletePins,
   updatePinLandmark,
   archivePin,
-  hardDeletePin
+  hardDeletePin,
+  observeAdminAuthState,
+  auth
 } from './services/firebase';
-import { checkIsAdminAuthenticated, renderAuthGate } from './components/AuthGate';
+import { checkIsAdminAuthenticated, setAdminAuthenticated, renderAuthGate } from './components/AuthGate';
 import { renderNavbar } from './components/Navbar';
 import { renderStatsBar } from './components/StatsBar';
 import { renderQueueFilter } from './components/QueueFilter';
@@ -47,15 +49,39 @@ class AdminApp {
   }
 
   async init() {
-    // 1. Check Authentication Gate
-    if (!checkIsAdminAuthenticated()) {
-      renderAuthGate(this.appEl, () => {
-        this.startDashboard();
-      });
-      return;
-    }
+    this.renderLoadingAuth();
 
-    await this.startDashboard();
+    // Listen to live Firebase Authentication state & verify authorization
+    observeAdminAuthState(async (user, isAuthorized) => {
+      if (user && isAuthorized) {
+        setAdminAuthenticated(true, user);
+        if (!this.initialLoadDone) {
+          await this.startDashboard();
+        }
+      } else {
+        setAdminAuthenticated(false);
+        this.initialLoadDone = false;
+        if (this.unsubscribeFirestore) {
+          this.unsubscribeFirestore();
+          this.unsubscribeFirestore = null;
+        }
+        renderAuthGate(this.appEl, async () => {
+          await this.startDashboard();
+        });
+      }
+    });
+  }
+
+  renderLoadingAuth() {
+    this.appEl.innerHTML = `
+      <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-[#0B0F19] text-slate-300 gap-4">
+        <div class="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="text-sm font-semibold tracking-wide flex items-center gap-2">
+          <span>🛡️</span>
+          <span>Connecting to Firebase Auth...</span>
+        </div>
+      </div>
+    `;
   }
 
   async startDashboard() {
@@ -213,6 +239,7 @@ class AdminApp {
 
     // 2. Render Navbar
     renderNavbar(navbarMount, {
+      adminUser: auth.currentUser,
       isConnected: this.isConnected,
       isAudioEnabled: this.isAudioEnabled,
       onToggleAudio: () => {

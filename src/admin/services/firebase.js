@@ -7,13 +7,21 @@ import {
   onSnapshot,
   doc,
   getDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   serverTimestamp,
   writeBatch
 } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
-
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -31,24 +39,240 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Ensure anonymous session for Firestore rules access
+// ========================================================
+// Strict Admin Authorization & Whitelist Verification
+// ========================================================
+
+/**
+ * Get normalized list of authorized administrative emails
+ */
+export function getAuthorizedAdminEmails() {
+  const envList = import.meta.env.VITE_ADMIN_EMAILS || '';
+  const parsed = envList
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  // Baseline authorized admin emails
+  const defaults = [
+    'inforoadtok@gmail.com',
+    'nileshbagulkhan763100@gmail.com',
+    'admin@roadtok.in',
+    'admin@khadda.com'
+  ];
+
+  return Array.from(new Set([...defaults, ...parsed]));
+}
+
+/**
+ * Check if an email address is in the authorized admin list
+ */
+export function isEmailAuthorizedAdmin(email) {
+  if (!email || typeof email !== 'string') return false;
+  const normalized = email.trim().toLowerCase();
+  const allowed = getAuthorizedAdminEmails();
+  return allowed.includes(normalized);
+}
+
+/**
+ * Comprehensive authorization validator:
+ * Checks email whitelist, Firestore 'admins' collection, and custom token claims
+ */
+export async function verifyIsAuthorizedAdmin(user) {
+  if (!user || user.isAnonymous) return false;
+
+  const email = (user.email || '').trim().toLowerCase();
+
+  // 1. Direct whitelist check
+  if (email && isEmailAuthorizedAdmin(email)) {
+    return true;
+  }
+
+  // 2. Custom claims check (Firebase Admin SDK claims)
+  try {
+    const tokenResult = await user.getIdTokenResult(true);
+    if (tokenResult?.claims?.admin === true || tokenResult?.claims?.role === 'admin') {
+      return true;
+    }
+  } catch (err) {
+    console.warn('[Admin Auth] Error checking token claims:', err);
+  }
+
+  // 3. Firestore 'admins' collection check
+  try {
+    if (user.uid) {
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (adminDoc.exists() && (adminDoc.data()?.role === 'admin' || adminDoc.data()?.active !== false)) {
+        return true;
+      }
+    }
+    if (email) {
+      const emailDoc = await getDoc(doc(db, 'admins', email));
+      if (emailDoc.exists() && (emailDoc.data()?.role === 'admin' || emailDoc.data()?.active !== false)) {
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('[Admin Auth] Error checking Firestore admin doc:', err);
+  }
+
+  return false;
+}
+
+/**
+ * Authenticate Admin via Firebase Email and Password
+ * Strictly checks authorization before allowing access
+ */
+export async function signInAdminWithEmail(email, password) {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!normalizedEmail || !password) {
+    throw new Error('कृपया वैध ईमेल और पासवर्ड दर्ज करें। (Please enter valid email and password)');
+  }
+
+  // Pre-check authorization if email is provided
+  const isPreWhitelisted = isEmailAuthorizedAdmin(normalizedEmail);
+
+  // Authenticate with Firebase Authentication
+  const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+  const user = userCredential.user;
+
+  // Strict Authorization Guard: Only authorized persons can enter
+  const isAuthorized = isPreWhitelisted || (await verifyIsAuthorizedAdmin(user));
+  if (!isAuthorized) {
+    await signOut(auth);
+    throw new Error(`अनधिकृत खाता! This account (${user.email}) does not have admin privileges.`);
+  }
+
+  // Record/sync admin activity in Firestore
+  try {
+    await setDoc(
+      doc(db, 'admins', user.uid),
+      {
+        email: user.email,
+        role: 'admin',
+        lastLoginAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  } catch (e) {
+    console.warn('[Admin Auth] Firestore sync notice:', e);
+  }
+
+  return user;
+}
+
+/**
+ * Authenticate Admin via Google Sign-In popup
+ * Strictly verifies that the signed-in Google account is an authorized admin
+ */
+export async function signInAdminWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+
+  const userCredential = await signInWithPopup(auth, provider);
+  const user = userCredential.user;
+
+  // Strict Authorization Guard
+  const isAuthorized = await verifyIsAuthorizedAdmin(user);
+  if (!isAuthorized) {
+    await signOut(auth);
+    throw new Error(`अनधिकृत खाता! Google account (${user.email}) is not registered as an authorized Admin.`);
+  }
+
+  try {
+    await setDoc(
+      doc(db, 'admins', user.uid),
+      {
+        email: user.email,
+        displayName: user.displayName || 'Admin',
+        role: 'admin',
+        lastLoginAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  } catch (e) {
+    console.warn('[Admin Auth] Firestore sync notice:', e);
+  }
+
+  return user;
+}
+
+/**
+ * Register a new Admin with Firebase (Strictly restricted to pre-authorized emails)
+ */
+export async function registerAdminWithEmail(email, password) {
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!isEmailAuthorizedAdmin(normalizedEmail)) {
+    throw new Error('पंजीकरण अस्वीकृत: केवल पूर्व-अधिकृत एडमिन ईमेल ही नया पासवर्ड सेट कर सकते हैं। (Only pre-authorized admin emails can be registered)');
+  }
+
+  const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+  const user = userCredential.user;
+
+  try {
+    await setDoc(
+      doc(db, 'admins', user.uid),
+      {
+        email: user.email,
+        role: 'admin',
+        createdAt: serverTimestamp(),
+        lastLoginAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  } catch (e) {
+    console.warn('[Admin Auth] Firestore doc notice:', e);
+  }
+
+  return user;
+}
+
+/**
+ * Sign out current admin from Firebase Auth
+ */
+export async function signOutAdmin() {
+  try {
+    await signOut(auth);
+  } catch (e) {
+    console.warn('[Admin Auth] Sign out error:', e);
+  }
+}
+
+/**
+ * Get current authenticated Firebase admin user
+ */
+export function getCurrentAdminUser() {
+  return auth.currentUser;
+}
+
+/**
+ * Observe live Firebase Auth state changes
+ */
+export function observeAdminAuthState(callback) {
+  return onAuthStateChanged(auth, async (user) => {
+    if (!user || user.isAnonymous) {
+      callback(null, false);
+      return;
+    }
+    const isAuthorized = await verifyIsAuthorizedAdmin(user);
+    callback(user, isAuthorized);
+  });
+}
+
+/**
+ * Initialize / ensure admin auth session is active
+ */
 export function initAdminAuth() {
   return new Promise((resolve) => {
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        resolve(user);
-      } else {
-        try {
-          const cred = await signInAnonymously(auth);
-          resolve(cred.user);
-        } catch (e) {
-          console.warn('[Admin Auth] Anonymous session warning:', e);
-          resolve({ uid: 'admin_local' });
-        }
-      }
+      resolve(user || null);
     });
   });
 }
+
+// ========================================================
+// Moderation Queue & Firestore Operations (Intact)
+// ========================================================
 
 /**
  * Real-time listener for all pins in moderation queue
@@ -88,7 +312,7 @@ export async function approvePin(pinId) {
     photoStatus: 'approved',
     photoApproved: true,
     photoApprovedAt: serverTimestamp(),
-    moderatedBy: 'admin'
+    moderatedBy: auth.currentUser?.email || 'admin'
   });
   return true;
 }
@@ -104,7 +328,7 @@ export async function rejectPin(pinId, reason = 'Photo does not meet guidelines'
     photoApproved: false,
     photoRejectedReason: reason,
     photoRejectedAt: serverTimestamp(),
-    moderatedBy: 'admin'
+    moderatedBy: auth.currentUser?.email || 'admin'
   });
   return true;
 }
@@ -115,13 +339,14 @@ export async function rejectPin(pinId, reason = 'Photo does not meet guidelines'
 export async function bulkApprovePins(pinIds) {
   if (!Array.isArray(pinIds) || pinIds.length === 0) return 0;
   const batch = writeBatch(db);
+  const adminEmail = auth.currentUser?.email || 'admin';
   pinIds.forEach((id) => {
     const pinRef = doc(db, 'pins', id);
     batch.update(pinRef, {
       photoStatus: 'approved',
       photoApproved: true,
       photoApprovedAt: serverTimestamp(),
-      moderatedBy: 'admin'
+      moderatedBy: adminEmail
     });
   });
   await batch.commit();
@@ -134,6 +359,7 @@ export async function bulkApprovePins(pinIds) {
 export async function bulkRejectPins(pinIds, reason = 'Bulk rejected by admin') {
   if (!Array.isArray(pinIds) || pinIds.length === 0) return 0;
   const batch = writeBatch(db);
+  const adminEmail = auth.currentUser?.email || 'admin';
   pinIds.forEach((id) => {
     const pinRef = doc(db, 'pins', id);
     batch.update(pinRef, {
@@ -141,7 +367,7 @@ export async function bulkRejectPins(pinIds, reason = 'Bulk rejected by admin') 
       photoApproved: false,
       photoRejectedReason: reason,
       photoRejectedAt: serverTimestamp(),
-      moderatedBy: 'admin'
+      moderatedBy: adminEmail
     });
   });
   await batch.commit();
@@ -256,7 +482,7 @@ export async function updatePinImage(pinId, newImageUrl, imageIndex = 0) {
       photoApproved: true,
       photoStatus: 'approved',
       photoApprovedAt: serverTimestamp(),
-      moderatedBy: 'admin'
+      moderatedBy: auth.currentUser?.email || 'admin'
     };
 
     if (imageIndex === 0 || !data.imageUrl || data.imageUrl === (data.images && data.images[0])) {
@@ -268,7 +494,6 @@ export async function updatePinImage(pinId, newImageUrl, imageIndex = 0) {
     return true;
   } catch (err) {
     console.error('[Admin Firebase] Error updating pin image:', err);
-    // Fallback direct update
     await updateDoc(pinRef, {
       imageUrl: newImageUrl,
       thumbnailUrl: newImageUrl,
@@ -277,7 +502,7 @@ export async function updatePinImage(pinId, newImageUrl, imageIndex = 0) {
       photoApproved: true,
       photoStatus: 'approved',
       photoApprovedAt: serverTimestamp(),
-      moderatedBy: 'admin'
+      moderatedBy: auth.currentUser?.email || 'admin'
     });
     return true;
   }
@@ -292,5 +517,3 @@ export async function hardDeletePin(pinId) {
   await deleteDoc(pinRef);
   return true;
 }
-
-

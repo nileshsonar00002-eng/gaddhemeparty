@@ -1,10 +1,12 @@
 // Top Navigation Bar
 
-import { logoutAdmin } from './AuthGate';
+import { logoutAdmin, getCachedAdminInfo } from './AuthGate';
 
 export function renderNavbar(container, options = {}) {
-  const { onSearch, isAudioEnabled = true, onToggleAudio, isConnected = true } = options;
+  const { onSearch, isAudioEnabled = true, onToggleAudio, isConnected = true, adminUser = null } = options;
   const clientUrl = import.meta.env.VITE_MAIN_SITE_URL || 'http://localhost:5173';
+  const cachedAdmin = getCachedAdminInfo();
+  const currentEmail = adminUser?.email || cachedAdmin?.email || 'Authorized Admin';
 
   container.innerHTML = `
     <header class="bg-slate-900/90 border-b border-slate-800/80 sticky top-0 z-40 backdrop-blur-md px-4 sm:px-6 py-3">
@@ -49,6 +51,16 @@ export function renderNavbar(container, options = {}) {
 
         <!-- Right: Actions & Tools -->
         <div class="flex items-center gap-2.5">
+          
+          <!-- Authorized Admin Identity Badge -->
+          <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs text-slate-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="text-slate-400 text-[11px]">Admin:</span>
+            <span class="font-semibold text-white truncate max-w-[150px]" title="${currentEmail}">
+              ${currentEmail}
+            </span>
+          </div>
+
           <!-- Audio Alert Toggle -->
           <button
             id="btn-toggle-audio"
@@ -74,10 +86,11 @@ export function renderNavbar(container, options = {}) {
           <button
             id="btn-admin-logout"
             type="button"
-            title="Logout"
-            class="p-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 border border-slate-700 hover:border-rose-500/30 transition cursor-pointer"
+            title="Logout from Admin HQ"
+            class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 hover:text-rose-400 text-slate-400 border border-slate-700 hover:border-rose-500/30 transition flex items-center gap-1.5 cursor-pointer text-xs font-medium"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span class="hidden sm:inline">Logout</span>
           </button>
         </div>
       </div>
@@ -104,7 +117,7 @@ export function renderNavbar(container, options = {}) {
   });
 
   searchClear?.addEventListener('click', () => {
-    if (searchInput) searchInput.value = '';
+    searchInput.value = '';
     searchClear.classList.add('hidden');
     if (onSearch) onSearch('');
   });
@@ -113,9 +126,7 @@ export function renderNavbar(container, options = {}) {
     if (onToggleAudio) onToggleAudio();
   });
 
-  logoutBtn?.addEventListener('click', () => {
-    if (confirm('Are you sure you want to log out of Admin Panel?')) {
-      logoutAdmin();
-    }
+  logoutBtn?.addEventListener('click', async () => {
+    await logoutAdmin();
   });
 }
