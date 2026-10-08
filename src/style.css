@@ -642,12 +642,28 @@ main {
   bottom: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  height: 100dvh !important;
   max-width: none !important;
   max-height: none !important;
   border-radius: 0 !important;
   border: none !important;
   z-index: 99999 !important;
   margin-top: 0 !important;
+}
+
+#map-card-container.is-fullscreen #map-confirm-bar {
+  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+#map-card-container.is-fullscreen #btn-map-fullscreen-exit,
+#map-card-container.is-fullscreen > div.absolute.top-4 {
+  top: calc(1rem + env(safe-area-inset-top, 0px)) !important;
+}
+
+body.map-confirm-active #btn-open-report,
+body.map-confirm-active #btn-open-about,
+body.map-confirm-active #sticky-mobile-cta {
+  display: none !important;
 }
 
 /* Modal Scroll Lock */

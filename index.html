@@ -102,6 +102,22 @@
             <!-- Map Canvas -->
             <div id="map" class="w-full h-full bg-[var(--map-bg)]"></div>
 
+            <!-- Fullscreen Exit Button (Visible ONLY when Fullscreen is active) -->
+            <button
+              id="btn-map-fullscreen-exit"
+              type="button"
+              class="hidden absolute top-4 left-4 z-[400] items-center gap-1.5 px-3 py-2 bg-[var(--surface)] text-[var(--text)] hover:text-[var(--primary)] rounded-xl border border-[var(--border)] shadow-md text-xs font-bold cursor-pointer active:scale-95 transition select-none"
+              title="फुल स्क्रीन से बाहर निकलें"
+              aria-label="फुल स्क्रीन से बाहर निकलें"
+              data-i18n-title="exitFullscreenTooltip"
+              data-i18n-aria="exitFullscreenTooltip"
+            >
+              <svg class="w-4 h-4 text-inherit" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              <span data-i18n="exitFullscreenBtn">बाहर निकलें</span>
+            </button>
+
             <!-- Floating Map Controls (Locate Me, Zoom In, Zoom Out, Fullscreen) Inside Card -->
             <div class="absolute top-4 right-4 z-[400] flex flex-col bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-md overflow-hidden select-none">
               <!-- Locate Me Button -->

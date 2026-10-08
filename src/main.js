@@ -351,6 +351,24 @@ class KhaddaApp {
       this.toggleMapFullscreen();
     });
 
+    // Dedicated Fullscreen Exit Button on Map (Mobile & Desktop)
+    const exitFullscreenTopBtn = document.getElementById('btn-map-fullscreen-exit');
+    exitFullscreenTopBtn?.addEventListener('click', () => {
+      if (this.activeConfirmCleanup) {
+        this.activeConfirmCleanup();
+      }
+      this.exitMapFullscreen();
+      this.isReportFullscreenFlow = false;
+    });
+
+    // When Report Drawer closes, return to normal view if opened from report flow
+    this.bottomSheet.onCloseCallbacks.push(() => {
+      if (this.isReportFullscreenFlow && this.isMapFullscreenActive()) {
+        this.exitMapFullscreen();
+        this.isReportFullscreenFlow = false;
+      }
+    });
+
     // Listen to native and ESC fullscreen changes
     const onFullscreenChange = () => {
       const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
@@ -939,8 +957,11 @@ class KhaddaApp {
       this.mapAdapter?.clearAccuracyCircle?.();
     };
 
+    this.activeConfirmCleanup = cleanupConfirmMode;
+
     // Done / Confirm Button Click
     const handleDone = () => {
+      this.activeConfirmCleanup = null;
       const pinPos = this.mapAdapter?.getConfirmLocationPosition?.() || activeCoords;
       const distFromOrigin = (realGps && typeof realGps.lat === 'number') 
         ? haversineDistanceKm(realGps.lat, realGps.lng, pinPos.lat, pinPos.lng) 
@@ -985,9 +1006,16 @@ class KhaddaApp {
 
     // Cancel Button Click
     const handleCancel = () => {
+      this.activeConfirmCleanup = null;
       cleanupConfirmMode();
       doneBtn?.removeEventListener('click', handleDone);
       cancelBtn?.removeEventListener('click', handleCancel);
+
+      if (this.isReportFullscreenFlow && !formState.isLocationConfirmed && !imageData) {
+        this.exitMapFullscreen();
+        this.isReportFullscreenFlow = false;
+        return;
+      }
 
       // Restore report sheet with previous state
       this.openReportDrawer({
@@ -1006,6 +1034,8 @@ class KhaddaApp {
   handleOpenReportClick() {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
+      this.isReportFullscreenFlow = true;
+      this.enterMapFullscreen();
       // Mobile Step 1: Open Full Screen Map Location Confirmation first
       this.startMapLocationConfirm({ autoTriggerPhoto: true });
     } else {
@@ -1268,46 +1298,35 @@ class KhaddaApp {
     updateOnlineStatus();
   }
 
-  toggleMapFullscreen() {
+  isMapFullscreenActive() {
     const card = document.getElementById('map-card-container');
-    if (!card) return;
-
-    const isCurrentlyFs = !!(
+    return !!(
       document.fullscreenElement ||
       document.webkitFullscreenElement ||
       document.mozFullScreenElement ||
       document.msFullscreenElement ||
-      card.classList.contains('is-fullscreen')
+      card?.classList.contains('is-fullscreen')
     );
+  }
 
-    if (isCurrentlyFs) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-      card.classList.remove('is-fullscreen');
-      this.updateFullscreenUI(false);
-    } else {
-      if (card.requestFullscreen) {
-        card.requestFullscreen().catch(() => {
-          card.classList.add('is-fullscreen');
-          this.updateFullscreenUI(true);
-        });
-      } else if (card.webkitRequestFullscreen) {
-        card.webkitRequestFullscreen();
-      } else if (card.mozRequestFullScreen) {
-        card.mozRequestFullScreen();
-      } else if (card.msRequestFullscreen) {
-        card.msRequestFullscreen();
-      } else {
+  enterMapFullscreen() {
+    const card = document.getElementById('map-card-container');
+    if (!card || this.isMapFullscreenActive()) return;
+
+    if (card.requestFullscreen) {
+      card.requestFullscreen().catch(() => {
         card.classList.add('is-fullscreen');
         this.updateFullscreenUI(true);
-      }
+      });
+    } else if (card.webkitRequestFullscreen) {
+      card.webkitRequestFullscreen();
+    } else if (card.mozRequestFullScreen) {
+      card.mozRequestFullScreen();
+    } else if (card.msRequestFullscreen) {
+      card.msRequestFullscreen();
+    } else {
+      card.classList.add('is-fullscreen');
+      this.updateFullscreenUI(true);
     }
 
     if (this.mapAdapter && this.mapAdapter.resize) {
@@ -1316,14 +1335,49 @@ class KhaddaApp {
     }
   }
 
+  exitMapFullscreen() {
+    const card = document.getElementById('map-card-container');
+    if (!card || !this.isMapFullscreenActive()) return;
+
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+    card.classList.remove('is-fullscreen');
+    this.updateFullscreenUI(false);
+
+    if (this.mapAdapter && this.mapAdapter.resize) {
+      setTimeout(() => this.mapAdapter.resize(), 120);
+      setTimeout(() => this.mapAdapter.resize(), 350);
+    }
+  }
+
+  toggleMapFullscreen() {
+    if (this.isMapFullscreenActive()) {
+      this.exitMapFullscreen();
+    } else {
+      this.enterMapFullscreen();
+    }
+  }
+
   updateFullscreenUI(isFullscreen) {
     const btn = document.getElementById('btn-fullscreen-toggle');
     const enterIcon = document.getElementById('icon-enter-fullscreen');
     const exitIcon = document.getElementById('icon-exit-fullscreen');
+    const topExitBtn = document.getElementById('btn-map-fullscreen-exit');
 
     if (isFullscreen) {
       enterIcon?.classList.add('hidden');
       exitIcon?.classList.remove('hidden');
+      if (topExitBtn) {
+        topExitBtn.classList.remove('hidden');
+        topExitBtn.classList.add('flex');
+      }
       if (btn) {
         btn.title = t('exitFullscreenTooltip');
         btn.setAttribute('aria-label', t('exitFullscreenTooltip'));
@@ -1331,6 +1385,10 @@ class KhaddaApp {
     } else {
       enterIcon?.classList.remove('hidden');
       exitIcon?.classList.add('hidden');
+      if (topExitBtn) {
+        topExitBtn.classList.add('hidden');
+        topExitBtn.classList.remove('flex');
+      }
       if (btn) {
         btn.title = t('fullscreenTooltip');
         btn.setAttribute('aria-label', t('fullscreenTooltip'));

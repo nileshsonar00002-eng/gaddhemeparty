@@ -34,6 +34,7 @@ export const translations = {
     zoomOutTooltip: 'ज़ूम आउट (-)',
     fullscreenTooltip: 'फुल स्क्रीन',
     exitFullscreenTooltip: 'फुल स्क्रीन से बाहर निकलें',
+    exitFullscreenBtn: 'बाहर निकलें',
     gestureHintMobile: 'मैप को हिलाने के लिए २ उंगलियों का उपयोग करें',
     gestureHintDesktop: 'मैप को ज़ूम करने के लिए Ctrl दबाकर स्क्रॉल करें',
     sheetTitle: 'गड्ढा रिपोर्ट करें',
@@ -252,6 +253,7 @@ export const translations = {
     zoomOutTooltip: 'Zoom Out (-)',
     fullscreenTooltip: 'Full Screen',
     exitFullscreenTooltip: 'Exit Full Screen',
+    exitFullscreenBtn: 'Exit',
     gestureHintMobile: 'Use 2 fingers to move map',
     gestureHintDesktop: 'Use Ctrl + scroll to zoom map',
     
