@@ -13,6 +13,7 @@ import {
   updatePinLandmark,
   archivePin,
   hardDeletePin,
+  deletePinPhoto,
   observeAdminAuthState,
   auth
 } from './services/firebase';
@@ -406,9 +407,30 @@ class AdminApp {
 
       const triggerLightbox = () => {
         if (images.length > 0) {
-          openLightbox(images, pin.landmark || 'Pothole Image', cardActiveImgIndex, (targetIdx) => {
-            openImageEditModal(pin, targetIdx);
-          });
+          openLightbox(
+            images,
+            pin.landmark || 'Pothole Image',
+            cardActiveImgIndex,
+            (targetIdx) => {
+              openImageEditModal(pin, targetIdx);
+            },
+            async (targetIdx) => {
+              const photoNum = targetIdx + 1;
+              const totalPhotos = images.length;
+              const confirmMsg = totalPhotos > 1
+                ? `Are you sure you want to delete Photo #${photoNum} out of ${totalPhotos}? The remaining photo(s) will be kept.`
+                : `Are you sure you want to delete this photo from report #${pin.id.slice(0, 6)}?`;
+
+              if (confirm(confirmMsg)) {
+                try {
+                  await deletePinPhoto(pin.id, targetIdx);
+                  showToast(`🗑️ Photo #${photoNum} deleted successfully!`, 'info');
+                } catch (err) {
+                  showToast('Failed to delete photo', 'error');
+                }
+              }
+            }
+          );
         }
       };
 
@@ -425,6 +447,27 @@ class AdminApp {
         el.addEventListener('click', (e) => {
           e.stopPropagation();
           openImageEditModal(pin, cardActiveImgIndex);
+        });
+      });
+
+      // Delete Single Photo Button click handler
+      card.querySelectorAll('[data-action="delete-single-photo"]').forEach((el) => {
+        el.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const targetPhotoNum = cardActiveImgIndex + 1;
+          const totalPhotos = images.length;
+          const confirmMsg = totalPhotos > 1
+            ? `Are you sure you want to delete Photo #${targetPhotoNum} out of ${totalPhotos}? The remaining photo(s) will be kept.`
+            : `Are you sure you want to delete this photo from report #${pin.id.slice(0, 6)}?`;
+
+          if (confirm(confirmMsg)) {
+            try {
+              await deletePinPhoto(pin.id, cardActiveImgIndex);
+              showToast(`🗑️ Photo #${targetPhotoNum} deleted successfully!`, 'info');
+            } catch (err) {
+              showToast('Failed to delete photo', 'error');
+            }
+          }
         });
       });
 

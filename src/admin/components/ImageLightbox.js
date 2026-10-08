@@ -1,6 +1,6 @@
 // Image Fullscreen Lightbox with Multi-Photo Gallery & Zoom Support
 
-export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex = 0, onEditPhoto = null) {
+export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex = 0, onEditPhoto = null, onDeletePhoto = null) {
   let images = [];
   if (Array.isArray(imagesInput)) {
     images = imagesInput.filter((img) => img && typeof img === 'string');
@@ -37,6 +37,15 @@ export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex 
               class="px-3 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-slate-950 text-xs font-bold border border-amber-500/40 transition cursor-pointer flex items-center gap-1"
             >
               🎨 Edit Photo
+            </button>
+          ` : ''}
+          ${onDeletePhoto ? `
+            <button
+              id="btn-delete-lightbox-photo"
+              type="button"
+              class="px-3 py-1.5 rounded-full bg-rose-500/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold border border-rose-500/40 transition cursor-pointer flex items-center gap-1"
+            >
+              🗑️ Delete Photo
             </button>
           ` : ''}
           <a
@@ -119,6 +128,11 @@ export function openLightbox(imagesInput, title = 'Pothole Image', initialIndex 
     modal.querySelector('#btn-edit-lightbox-photo')?.addEventListener('click', () => {
       close();
       if (onEditPhoto) onEditPhoto(currentIndex);
+    });
+
+    modal.querySelector('#btn-delete-lightbox-photo')?.addEventListener('click', () => {
+      close();
+      if (onDeletePhoto) onDeletePhoto(currentIndex);
     });
 
     modal.querySelector('#btn-prev-lightbox')?.addEventListener('click', (e) => {

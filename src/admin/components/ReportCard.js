@@ -101,7 +101,18 @@ export function createReportCardHtml(pin, isSelected = false) {
               class="absolute top-2 right-2 px-2 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-[10px] font-bold text-amber-400 border border-amber-500/40 flex items-center gap-1 shadow-lg cursor-pointer hover:bg-amber-500 hover:text-slate-950 transition z-10"
               title="Blur sensitive areas or draw on photo"
             >
-              <span>🎨 Edit Photo</span>
+              <span>🎨 Edit</span>
+            </button>
+
+            <!-- Delete Specific Photo Button -->
+            <button
+              type="button"
+              data-action="delete-single-photo"
+              data-id="${pin.id}"
+              class="absolute top-2 left-2 px-2 py-1 rounded-xl bg-slate-900/80 backdrop-blur-md text-[10px] font-bold text-rose-400 hover:text-white hover:bg-rose-600 border border-rose-500/40 flex items-center gap-1 shadow-lg cursor-pointer transition z-10"
+              title="Delete this photo only"
+            >
+              <span>🗑️ Delete Photo</span>
             </button>
 
             <!-- Click to Zoom Badge -->

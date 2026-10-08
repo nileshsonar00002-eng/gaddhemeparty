@@ -481,6 +481,49 @@ export async function updatePinImage(pinId, newImageUrl, imageIndex = 0) {
 }
 
 /**
+ * Delete a specific individual photo at photoIndex from a pin without deleting the pin itself
+ */
+export async function deletePinPhoto(pinId, photoIndex = 0) {
+  if (!pinId) return false;
+  const pinRef = doc(db, 'pins', pinId);
+
+  try {
+    const snap = await getDoc(pinRef);
+    if (!snap.exists()) return false;
+
+    const data = snap.data();
+    let currentImages = Array.isArray(data.images) ? [...data.images] : (data.imageUrl ? [data.imageUrl] : []);
+    let currentThumbs = Array.isArray(data.thumbnails) ? [...data.thumbnails] : (data.thumbnailUrl ? [data.thumbnailUrl] : []);
+
+    if (photoIndex >= 0 && photoIndex < currentImages.length) {
+      currentImages.splice(photoIndex, 1);
+    }
+    if (photoIndex >= 0 && photoIndex < currentThumbs.length) {
+      currentThumbs.splice(photoIndex, 1);
+    }
+
+    const updates = {
+      images: currentImages,
+      thumbnails: currentThumbs,
+      imageUrl: currentImages[0] || null,
+      thumbnailUrl: currentThumbs[0] || currentImages[0] || null,
+      lastReportedAt: serverTimestamp()
+    };
+
+    if (currentImages.length === 0) {
+      updates.photoStatus = 'none';
+      updates.photoApproved = false;
+    }
+
+    await updateDoc(pinRef, updates);
+    return true;
+  } catch (err) {
+    console.error('[Admin Firebase] Error deleting specific pin photo:', err);
+    throw err;
+  }
+}
+
+/**
  * Permanent Delete pin
  */
 export async function hardDeletePin(pinId) {
