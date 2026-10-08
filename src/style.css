@@ -5,39 +5,47 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   --header-h: 77px;
   --gap-desktop: 32px;
   --gap-mobile: 24px;
   --scroll-offset: calc(var(--header-h) + 16px);
 
-  /* 1. TOKENS: Warm Cream + Burgundy Palette (Light Theme Only) */
-  --bg: #F9F2E8;           /* page, warm cream */
-  --surface: #FDF8F0;      /* cards, panels, popups */
-  --surface-2: #F1E6D8;
-  --border: #DDD0C2;
-  --text: #3B2620;
-  --muted: #6B5A52;
-  --heading: #4A1D16;
-  --primary: #7A2315;      /* rust-red buttons */
-  --primary-hover: #62190F;
-  --primary-ink: #FFF6EC;
-  --band: #521F17;         /* deep burgundy: header, stats strip, footer, dark sections */
-  --band-ink: #F9F2E8;
-  --accent: #7A2315;
-  --accent-ink: #FFF6EC;
-  --danger: #C62828;
-  --success: #2E7D4F;
+  /* 1. TOKENS: Dark Navy + Neon Lime Green + Crisp White Palette */
+  --bg: #050B14;           /* page background, deep navy / almost black */
+  --surface: #0B1626;      /* cards, panels, popups, dark blue */
+  --surface-2: #101D2E;    /* secondary dark surface */
+  --border: #243449;       /* subtle blue-gray border */
+  --border-subtle: #30445B;
+  --text: #F5F7FA;         /* primary text, crisp white */
+  --muted: #94A3B8;        /* secondary text, light gray */
+  --heading: #FFFFFF;      /* headings, pure white */
+  --primary: #8CFF3F;      /* main accent, bright neon lime green */
+  --primary-hover: #A7FF68;/* hover neon green */
+  --primary-ink: #06100A;  /* dark text on green buttons */
+  --band: #07111D;         /* deep dark navy header & bands */
+  --band-ink: #F5F7FA;
+  --accent: #8CFF3F;       /* neon green accent */
+  --accent-ink: #06100A;
+  
+  /* Status Colors */
+  --danger: #FF4D35;       /* red-orange pothole status */
+  --warning: #FFD43B;      /* yellow road damage status */
+  --waterlogging: #2494FF; /* bright blue waterlogging status */
+  --other: #94A3B8;        /* slate gray status */
+  --success: #8CFF3F;      /* neon green success status */
 
-  /* 3D Elevation & Warm Brown-Tinted Shadows */
-  --shadow-sm: 0 1px 2px rgba(82, 31, 23, 0.10), 0 2px 6px rgba(82, 31, 23, 0.08);
-  --shadow-md: 0 2px 4px rgba(82, 31, 23, 0.08), 0 8px 20px rgba(82, 31, 23, 0.12);
-  --shadow-lg: 0 4px 8px rgba(82, 31, 23, 0.08), 0 16px 40px rgba(82, 31, 23, 0.18), 0 40px 80px -20px rgba(82, 31, 23, 0.22);
-  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  --shadow-on-band: 0 12px 32px rgba(40, 12, 8, 0.40), inset 0 1px 0 rgba(249, 242, 232, 0.18);
+  /* Dark Elevation & Neon Green Glow Effects */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 25px rgba(140, 255, 63, 0.30);
+  --shadow-glow-sm: 0 0 12px rgba(140, 255, 63, 0.20);
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-on-band: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --shadow-soft: var(--shadow-md);
   --shadow-card: var(--shadow-md);
-  --shadow-header: 0 4px 20px rgba(82, 31, 23, 0.15);
+  --shadow-header: 0 4px 24px rgba(0, 0, 0, 0.8);
 
   /* Aliases */
   --bg-primary: var(--bg);
@@ -45,20 +53,20 @@
   --bg-card: var(--surface);
   --bg-card-subtle: var(--surface-2);
   --bg-card-hover: var(--surface-2);
-  --bg-nav: rgba(82, 31, 23, 0.88);
-  --bg-glass: rgba(249, 242, 232, 0.96);
+  --bg-nav: rgba(7, 17, 29, 0.92);
+  --bg-glass: rgba(11, 22, 38, 0.90);
   --text-primary: var(--text);
   --text-secondary: var(--muted);
   --text-muted: var(--muted);
   --border-color: var(--border);
-  --border-subtle: rgba(221, 208, 194, 0.6);
+  --border-subtle: rgba(48, 68, 91, 0.6);
   --accent-amber: var(--primary);
   --accent-amber-text: var(--primary);
-  --accent-amber-bg: rgba(122, 35, 21, 0.12);
+  --accent-amber-bg: rgba(140, 255, 63, 0.12);
   --accent-rose: var(--danger);
   --popup-bg: var(--surface);
-  --map-bg: #EFE5D6;
-  --theme-color: #521F17;
+  --map-bg: #050B14;
+  --theme-color: #050B14;
 }
 
 @media (max-width: 640px) {
@@ -165,33 +173,37 @@
 /* ========================================================
    3D Tactile Chunky Buttons
    ======================================================== */
+/* ========================================================
+   3D Tactile Neon Green & Dark Navy Buttons
+   ======================================================== */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(180deg, #8E2B1A 0%, #7A2315 100%);
-  color: var(--primary-ink);
+  background: #8CFF3F;
+  color: #06100A;
   font-weight: 700;
   font-size: 0.9375rem;
   padding: 0.625rem 1.25rem;
   min-height: 44px;
   border-radius: 14px;
-  border: 1px solid #9C3320;
-  box-shadow: 0 4px 0 #4A1209, 0 6px 16px rgba(122, 35, 21, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+  border: 1px solid #9EFF45;
+  box-shadow: 0 0 20px rgba(140, 255, 63, 0.30), 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.18s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.18s cubic-bezier(0.2, 0, 0, 1), background-color 0.18s ease;
   cursor: pointer;
   text-decoration: none;
   user-select: none;
 }
 .btn-primary:hover {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-  box-shadow: 0 5px 0 #4A1209, 0 8px 20px rgba(122, 35, 21, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  background: #A7FF68;
+  color: #06100A;
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(140, 255, 63, 0.45), 0 6px 18px rgba(0, 0, 0, 0.5);
 }
 .btn-primary:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #4A1209, 0 3px 8px rgba(122, 35, 21, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(1px);
+  box-shadow: 0 0 14px rgba(140, 255, 63, 0.25), 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .btn-primary:focus-visible {
   outline: 2px solid var(--primary);
@@ -203,7 +215,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F6EBDD 100%);
+  background: rgba(16, 29, 46, 0.85);
   color: var(--text);
   font-weight: 600;
   font-size: 0.875rem;
@@ -211,22 +223,21 @@
   min-height: 44px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 0 rgba(82, 31, 23, 0.18), 0 3px 8px rgba(82, 31, 23, 0.08), inset 0 1px 0 #FFFFFF;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   cursor: pointer;
   text-decoration: none;
   user-select: none;
 }
 .btn-secondary:hover {
-  background: linear-gradient(180deg, #FFFFFF 0%, #EFE1CE 100%);
-  border-color: var(--heading);
-  color: var(--heading);
+  background: #101D2E;
+  border-color: #8CFF3F;
+  color: #8CFF3F;
   transform: translateY(-1px);
-  box-shadow: 0 3px 0 rgba(82, 31, 23, 0.25), 0 5px 12px rgba(82, 31, 23, 0.14), inset 0 1px 0 #FFFFFF;
+  box-shadow: 0 0 14px rgba(140, 255, 63, 0.20), 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 .btn-secondary:active {
-  transform: translateY(2px);
-  box-shadow: 0 0 0 rgba(82, 31, 23, 0.15), inset 0 1px 2px rgba(82, 31, 23, 0.15);
+  transform: translateY(1px);
 }
 .btn-secondary:focus-visible {
   outline: 2px solid var(--primary);
@@ -242,34 +253,33 @@
   border-radius: 0 !important;
 }
 
-/* Button for Burgundy Band (Pill 3D style) */
+/* Button for Dark Band */
 .btn-band {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(180deg, #FDF8F0 0%, #F1E6D8 100%);
-  color: var(--band);
+  background: #8CFF3F;
+  color: #06100A;
   font-weight: 700;
   font-size: 0.875rem;
   padding: 0.5rem 1.25rem;
   min-height: 44px;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 4px 0 #36120C, 0 6px 16px rgba(40, 12, 8, 0.35), inset 0 1px 0 #FFFFFF;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+  border: 1px solid #9EFF45;
+  box-shadow: 0 0 20px rgba(140, 255, 63, 0.30);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
   cursor: pointer;
   text-decoration: none;
   user-select: none;
 }
 .btn-band:hover {
-  filter: brightness(1.05);
+  background: #A7FF68;
   transform: translateY(-1px);
-  box-shadow: 0 5px 0 #36120C, 0 8px 20px rgba(40, 12, 8, 0.4), inset 0 1px 0 #FFFFFF;
+  box-shadow: 0 0 28px rgba(140, 255, 63, 0.45);
 }
 .btn-band:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #36120C, 0 3px 8px rgba(40, 12, 8, 0.25);
+  transform: translateY(1px);
 }
 .btn-band:focus-visible {
   outline: 2px solid var(--band-ink);
@@ -277,60 +287,41 @@
 }
 
 /* ========================================================
-   Tactile Cards & Panels (Cream & Burgundy)
+   Glassmorphism Dark Navy Cards & Panels
    ======================================================== */
-.card-lime, .card-cream {
-  background: linear-gradient(180deg, #FFFBF4 0%, #F6EBDD 100%);
+.card-lime, .card-cream, .card-forest, .card-burgundy {
+  background: rgba(11, 22, 38, 0.90);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md), var(--highlight);
   border-radius: 16px;
+  color: var(--text);
   position: relative;
-  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1), border-color 0.2s ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  .card-lime:hover, .card-cream:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: var(--shadow-lg), var(--highlight);
-  }
-}
-
-.card-forest, .card-burgundy {
-  background: linear-gradient(180deg, #6A2A20 0%, #521F17 100%);
-  border: 1px solid rgba(249, 242, 232, 0.30);
-  box-shadow: var(--shadow-on-band);
-  border-radius: 16px;
-  color: var(--band-ink);
-  position: relative;
-  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1);
-}
-@media (hover: hover) and (pointer: fine) {
-  .card-forest:hover, .card-burgundy:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 18px 42px rgba(40, 12, 8, 0.45), inset 0 1px 0 rgba(249, 242, 232, 0.35);
+  .card-lime:hover, .card-cream:hover, .card-forest:hover, .card-burgundy:hover {
+    transform: translateY(-4px);
+    border-color: rgba(140, 255, 63, 0.30);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(140, 255, 63, 0.12);
   }
 }
 
 /* Tactile Icon Tiles */
-.icon-tile-lime, .icon-tile-cream {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F1E6D8 100%);
-  border: 1px solid rgba(82, 31, 23, 0.18);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 5px rgba(82, 31, 23, 0.08);
+.icon-tile-lime, .icon-tile-cream, .icon-tile-forest, .icon-tile-burgundy {
+  background: rgba(16, 29, 46, 0.90);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.3);
   border-radius: 14px;
 }
 
-.icon-tile-forest, .icon-tile-burgundy {
-  background: linear-gradient(180deg, rgba(249, 242, 232, 0.20) 0%, rgba(82, 31, 23, 0.45) 100%);
-  border: 1px solid rgba(249, 242, 232, 0.35);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 2px 6px rgba(40, 12, 8, 0.35);
-  border-radius: 14px;
-}
-
-/* Step Numbers & Rank Badges with Muted Metallic Sheen */
+/* Step Numbers & Rank Badges with Metallic / Neon Glow Sheen */
 .badge-metallic-step {
-  background: linear-gradient(180deg, #7A2315 0%, #521F17 100%);
-  color: var(--primary-ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 3px 6px rgba(122, 35, 21, 0.3);
-  border: 1px solid rgba(249, 242, 232, 0.3);
+  background: rgba(140, 255, 63, 0.15);
+  color: #8CFF3F;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 12px rgba(140, 255, 63, 0.2);
+  border: 1px solid rgba(140, 255, 63, 0.35);
 }
 
 .badge-rank-gold {
@@ -356,8 +347,9 @@
 
 /* Map Device Frame & Inset Screen Vignette */
 .map-device-frame {
-  border: 6px solid #E3D3C0;
-  box-shadow: var(--shadow-lg), inset 0 0 0 1px rgba(82, 31, 23, 0.15);
+  border: 1px solid #243449;
+  background: #0B1626;
+  box-shadow: var(--shadow-lg), 0 0 24px rgba(140, 255, 63, 0.08);
   border-radius: 20px;
   position: relative;
 }
@@ -366,7 +358,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  box-shadow: inset 0 3px 12px rgba(82, 31, 23, 0.16), inset 0 -3px 12px rgba(82, 31, 23, 0.12);
+  box-shadow: inset 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 -4px 16px rgba(0, 0, 0, 0.5);
   border-radius: 14px;
   z-index: 300;
 }
@@ -375,10 +367,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F1E6D8 100%);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(82, 31, 23, 0.08), inset 0 1px 0 #FFFFFF;
+  background: rgba(16, 29, 46, 0.85);
+  color: #94A3B8;
+  border: 1px solid #243449;
   border-radius: 9999px;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -387,20 +378,21 @@
 
 /* Hero swatch accent underline */
 .hero-highlight-word {
+  color: #8CFF3F;
   text-decoration: underline;
-  text-decoration-color: var(--primary);
+  text-decoration-color: #8CFF3F;
   text-decoration-thickness: 3px;
   text-underline-offset: 4px;
 }
 
-/* Hero Ambient Soft Lighting Shapes (Radial Gradients - No Heavy Blur) */
+/* Hero Ambient Soft Lighting Shapes (Neon Green & Soft Blue Glow) */
 .hero-ambient-shape-1 {
   position: absolute;
   top: -10%;
   left: 15%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(235, 217, 195, 0.65) 0%, rgba(249, 242, 232, 0) 70%);
+  background: radial-gradient(circle, rgba(140, 255, 63, 0.08) 0%, rgba(5, 11, 20, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -411,7 +403,7 @@
   right: 5%;
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(122, 35, 21, 0.08) 0%, rgba(249, 242, 232, 0) 70%);
+  background: radial-gradient(circle, rgba(36, 148, 255, 0.06) 0%, rgba(5, 11, 20, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -534,11 +526,11 @@
     from var(--nav-snake-angle, 0deg),
     transparent 0deg,
     transparent 280deg,
-    rgba(249, 242, 232, 0.08) 295deg,
-    rgba(217, 140, 60, 0.28) 315deg,
-    rgba(245, 185, 105, 0.65) 335deg,
-    rgba(255, 230, 165, 0.92) 352deg,
-    rgba(255, 252, 242, 1) 360deg
+    rgba(140, 255, 63, 0.08) 295deg,
+    rgba(140, 255, 63, 0.28) 315deg,
+    rgba(140, 255, 63, 0.65) 335deg,
+    rgba(167, 255, 104, 0.92) 352deg,
+    #8CFF3F 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -548,7 +540,7 @@
   will-change: --nav-snake-angle;
 }
 
-/* 2. Soft warm ambient glow trailing behind the moving snake */
+/* 2. Soft neon green ambient glow trailing behind the moving snake */
 #navbar-container > div::after {
   content: '';
   position: absolute;
@@ -562,9 +554,9 @@
     from var(--nav-snake-angle, 0deg),
     transparent 0deg,
     transparent 300deg,
-    rgba(217, 140, 60, 0.15) 325deg,
-    rgba(245, 185, 105, 0.40) 345deg,
-    rgba(255, 240, 200, 0.70) 360deg
+    rgba(140, 255, 63, 0.15) 325deg,
+    rgba(140, 255, 63, 0.40) 345deg,
+    rgba(167, 255, 104, 0.75) 360deg
   );
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;

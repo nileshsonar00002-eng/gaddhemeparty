@@ -263,21 +263,21 @@ class KhaddaApp {
       localStorage.setItem('khadda_theme', 'light');
     }
 
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.remove('light');
+    document.documentElement.classList.add('dark');
 
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', '#521F17');
+      meta.setAttribute('content', '#050B14');
     }
 
     if (this.mapAdapter && this.mapAdapter.applyTheme) {
-      this.mapAdapter.applyTheme('light');
+      this.mapAdapter.applyTheme('dark');
     }
 
     if (this.nightGlobe && this.nightGlobe.applyTheme) {
-      this.nightGlobe.applyTheme('light');
+      this.nightGlobe.applyTheme('dark');
     }
 
     if (this.starfield && this.starfield.applyTheme) {
