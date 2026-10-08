@@ -1,6 +1,6 @@
 import { t, getLanguage } from '../utils/i18n';
 import { prefersReducedMotion } from '../utils/deviceTier';
-import { subscribeToLeaderboard, callRefreshLeaderboard } from '../services/firebase';
+import { subscribeToLeaderboard, callRefreshLeaderboard, isPinPhotoApproved } from '../services/firebase';
 
 /**
  * Slide-Over Panel Manager
@@ -468,7 +468,7 @@ export class PanelManager {
           </div>
 
           <div class="flex gap-3.5 items-center">
-            ${heroPin.thumbnailUrl || heroPin.imageUrl ? `
+            ${(heroPin.thumbnailUrl || heroPin.imageUrl) && isPinPhotoApproved(heroPin) ? `
               <img src="${heroPin.thumbnailUrl || heroPin.imageUrl}" alt="Hero Pothole" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-[#8CFF3F]/50 shadow-sm flex-shrink-0" />
             ` : `
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#8CFF3F]/15 border-2 border-[#8CFF3F]/40 flex items-center justify-center text-[#8CFF3F] flex-shrink-0">
@@ -590,7 +590,7 @@ export class PanelManager {
                   ${rankNumber}
                 </span>
 
-                ${pin.thumbnailUrl || pin.imageUrl ? `
+                ${(pin.thumbnailUrl || pin.imageUrl) && isPinPhotoApproved(pin) ? `
                   <img src="${pin.thumbnailUrl || pin.imageUrl}" alt="Pothole thumb" class="${thumbSize} rounded-xl object-cover border border-white/15 flex-shrink-0 shadow-xs" />
                 ` : `
                   <div class="${thumbSize} rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-xs text-[#94A3B8] flex-shrink-0">

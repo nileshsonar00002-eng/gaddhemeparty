@@ -354,6 +354,8 @@ export async function attachPhotoToPin(pinId, imageUrl, thumbnailUrl) {
       thumbnails: currentThumbs,
       imageUrl: imageUrl || null,
       thumbnailUrl: thumbnailUrl || imageUrl || null,
+      photoStatus: 'pending',
+      photoApproved: false,
       lastReportedAt: serverTimestamp()
     });
     return { success: true, images: currentImages };

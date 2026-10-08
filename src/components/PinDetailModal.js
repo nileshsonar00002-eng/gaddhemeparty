@@ -381,6 +381,8 @@ export function openPinDetailModal(pin) {
         }
         pin.images.unshift(imgUrl);
         pin.imageUrl = imgUrl;
+        pin.photoStatus = 'pending';
+        pin.photoApproved = false;
         pin.reportCount = (pin.reportCount || 1) + 1;
 
         // Record locally counted action
@@ -388,7 +390,7 @@ export function openPinDetailModal(pin) {
 
         // Persist to Firestore
         await attachPhotoToPin(pin.id, imgUrl, imgUrl);
-        showToast(isHindi ? 'नई फ़ोटो सफलतापूर्वक जुड़ गई!' : 'Photo added successfully!', 'success');
+        showToast(isHindi ? 'फ़ोटो समीक्षा के लिए भेज दी गई है (एडमिन अप्रूवल पेंडिंग)' : 'Photo submitted for admin approval!', 'info', 4000);
         
         // Re-render pins so blinking/badges update immediately if 5+ photos/reports
         if (window.__khaddaReRenderPins) {
