@@ -3,7 +3,6 @@
 import {
   signInAdminWithEmail,
   signInAdminWithGoogle,
-  registerAdminWithEmail,
   signOutAdmin,
   auth
 } from '../services/firebase';
@@ -52,8 +51,6 @@ export async function logoutAdmin() {
 }
 
 export function renderAuthGate(container, onSuccess) {
-  let isRegisterMode = false;
-
   const renderUI = () => {
     container.innerHTML = `
       <div class="min-h-screen flex items-center justify-center p-4 bg-[#0B0F19] relative overflow-hidden">
@@ -78,24 +75,6 @@ export function renderAuthGate(container, onSuccess) {
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               <span>Firebase Auth Connected</span>
             </div>
-          </div>
-
-          <!-- Mode Toggle Tabs (Sign In vs First-Time Password Setup) -->
-          <div class="flex items-center bg-slate-950/70 p-1 rounded-2xl border border-slate-800 text-xs font-semibold">
-            <button
-              type="button"
-              id="tab-signin-mode"
-              class="flex-1 py-2 rounded-xl transition cursor-pointer text-center ${!isRegisterMode ? 'bg-amber-500 text-slate-950 font-bold shadow-md' : 'text-slate-400 hover:text-white'}"
-            >
-              Admin Sign In
-            </button>
-            <button
-              type="button"
-              id="tab-register-mode"
-              class="flex-1 py-2 rounded-xl transition cursor-pointer text-center ${isRegisterMode ? 'bg-amber-500 text-slate-950 font-bold shadow-md' : 'text-slate-400 hover:text-white'}"
-            >
-              First-Time Setup
-            </button>
           </div>
 
           <!-- Error Alert Banner -->
@@ -128,16 +107,15 @@ export function renderAuthGate(container, onSuccess) {
             <div class="space-y-1.5">
               <div class="flex items-center justify-between">
                 <label for="admin-password" class="block text-xs font-bold uppercase tracking-wider text-slate-300">
-                  ${isRegisterMode ? 'Set New Password (Min 6 chars)' : 'Firebase Admin Password'}
+                  Firebase Admin Password
                 </label>
               </div>
               <div class="relative">
                 <input
                   id="admin-password"
                   type="password"
-                  placeholder="${isRegisterMode ? 'Create strong password' : 'Enter your password'}"
-                  autocomplete="${isRegisterMode ? 'new-password' : 'current-password'}"
-                  minlength="6"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
                   required
                   class="w-full px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition pr-10"
                 />
@@ -159,9 +137,7 @@ export function renderAuthGate(container, onSuccess) {
               class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-heading font-bold text-sm tracking-wide shadow-lg shadow-amber-500/20 active:scale-98 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
             >
               <span id="btn-submit-spinner" class="hidden w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
-              <span id="btn-submit-text">
-                ${isRegisterMode ? 'Create & Activate Admin' : 'Sign In with Firebase'}
-              </span>
+              <span id="btn-submit-text">Sign In with Firebase</span>
               <span>→</span>
             </button>
           </form>
@@ -208,8 +184,6 @@ export function renderAuthGate(container, onSuccess) {
     const passwordInput = container.querySelector('#admin-password');
     const togglePassBtn = container.querySelector('#toggle-password-visibility');
     const googleBtn = container.querySelector('#btn-google-signin');
-    const tabSignIn = container.querySelector('#tab-signin-mode');
-    const tabRegister = container.querySelector('#tab-register-mode');
     const errorBanner = container.querySelector('#auth-error-banner');
     const errorText = container.querySelector('#auth-error-text');
     const submitBtn = container.querySelector('#btn-auth-submit');
@@ -234,26 +208,9 @@ export function renderAuthGate(container, onSuccess) {
       if (googleBtn) googleBtn.disabled = loading;
       if (submitSpinner) submitSpinner.classList.toggle('hidden', !loading);
       if (submitText) {
-        submitText.textContent = loading
-          ? 'Connecting to Firebase...'
-          : isRegisterMode
-          ? 'Create & Activate Admin'
-          : 'Sign In with Firebase';
+        submitText.textContent = loading ? 'Connecting to Firebase...' : 'Sign In with Firebase';
       }
     };
-
-    // Mode toggles
-    tabSignIn?.addEventListener('click', () => {
-      isRegisterMode = false;
-      clearError();
-      renderUI();
-    });
-
-    tabRegister?.addEventListener('click', () => {
-      isRegisterMode = true;
-      clearError();
-      renderUI();
-    });
 
     // Password view toggle
     togglePassBtn?.addEventListener('click', () => {
@@ -278,13 +235,7 @@ export function renderAuthGate(container, onSuccess) {
       setLoading(true);
 
       try {
-        let user;
-        if (isRegisterMode) {
-          user = await registerAdminWithEmail(email, password);
-        } else {
-          user = await signInAdminWithEmail(email, password);
-        }
-
+        const user = await signInAdminWithEmail(email, password);
         setAdminAuthenticated(true, user);
         onSuccess();
       } catch (err) {
@@ -296,9 +247,7 @@ export function renderAuthGate(container, onSuccess) {
         if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
           friendlyMsg = 'गलत ईमेल या पासवर्ड! Incorrect email or password.';
         } else if (err.code === 'auth/user-not-found') {
-          friendlyMsg = 'एडमिन खाता नहीं मिला! If this is your first time, click "First-Time Setup" tab to set your admin password.';
-        } else if (err.code === 'auth/email-already-in-use') {
-          friendlyMsg = 'यह ईमेल पहले से पंजीकृत है। कृपया "Admin Sign In" टैब से लॉगिन करें।';
+          friendlyMsg = 'एडमिन खाता नहीं मिला! Please check your email address.';
         } else if (err.code === 'auth/too-many-requests') {
           friendlyMsg = 'बहुत सारे असफल प्रयास! यह खाता अस्थायी रूप से लॉक है। कृपया कुछ मिनट बाद प्रयास करें।';
         } else if (err.code === 'auth/network-request-failed') {
