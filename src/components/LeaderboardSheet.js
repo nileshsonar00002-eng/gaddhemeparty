@@ -1,6 +1,7 @@
 import { t, getLanguage } from '../utils/i18n';
 import { resolvePinCity } from '../utils/cities';
 import { modalManager } from '../utils/modalManager';
+import { getLucideIcon } from '../utils/icons';
 
 export class LeaderboardSection {
   constructor(containerId = 'leaderboard-mount') {
@@ -80,7 +81,7 @@ export class LeaderboardSection {
             id="btn-open-full-leaderboard"
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none btn-primary text-xs sm:text-sm font-heading font-extrabold shadow-md transition cursor-pointer"
           >
-            <svg class="w-4 h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15l-2 5l-1-2l-2 1l1-3l-2-1l3-1l-1-3l3 2l2-3l1 3l3-1l-1 3l2 1l-3 1l1 3l-2-1z"/></svg>
+            ${getLucideIcon('trophy', 'w-4 h-4 text-inherit shrink-0')}
             <span>${isHindi ? 'पूरा लीडरबोर्ड देखें' : 'View Full Leaderboard'}</span>
             <span class="text-xs">➔</span>
           </button>
