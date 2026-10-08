@@ -187,6 +187,7 @@ export const translations = {
     aboutDisclaimerHindi: '• "यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।"',
     aboutDisclaimerEnglish: '• "This is a citizen initiative, not a political party."',
     aboutDisclaimer: 'यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।',
+    aboutContactHeader: 'संपर्क करें',
     aboutContactBtn: 'संपर्क करें (inforoadtok@gmail.com)',
     contactEmail: 'inforoadtok@gmail.com',
 
@@ -412,6 +413,7 @@ export const translations = {
     aboutDisclaimerHindi: '• "यह एक नागरिक पहल है, कोई राजनीतिक दल नहीं।"',
     aboutDisclaimerEnglish: '• "This is a citizen initiative, not a political party."',
     aboutDisclaimer: 'This is a citizen initiative, not a political party.',
+    aboutContactHeader: 'Contact Us',
     aboutContactBtn: 'Contact Us (inforoadtok@gmail.com)',
     contactEmail: 'inforoadtok@gmail.com',
 

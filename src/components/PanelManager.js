@@ -769,14 +769,13 @@ export class PanelManager {
 
         <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed text-center p-2">${t('aboutStory')}</p>
 
-        <div class="p-4 rounded-2xl bg-[#101D2E] border border-[#243449] text-center space-y-2 shadow-sm">
+        <div class="p-4 rounded-2xl bg-[#101D2E] border border-[#243449] text-center space-y-1.5 shadow-sm">
           <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#8CFF3F]/15 border border-[#8CFF3F]/30 text-[#8CFF3F] mb-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
           </div>
-          <h4 class="font-heading font-bold text-xs sm:text-sm text-[#F5F7FA]">${t('aboutContactBtn')}</h4>
-          <a href="mailto:inforoadtok@gmail.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#8CFF3F]/15 hover:bg-[#8CFF3F]/25 text-[#8CFF3F] text-xs font-mono font-bold border border-[#8CFF3F]/30 transition">
-            <span>inforoadtok@gmail.com</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+          <h4 class="font-heading font-bold text-sm text-[#F5F7FA]">${t('aboutContactHeader') || 'Contact Us'}</h4>
+          <a href="mailto:inforoadtok@gmail.com" class="inline-block text-xs sm:text-sm text-[#8CFF3F] font-mono font-bold hover:underline transition">
+            inforoadtok@gmail.com
           </a>
         </div>
       </div>
