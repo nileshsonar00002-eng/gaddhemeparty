@@ -147,7 +147,7 @@ export class TempleBellWidget {
 
         <!-- Hanging Rig: Unified 3D Brass Chain + Bell Dome + Internal Clapper Assembly -->
         <div id="bell-pendulum-assembly" class="relative z-10 flex flex-col items-center transform-origin-top transition-transform duration-100">
-          <svg class="w-40 h-52 sm:w-48 sm:h-60 overflow-visible drop-shadow-2xl" viewBox="0 0 160 210" fill="none">
+          <svg class="w-32 h-[168px] sm:w-48 sm:h-60 overflow-visible drop-shadow-2xl" viewBox="0 0 160 210" fill="none">
             <defs>
               <!-- 3D Cylindrical Brass Body Gradient -->
               <linearGradient id="brassBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -320,7 +320,7 @@ export class TempleBellWidget {
         </div>
 
         <!-- Dynamic Ground Contact Shadow (Synchronizes with swing) -->
-        <div id="bell-ground-shadow" class="w-28 h-4 rounded-full bg-amber-950/20 blur-[3px] transition-all duration-300 -mt-2"></div>
+        <div id="bell-ground-shadow" class="w-24 sm:w-28 h-3.5 sm:h-4 rounded-full bg-amber-950/20 blur-[3px] transition-all duration-300 -mt-1 sm:-mt-2"></div>
 
         <!-- Interactive Chime Counter & Prompt Badge -->
         <div class="mt-3 flex flex-col items-center gap-1.5 z-20">
