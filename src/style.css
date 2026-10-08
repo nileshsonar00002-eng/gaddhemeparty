@@ -719,17 +719,18 @@ body.map-confirm-active #sticky-mobile-cta {
   filter: contrast(1.12) saturate(1.08) brightness(1.02); /* Crisp, vivid photographic detail */
 }
 
-/* Minimal Subtle Left-Edge Fade (Strictly 12-15% of width max) */
+/* Minimal Subtle Left-Edge Fade (Seamlessly blends into Deep Navy #050B14 background) */
 .hero-bg-pothole-fade-left {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: 14%;
+  width: 16%;
   background: linear-gradient(
     90deg,
     var(--bg) 0%,
-    rgba(250, 243, 232, 0.6) 50%,
+    rgba(5, 11, 20, 0.75) 45%,
+    rgba(5, 11, 20, 0.3) 75%,
     transparent 100%
   );
   z-index: 2;
