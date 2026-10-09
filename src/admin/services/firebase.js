@@ -513,6 +513,9 @@ export async function deletePinPhoto(pinId, photoIndex = 0) {
     if (currentImages.length === 0) {
       updates.photoStatus = 'none';
       updates.photoApproved = false;
+    } else {
+      updates.photoStatus = 'approved';
+      updates.photoApproved = true;
     }
 
     await updateDoc(pinRef, updates);

@@ -233,6 +233,7 @@ class KhaddaApp {
         if (pin) {
           const pinRank = window.__khaddaGetPinRank?.(pin.id) || null;
           if (pinRank) pin.rank = pinRank;
+
           this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
           if (this.mapAdapter.highlightPin) {
             this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
@@ -469,6 +470,7 @@ class KhaddaApp {
         if (mapEl) {
           mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+
         this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
         if (this.mapAdapter.highlightPin) {
           this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);

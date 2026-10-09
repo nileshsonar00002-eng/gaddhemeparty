@@ -1,6 +1,7 @@
 import { t, getLanguage } from '../utils/i18n';
 import { prefersReducedMotion } from '../utils/deviceTier';
 import { subscribeToLeaderboard, callRefreshLeaderboard, isPinPhotoApproved } from '../services/firebase';
+import { getLucideIcon } from '../utils/icons';
 
 /**
  * Slide-Over Panel Manager
@@ -354,7 +355,7 @@ export class PanelManager {
   populatePanelData(panelId) {
     switch (panelId) {
       case 'leaderboard':
-        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#8CFF3F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15l-2 5l-1-2l-2 1l1-3l-2-1l3-1l-1-3l3 2l2-3l1 3l3-1l-1 3l2 1l-3 1l1 3l-2-1z"/></svg>`;
+        this.headerIcon.innerHTML = getLucideIcon('trophy', 'w-5 h-5 text-[#8CFF3F]');
         this.headerTitle.innerText = t('leaderboardTitle');
         this.updateLeaderboardTimeAgo();
         this.renderLeaderboardBody();

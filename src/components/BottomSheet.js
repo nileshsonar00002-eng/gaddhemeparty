@@ -47,7 +47,7 @@ export class BottomSheet {
         aria-labelledby="report-panel-title"
         class="fixed z-[1050] bg-[var(--surface)] text-[var(--text)] border-[var(--border)] shadow-2xl flex flex-col transition-transform duration-250 ease-out pointer-events-none
                /* Mobile: Bottom Sheet */
-               bottom-0 left-0 right-0 max-h-[85dvh] rounded-t-3xl border-t translate-y-full pb-[env(safe-area-inset-bottom,12px)]
+               bottom-0 left-0 right-0 max-h-[96dvh] rounded-t-3xl border-t translate-y-full pb-[env(safe-area-inset-bottom,12px)]
                /* Desktop / Tablet (>= 768px): Right Docked Panel */
                md:top-16 md:right-0 md:bottom-0 md:left-auto md:w-[440px] md:max-w-[440px] md:h-[calc(100dvh-4rem)] md:max-h-none md:rounded-none md:border-t-0 md:border-r-0 md:border-b-0 md:border-l md:translate-y-0 md:translate-x-full md:pb-0"
       >

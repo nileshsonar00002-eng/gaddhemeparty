@@ -73,13 +73,13 @@ export function renderReportForm(container, options = {}) {
     <div class="flex flex-col h-full w-full bg-[var(--surface)] text-[var(--text)] select-none">
       
       <!-- 1. Sticky Header: Title + Quota Chip + X Close Icon Button -->
-      <div class="flex-shrink-0 px-4 py-3.5 sm:px-5 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between z-10">
-        <div class="flex items-center gap-2.5 min-w-0">
-          <h2 id="report-panel-title" class="font-heading font-bold text-base sm:text-lg text-[var(--text)] truncate">
+      <div class="flex-shrink-0 px-4 py-2.5 sm:px-5 sm:py-3 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between z-10">
+        <div class="flex items-center gap-2 min-w-0">
+          <h2 id="report-panel-title" class="font-heading font-bold text-base text-[var(--text)] truncate">
             ${t('sheetTitle')}
           </h2>
           <!-- Quota Chip -->
-          <span class="tabular-nums text-[11px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ${
+          <span class="tabular-nums text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
             quota.isLimitReached
               ? 'bg-[var(--danger)]/15 text-[var(--danger)] border border-[var(--danger)]/30'
               : 'bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30'
@@ -92,7 +92,7 @@ export function renderReportForm(container, options = {}) {
         <button
           id="btn-close-report-drawer"
           type="button"
-          class="w-8 h-8 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)] flex items-center justify-center transition cursor-pointer shrink-0"
+          class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] border border-[var(--border)] flex items-center justify-center transition cursor-pointer shrink-0"
           aria-label="${t('closeAriaLabel')}"
           title="${t('closeAriaLabel')}"
         >
@@ -103,27 +103,27 @@ export function renderReportForm(container, options = {}) {
       </div>
 
       <!-- 2. Sticky Top Action Bar: Primary Solid Submit Button with Missing Reason Helper -->
-      <div class="flex-shrink-0 px-4 py-3 sm:px-5 sm:py-3.5 border-b border-[var(--border)] bg-[var(--surface)] z-10 space-y-1.5 shadow-xs">
+      <div class="flex-shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 border-b border-[var(--border)] bg-[var(--surface)] z-10 space-y-1 shadow-xs">
         <button
           id="btn-submit-report"
           type="button"
-          class="btn-primary w-full py-3 sm:py-3.5 rounded-xl text-sm shadow-md font-bold transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+          class="btn-primary w-full py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm shadow-md font-bold transition active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
           <span id="submit-btn-spinner" class="hidden w-4 h-4 border-2 border-[var(--primary-ink)] border-t-transparent rounded-full animate-spin"></span>
           <span id="submit-btn-text"></span>
         </button>
         <!-- Helper text explaining missing items -->
-        <div id="submit-helper-text" class="text-center text-[11px] text-[var(--muted)] font-medium"></div>
+        <div id="submit-helper-text" class="text-center text-[10px] sm:text-[11px] text-[var(--muted)] font-medium"></div>
       </div>
 
       <!-- 3. Scrollable Body: 3 Numbered Steps -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 overscroll-contain select-text">
+      <div class="flex-1 overflow-y-auto p-3.5 sm:p-4 pb-14 sm:pb-16 space-y-2.5 overscroll-contain select-text">
         
         ${
           quota.isLimitReached
             ? `
           <!-- Limit Reached Notice Banner -->
-          <div class="bg-[var(--danger)]/10 border border-[var(--danger)]/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-[var(--danger)]">
+          <div class="bg-[var(--danger)]/10 border border-[var(--danger)]/30 rounded-xl p-2.5 flex items-start gap-2 text-xs text-[var(--danger)]">
             ${getLucideIcon('alert', 'w-4 h-4 shrink-0 mt-0.5')}
             <div>
               <div class="font-bold">${t('dailyLimitReached')}</div>
@@ -137,10 +137,10 @@ export function renderReportForm(container, options = {}) {
         }
 
         <!-- STEP 1: Photo Dropzone -->
-        <div class="space-y-2">
+        <div class="space-y-1">
           <div class="flex items-center justify-between">
-            <label class="flex items-center gap-1.5 text-[13px] font-medium text-[var(--muted)]">
-              <span class="w-5 h-5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] font-mono font-bold text-xs flex items-center justify-center">1</span>
+            <label class="flex items-center gap-1.5 text-xs font-medium text-[var(--muted)]">
+              <span class="w-4.5 h-4.5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] font-mono font-bold text-[11px] flex items-center justify-center">1</span>
               <span>${t('step1Title')}</span>
               <span class="text-[var(--danger)] font-bold">*</span>
             </label>
@@ -150,23 +150,23 @@ export function renderReportForm(container, options = {}) {
 
           <div
             id="photo-dropzone"
-            class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-3 bg-[var(--surface-2)] transition-all flex flex-col items-center justify-center min-h-[120px] max-h-[130px] overflow-hidden"
+            class="relative group ${quota.isLimitReached ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} border-2 border-dashed border-[var(--border)] hover:border-[var(--primary)] rounded-xl p-2 bg-[var(--surface-2)] transition-all flex flex-col items-center justify-center min-h-[75px] max-h-[85px] overflow-hidden"
           >
             <!-- Empty Placeholder -->
-            <div id="photo-placeholder" class="${processedImageData ? 'hidden' : 'flex'} flex-col items-center justify-center gap-1.5 text-center">
-              <div class="w-9 h-9 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--primary)] group-hover:scale-105 transition shadow-xs">
-                ${getLucideIcon('camera', 'w-4 h-4')}
+            <div id="photo-placeholder" class="${processedImageData ? 'hidden' : 'flex'} flex-col items-center justify-center gap-1 text-center">
+              <div class="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--primary)] group-hover:scale-105 transition shadow-xs">
+                ${getLucideIcon('camera', 'w-3.5 h-3.5')}
               </div>
-              <div class="text-xs font-semibold text-[var(--text)]">
+              <div class="text-[11px] font-semibold text-[var(--text)]">
                 ${t('takePhoto')}
               </div>
             </div>
 
             <!-- Uploaded Thumbnail Preview with Change Button -->
-            <div id="photo-preview-container" class="${processedImageData ? 'flex' : 'hidden'} w-full items-center gap-3">
-              <img id="photo-preview-img" src="${processedImageData?.previewUrl || ''}" class="w-18 h-18 sm:w-20 sm:h-20 object-cover rounded-xl border border-[var(--border)] shadow-xs shrink-0" alt="Pothole preview" />
-              <div class="min-w-0 flex-1 space-y-1.5">
-                <div id="photo-size-badge" class="inline-flex items-center gap-1 tabular-nums text-[11px] font-mono px-2 py-0.5 rounded-md bg-[var(--success)]/15 text-[var(--success)] border border-[var(--success)]/30 font-bold">
+            <div id="photo-preview-container" class="${processedImageData ? 'flex' : 'hidden'} w-full items-center gap-2.5">
+              <img id="photo-preview-img" src="${processedImageData?.previewUrl || ''}" class="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border border-[var(--border)] shadow-xs shrink-0" alt="Pothole preview" />
+              <div class="min-w-0 flex-1 space-y-1">
+                <div id="photo-size-badge" class="inline-flex items-center gap-1 tabular-nums text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--success)]/15 text-[var(--success)] border border-[var(--success)]/30 font-bold">
                   <span>✓</span>
                   <span>${processedImageData ? t('photoOptimized', { size: processedImageData.compressedSizeKb || processedImageData.sizeKb || 120 }) : ''}</span>
                 </div>
@@ -174,9 +174,9 @@ export function renderReportForm(container, options = {}) {
                   <button
                     id="btn-change-photo"
                     type="button"
-                    class="text-xs text-[var(--primary)] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                    class="text-[11px] text-[var(--primary)] hover:underline font-bold flex items-center gap-1 cursor-pointer"
                   >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                     <span>${t('changePhotoBtn')}</span>
                   </button>
                 </div>
@@ -186,25 +186,25 @@ export function renderReportForm(container, options = {}) {
         </div>
 
         <!-- STEP 2: Location Verification Card -->
-        <div class="space-y-2">
+        <div class="space-y-1">
           <div class="flex items-center justify-between">
-            <label class="flex items-center gap-1.5 text-[13px] font-medium text-[var(--muted)]">
-              <span class="w-5 h-5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] font-mono font-bold text-xs flex items-center justify-center">2</span>
+            <label class="flex items-center gap-1.5 text-xs font-medium text-[var(--muted)]">
+              <span class="w-4.5 h-4.5 rounded-full bg-[var(--primary)]/15 text-[var(--primary)] font-mono font-bold text-[11px] flex items-center justify-center">2</span>
               <span>${t('step2Title')}</span>
               <span class="text-[var(--danger)] font-bold">*</span>
             </label>
           </div>
 
           <!-- Single Merged Status Card (No dual 'Locked' vs 'Weak' conflict) -->
-          <div id="gps-status-card" class="bg-[var(--surface-2)] border ${initialStatus.cardClass} rounded-xl p-3 transition-colors duration-200 space-y-2.5">
+          <div id="gps-status-card" class="bg-[var(--surface-2)] border ${initialStatus.cardClass} rounded-xl p-2.5 transition-colors duration-200 space-y-2">
             <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span id="gps-dot-indicator" class="w-2.5 h-2.5 rounded-full ${initialStatus.dotClass} shrink-0"></span>
+              <div class="flex items-center gap-2 min-w-0">
+                <span id="gps-dot-indicator" class="w-2 h-2 rounded-full ${initialStatus.dotClass} shrink-0"></span>
                 <div class="min-w-0">
                   <div id="gps-status-text" class="text-xs font-bold truncate">
                     ${initialStatus.statusText}
                   </div>
-                  <div id="gps-coords-text" class="tabular-nums text-[11px] font-mono text-[var(--muted)] truncate">
+                  <div id="gps-coords-text" class="tabular-nums text-[10px] font-mono text-[var(--muted)] truncate">
                     ${formatCoords(currentCoordinates)}${initialStatus.accText ? ` (${initialStatus.accText})` : ''}
                   </div>
                 </div>
@@ -214,12 +214,12 @@ export function renderReportForm(container, options = {}) {
               <button
                 id="btn-refresh-gps"
                 type="button"
-                class="btn-secondary px-2.5 py-1.5 text-xs rounded-lg flex items-center gap-1 shrink-0 cursor-pointer"
+                class="btn-secondary px-2 py-1 text-[11px] rounded-md flex items-center gap-1 shrink-0 cursor-pointer"
                 title="${t('reDetectGpsBtn')}"
                 aria-label="${t('reDetectGpsBtn')}"
               >
-                ${getLucideIcon('refresh', 'w-3.5 h-3.5')}
-                <span class="text-[11px] font-semibold">${t('reDetectGpsBtn')}</span>
+                ${getLucideIcon('refresh', 'w-3 h-3')}
+                <span class="font-semibold">${t('reDetectGpsBtn')}</span>
               </button>
             </div>
 
@@ -227,9 +227,9 @@ export function renderReportForm(container, options = {}) {
             <button
               id="btn-open-map-picker"
               type="button"
-              class="btn-secondary w-full py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-2 border-[var(--border)] hover:border-[var(--primary)] transition cursor-pointer"
+              class="btn-secondary w-full py-1.5 px-2.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 border-[var(--border)] hover:border-[var(--primary)] transition cursor-pointer"
             >
-              <svg class="w-4 h-4 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
               </svg>
               <span>${t('adjustOnMapBtn')}</span>
@@ -238,13 +238,13 @@ export function renderReportForm(container, options = {}) {
         </div>
 
         <!-- STEP 3: Landmark Input (Optional) -->
-        <div class="space-y-1.5">
+        <div class="space-y-1">
           <div class="flex items-center justify-between">
-            <label for="landmark-input" class="flex items-center gap-1.5 text-[13px] font-medium text-[var(--muted)]">
-              <span class="w-5 h-5 rounded-full bg-[var(--surface-2)] text-[var(--muted)] font-mono font-bold text-xs flex items-center justify-center">3</span>
+            <label for="landmark-input" class="flex items-center gap-1.5 text-xs font-medium text-[var(--muted)]">
+              <span class="w-4.5 h-4.5 rounded-full bg-[var(--surface-2)] text-[var(--muted)] font-mono font-bold text-[11px] flex items-center justify-center">3</span>
               <span>${t('step3Title')}</span>
             </label>
-            <span id="char-counter" class="tabular-nums text-[11px] font-mono text-[var(--muted)]">0/50</span>
+            <span id="char-counter" class="tabular-nums text-[10px] font-mono text-[var(--muted)]">0/50</span>
           </div>
           <input
             type="text"
@@ -253,7 +253,7 @@ export function renderReportForm(container, options = {}) {
             value="${options.landmark || ''}"
             placeholder="${t('landmarkPlaceholder')}"
             ${quota.isLimitReached ? 'disabled' : ''}
-            class="w-full px-3.5 py-2.5 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent transition disabled:opacity-50"
+            class="w-full px-3 py-2 bg-[var(--surface-2)] border border-[var(--border)] rounded-xl text-xs sm:text-sm text-[var(--text)] placeholder-[var(--muted)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)] focus:border-transparent transition disabled:opacity-50"
           />
         </div>
 
