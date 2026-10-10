@@ -143,17 +143,17 @@ export function openPinDetailModal(pin) {
                   onerror="this.parentElement.style.display='none'"
                 />
 
-                <!-- Instagram Reel-Style Overlay (Like & Comments) on Right Center -->
-                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-30 pointer-events-auto">
+                <!-- Instagram Reel-Style Overlay (Like & Comments) on Right Side (Below Close Button) -->
+                <div class="absolute right-2.5 top-12 sm:top-14 flex flex-col items-center gap-2.5 z-30 pointer-events-auto">
                   <!-- Reel Like Button & Count -->
                   <div class="flex flex-col items-center">
                     <button
                       id="photo-reel-like-btn"
                       type="button"
                       title="${isLiked ? (isHindi ? 'पसंद किया (Liked)' : 'Liked') : (isHindi ? 'लाइक करें' : 'Like')}"
-                      class="w-10 h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group ${isLiked ? 'text-rose-500 border-rose-500/50 bg-rose-950/50' : 'text-white border-white/30'}"
+                      class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group ${isLiked ? 'text-rose-500 border-rose-500/50 bg-rose-950/50' : 'text-white border-white/30'}"
                     >
-                      <svg class="w-5.5 h-5.5 transition-transform duration-200 group-hover:scale-110 ${isLiked ? 'fill-rose-500 text-rose-500 stroke-rose-500' : 'fill-none stroke-current'}" viewBox="0 0 24 24" stroke-width="2">
+                      <svg class="w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${isLiked ? 'fill-rose-500 text-rose-500 stroke-rose-500' : 'fill-none stroke-current'}" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                       </svg>
                     </button>
@@ -168,9 +168,9 @@ export function openPinDetailModal(pin) {
                       id="photo-reel-comment-btn"
                       type="button"
                       title="${isHindi ? 'कमेंट्स देखें' : 'View Comments'}"
-                      class="w-10 h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group text-white"
+                      class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group text-white"
                     >
-                      <svg class="w-5.5 h-5.5 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <svg class="w-5 h-5 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </button>
