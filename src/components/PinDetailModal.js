@@ -62,6 +62,7 @@ export function openPinDetailModal(pin) {
   const cityName = resolvePinCity(pin, isHindi);
   const reportCount = pin.reportCount || 1;
   const upvoteCount = pin.upvotes || 0;
+  const isLiked = hasUserReportedOrUpvoted(pin.id);
   const timeStr = formatRelativeTime(pin.createdAt || pin.lastReportedAt);
   const resolvedRank = pin.rank || (window.__khaddaGetPinRank ? window.__khaddaGetPinRank(pin.id) : null);
 
@@ -131,7 +132,7 @@ export function openPinDetailModal(pin) {
           <!-- Photo Gallery / Moderation Status Section -->
           ${photoApproved && allImages.length > 0 ? `
             <div class="space-y-2">
-              <div id="gallery-main-container" class="w-full h-38 sm:h-44 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
+              <div id="gallery-main-container" class="w-full h-40 sm:h-48 rounded-2xl overflow-hidden bg-[var(--surface-2)] border border-[var(--border)] relative shadow-inner flex items-center justify-center select-none cursor-zoom-in group">
                 <img
                   id="gallery-main-img"
                   src="${allImages[0]}"
@@ -142,15 +143,52 @@ export function openPinDetailModal(pin) {
                   onerror="this.parentElement.style.display='none'"
                 />
 
-                <!-- Zoom Hint Badge -->
-                <div class="absolute bottom-2.5 right-2.5 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white px-2.5 py-1 rounded-xl text-[10px] font-heading font-bold border border-white/20 flex items-center gap-1.5 shadow-md pointer-events-none transition group-hover:scale-105">
+                <!-- Instagram Reel-Style Overlay (Like & Comments) on Right Center -->
+                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex flex-col items-center gap-3 z-30 pointer-events-auto">
+                  <!-- Reel Like Button & Count -->
+                  <div class="flex flex-col items-center">
+                    <button
+                      id="photo-reel-like-btn"
+                      type="button"
+                      title="${isLiked ? (isHindi ? 'पसंद किया (Liked)' : 'Liked') : (isHindi ? 'लाइक करें' : 'Like')}"
+                      class="w-10 h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group ${isLiked ? 'text-rose-500 border-rose-500/50 bg-rose-950/50' : 'text-white border-white/30'}"
+                    >
+                      <svg class="w-5.5 h-5.5 transition-transform duration-200 group-hover:scale-110 ${isLiked ? 'fill-rose-500 text-rose-500 stroke-rose-500' : 'fill-none stroke-current'}" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                      </svg>
+                    </button>
+                    <span id="photo-reel-like-count" class="text-[11px] font-heading font-extrabold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5 tabular-nums">
+                      ${upvoteCount}
+                    </span>
+                  </div>
+
+                  <!-- Reel Comments Button & Label -->
+                  <div class="flex flex-col items-center">
+                    <button
+                      id="photo-reel-comment-btn"
+                      type="button"
+                      title="${isHindi ? 'कमेंट्स देखें' : 'View Comments'}"
+                      class="w-10 h-10 rounded-full bg-black/65 hover:bg-black/85 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group text-white"
+                    >
+                      <svg class="w-5.5 h-5.5 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                    </button>
+                    <span class="text-[10px] font-heading font-bold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5">
+                      ${isHindi ? 'कमेंट्स' : 'Comments'}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Zoom Hint Badge (Bottom Left) -->
+                <div class="absolute bottom-2.5 left-2.5 bg-black/60 hover:bg-black/80 backdrop-blur-md text-white px-2.5 py-1 rounded-xl text-[10px] font-heading font-bold border border-white/20 flex items-center gap-1.5 shadow-md pointer-events-none transition group-hover:scale-105">
                   <svg class="w-3.5 h-3.5 text-[var(--primary-ink)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
                   <span>${isHindi ? 'बड़ा देखें' : 'Zoom'}</span>
                 </div>
 
                 <!-- Multi-Photo Count Badge -->
                 ${allImages.length > 1 ? `
-                  <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full text-[11px] font-heading font-bold text-white flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
+                  <div class="absolute top-2.5 left-2.5 bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full text-[11px] font-heading font-bold text-white flex items-center gap-1.5 shadow-md z-10 pointer-events-none">
                     <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3" stroke-width="2"/></svg>
                     <span id="gallery-counter">1 / ${allImages.length} ${isHindi ? 'फ़ोटो' : 'Photos'}</span>
                   </div>
@@ -160,9 +198,9 @@ export function openPinDetailModal(pin) {
                     id="btn-gallery-prev"
                     type="button"
                     aria-label="Previous photo"
-                    class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-[var(--primary)] text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition shadow-lg z-20 cursor-pointer active:scale-90"
+                    class="absolute left-2.5 bottom-10 w-7 h-7 rounded-full bg-black/60 hover:bg-[var(--primary)] text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition shadow-lg z-20 cursor-pointer active:scale-90"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                   </button>
 
                   <!-- Next Arrow Button -->
@@ -170,9 +208,9 @@ export function openPinDetailModal(pin) {
                     id="btn-gallery-next"
                     type="button"
                     aria-label="Next photo"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 hover:bg-[var(--primary)] text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition shadow-lg z-20 cursor-pointer active:scale-90"
+                    class="absolute right-2.5 top-2.5 w-7 h-7 rounded-full bg-black/60 hover:bg-[var(--primary)] text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition shadow-lg z-20 cursor-pointer active:scale-90"
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                   </button>
                 ` : ''}
               </div>
@@ -261,40 +299,19 @@ export function openPinDetailModal(pin) {
             <span class="text-[11px] text-[var(--muted)] font-mono font-medium">${timeStr}</span>
           </div>
 
-          <!-- Landmark & Location Description -->
-          <div class="bg-[var(--surface-2)] p-3 rounded-2xl border border-[var(--border)]">
+          <!-- Comments & Location Description -->
+          <div id="pin-modal-landmark-box" class="bg-[var(--surface-2)] p-3 rounded-2xl border border-[var(--border)] transition-all duration-300">
+            <div class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-1 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
+              <span>${isHindi ? 'कमेंट्स / विवरण' : 'Comments / Description'}</span>
+            </div>
             <p class="text-xs sm:text-sm font-semibold text-[var(--text)] leading-relaxed">
               ${safeLandmark}
             </p>
           </div>
 
-          <!-- Actions: +1 Upvote & WhatsApp Share -->
-          <div class="pt-2 border-t border-[var(--border)] flex flex-col gap-2.5">
-            <!-- +1 Upvote Button -->
-            ${hasUserReportedOrUpvoted(pin.id) ? `
-              <button
-                id="pin-modal-upvote-btn"
-                type="button"
-                disabled
-                class="w-full py-3 px-4 bg-[var(--surface-2)] text-[var(--success)] border border-[var(--border)] font-heading font-bold text-sm rounded-2xl shadow-xs transition flex items-center justify-center gap-2 cursor-default disabled:opacity-90"
-              >
-                <svg class="w-4 h-4 text-emerald-500 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                <span>${t('alreadyReportedButton')}</span>
-                ${upvoteCount > 0 ? `<span class="bg-[var(--surface)] px-2.5 py-0.5 rounded-full text-xs font-bold border border-[var(--border)]">${upvoteCount}</span>` : ''}
-              </button>
-            ` : `
-              <button
-                id="pin-modal-upvote-btn"
-                type="button"
-                class="btn-primary w-full py-3 px-4 font-heading font-bold text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <svg class="w-4 h-4 text-[#06100A] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
-                <span>${t('upvoteBtn')}</span>
-                ${upvoteCount > 0 ? `<span class="bg-[var(--primary-ink)] text-[var(--primary)] px-2.5 py-0.5 rounded-full text-xs font-bold">${upvoteCount}</span>` : ''}
-              </button>
-            `}
-
-            <div class="flex items-center gap-2 flex-wrap">
+          <!-- Actions: Add Photo, WhatsApp Share & Flag -->
+          <div class="pt-2 border-t border-[var(--border)] flex items-center gap-2 flex-wrap">
               <!-- Add Photo Button -->
               <input type="file" id="modal-add-photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden" />
               <button
@@ -477,10 +494,42 @@ export function openPinDetailModal(pin) {
     }, { passive: true });
   }
 
-  // Open Fullscreen Photo Lightbox on Photo Click
+  // Reel Like & Comment button listeners
+  const photoLikeBtn = container.querySelector('#photo-reel-like-btn');
+  const photoCommentBtn = container.querySelector('#photo-reel-comment-btn');
+
+  photoLikeBtn?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    if (hasUserReportedOrUpvoted(pin.id)) {
+      showToast(t('alreadyReportedAlert'), 'warning');
+      return;
+    }
+    if (window.__khaddaUpvotePin) {
+      await window.__khaddaUpvotePin(pin.id);
+    }
+  });
+
+  photoCommentBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const landmarkBox = container.querySelector('#pin-modal-landmark-box');
+    if (landmarkBox) {
+      landmarkBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      landmarkBox.classList.add('ring-2', 'ring-[var(--primary)]', 'scale-[1.02]');
+      setTimeout(() => {
+        landmarkBox.classList.remove('ring-2', 'ring-[var(--primary)]', 'scale-[1.02]');
+      }, 1500);
+    }
+  });
+
+  // Open Fullscreen Photo Lightbox on Photo Click (excluding controls & reel buttons)
   const galleryMainContainer = document.getElementById('gallery-main-container');
   galleryMainContainer?.addEventListener('click', (e) => {
-    if (e.target.closest('#btn-gallery-prev') || e.target.closest('#btn-gallery-next')) {
+    if (
+      e.target.closest('#btn-gallery-prev') ||
+      e.target.closest('#btn-gallery-next') ||
+      e.target.closest('#photo-reel-like-btn') ||
+      e.target.closest('#photo-reel-comment-btn')
+    ) {
       return;
     }
     if (allImages.length > 0) {
@@ -517,16 +566,6 @@ export function openPinDetailModal(pin) {
       } else if (window.__khaddaFlyToPin) {
         window.__khaddaFlyToPin(pin.id, resolvedRank);
       }
-    }
-  });
-
-  upvoteBtn?.addEventListener('click', async () => {
-    if (hasUserUpvoted(pin.id)) {
-      showToast(t('alreadyUpvoted'), 'info');
-      return;
-    }
-    if (window.__khaddaUpvotePin) {
-      await window.__khaddaUpvotePin(pin.id);
     }
   });
 
