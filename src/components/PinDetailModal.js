@@ -271,46 +271,23 @@ export function openPinDetailModal(pin) {
             </div>
           `}
 
-          <!-- Header Badges: Severity + Time + City -->
-          <div class="flex items-center justify-between gap-2 flex-wrap">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-bold ${isSevere ? 'bg-[#D93025]/15 text-[#D93025] border border-[#D93025]/30' : 'bg-[#F2B705]/20 text-[#B45309] border border-[#F2B705]/40'}">
-                <span class="w-2 h-2 rounded-full ${isSevere ? 'bg-[#D93025] animate-pulse' : 'bg-[#F2B705]'}"></span>
-                ${reportCount > 1 ? t('reportedByCount', { count: reportCount }) : t('reportedBySingle')}
-              </span>
-
-              <button
-                id="pin-modal-location-btn"
-                type="button"
-                title="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
-                aria-label="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--text)] border border-[var(--border)] transition cursor-pointer active:scale-95 group shadow-xs"
-              >
-                <svg class="w-3.5 h-3.5 text-[var(--primary-ink)] group-hover:scale-110 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span>${cityName}</span>
-                ${resolvedRank ? `
-                  <span class="ml-0.5 px-1.5 py-0.2 rounded-md bg-[var(--primary)] text-[var(--primary-ink)] font-bold text-[10px] font-mono tabular-nums">
-                    #${resolvedRank}
-                  </span>
-                ` : ''}
-              </button>
-
-              <button
-                id="pin-modal-comments-trigger-btn"
-                type="button"
-                title="${isHindi ? 'कमेंट्स देखें' : 'View comments'}"
-                aria-label="${isHindi ? 'कमेंट्स देखें' : 'View comments'}"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--text)] border border-[var(--border)] transition cursor-pointer active:scale-95 group shadow-xs"
-              >
-                <svg class="w-3.5 h-3.5 text-[var(--accent)] group-hover:scale-110 transition shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <span>${isHindi ? 'कमेंट्स' : 'Comments'}</span>
-                <span id="badge-comments-count" class="ml-0.5 px-1.5 py-0.2 rounded-md bg-[var(--surface)] text-[var(--muted)] font-bold text-[10px] font-mono border border-[var(--border)] tabular-nums">
-                  1
+          <!-- Header Badges: Location + Time -->
+          <div class="flex items-center justify-between gap-2">
+            <button
+              id="pin-modal-location-btn"
+              type="button"
+              title="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
+              aria-label="${isHindi ? 'मैप पर स्थान देखें' : 'View location on map'}"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--text)] border border-[var(--border)] transition cursor-pointer active:scale-95 group shadow-xs"
+            >
+              <svg class="w-3.5 h-3.5 text-[var(--primary-ink)] group-hover:scale-110 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>${cityName}</span>
+              ${resolvedRank ? `
+                <span class="ml-0.5 px-1.5 py-0.2 rounded-md bg-[var(--primary)] text-[var(--primary-ink)] font-bold text-[10px] font-mono tabular-nums">
+                  #${resolvedRank}
                 </span>
-              </button>
-            </div>
+              ` : ''}
+            </button>
 
             <span class="text-[11px] text-[var(--muted)] font-mono font-medium">${timeStr}</span>
           </div>
@@ -564,7 +541,6 @@ export function openPinDetailModal(pin) {
   const reelCommentSubmitBtn = container.querySelector('#btn-submit-reel-comment');
   const overlayCommentsCountBadge = container.querySelector('#overlay-comments-count-badge');
   const photoReelCommentCount = container.querySelector('#photo-reel-comment-count');
-  const badgeCommentsCount = container.querySelector('#badge-comments-count');
   const commentsListContainer = container.querySelector('#comments-list-container');
 
   let cachedComments = [];
@@ -574,7 +550,6 @@ export function openPinDetailModal(pin) {
     const text = String(count);
     if (overlayCommentsCountBadge) overlayCommentsCountBadge.textContent = text;
     if (photoReelCommentCount) photoReelCommentCount.textContent = text;
-    if (badgeCommentsCount) badgeCommentsCount.textContent = text;
   };
 
   const renderCommentsList = (comments) => {
@@ -643,16 +618,10 @@ export function openPinDetailModal(pin) {
     commentsOverlay.classList.add('hidden');
   };
 
-  // Triggers for opening comments
+  // Trigger for opening comments (Photo Reels Comment button)
   const photoCommentBtn = container.querySelector('#photo-reel-comment-btn');
-  const badgeCommentsBtn = container.querySelector('#pin-modal-comments-trigger-btn');
 
   photoCommentBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openCommentsOverlay();
-  });
-
-  badgeCommentsBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
     openCommentsOverlay();
   });
