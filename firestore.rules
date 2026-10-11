@@ -1,31 +1,255 @@
 rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// This security rules file assumes the following data structures:
+//
+// Collection: pins
+// Document ID: {pinId} (unique identifier)
+// Fields:
+//   - id: string (optional, immutable) - document identifier
+//   - latitude: number (required, immutable) - geographic coordinate in India
+//   - longitude: number (required, immutable) - geographic coordinate in India
+//   - geohash: string (required, immutable) - geohash for proximity deduplication
+//   - landmark: string (required, 1-200 chars) - landmark / road description
+//   - cityNameHindi: string (optional, 1-100 chars) - city name in Hindi
+//   - cityNameEnglish: string (optional, 1-100 chars) - city name in English
+//   - cityState: string (optional, 1-100 chars) - state name
+//   - imageUrl: string|null (optional, URL <= 2000 chars) - main photo URL
+//   - thumbnailUrl: string|null (optional, URL <= 2000 chars) - thumbnail URL
+//   - images: list (optional, max 20 items) - array of photo URLs
+//   - thumbnails: list (optional, max 20 items) - array of thumbnail URLs
+//   - reportCount: number (required, >= 0) - deduplicated report counter
+//   - upvotes: number (required, >= 0) - verified upvotes count
+//   - flagCount: number (required, >= 0) - community spam flag count
+//   - status: string (required, 'active' | 'archived' | 'hidden') - pin lifecycle status
+//   - photoStatus: string (required, 'pending' | 'approved' | 'rejected' | 'none')
+//   - photoApproved: bool (required) - true if moderator approved photo
+//   - photoApprovedAt: timestamp (optional) - timestamp when photo was approved
+//   - photoRejectedReason: string (optional, <= 500 chars) - rejection reason
+//   - photoRejectedAt: timestamp (optional) - timestamp when photo was rejected
+//   - moderatedBy: string (optional, <= 100 chars) - email of moderator
+//   - createdBy: string (required, immutable) - creator UID
+//   - reporters: list (optional, immutable) - reporter UIDs
+//   - createdAt: timestamp (required, immutable) - server creation time
+//   - lastReportedAt: timestamp (optional) - last activity time
+//   - archivedAt: timestamp (optional) - archival time
+//
+// Subcollections under pins:
+//   - pins/{pinId}/reporters/{userId} (Strictly Server-Only)
+//   - pins/{pinId}/votes/{userId} (Strictly Server-Only)
+//   - pins/{pinId}/flags/{userId} (Strictly Server-Only)
+//
+// Anti-spam Collections:
+//   - limits/{uid} (Strictly Server-Only)
+//   - ipLimits/{ipHash} (Strictly Server-Only)
+//   - rate_limits/{docId} (Strictly Server-Only)
+//
+// Aggregate / Metrics Collections:
+//   - stats/{docId} (Public read; strict visitor/bell counter increment or Admin write)
+//   - leaderboard/{docId} (Public read; Server-Only write)
+//   - admins/{adminId} (Authorized Admins only; read and self audit record)
+//
+// ===============================================================
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Pothole pins collection: Public read only for active pins.
-    // Direct client writes (create/update/delete) are strictly forbidden.
-    // All creations and modifications must execute exclusively via server Cloud Functions (submitReport, upvotePin, flagPin).
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if the user is authenticated (anonymous or registered)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the caller is an authorized administrator
+    // Authority is derived ONLY from custom claims or verified bootstrap email whitelist
+    function isAdmin() {
+      return isAuthenticated() && (
+        // Admin Custom Claims (granted via Firebase Admin SDK)
+        ('admin' in request.auth.token && request.auth.token.admin == true) ||
+        ('role' in request.auth.token && request.auth.token.role == 'admin') ||
+        // Whitelisted Admin Email addresses (case-insensitive whitelist & domains)
+        ('email' in request.auth.token && (
+          request.auth.token.email in [
+            'admin@roadtok.com',
+            'npbagul1991@gmail.com',
+            'npbagul@gmail.com',
+            'inforoadtok@gmail.com',
+            'nileshbagulkhan763100@gmail.com',
+            'admin@roadtok.in',
+            'admin@khadda.com'
+          ] ||
+          request.auth.token.email.matches('.*@roadtok[.]com$') ||
+          request.auth.token.email.matches('.*@roadtok[.]in$')
+        ))
+      );
+    }
+
+    // Check if the document contains only allowed fields
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Check that immutable fields have not been modified during an update
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Validate string length within bounds
+    function validStringLength(field, minLen, maxLen) {
+      return field in request.resource.data &&
+        request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    // Validate optional string (if present, must be string and within length)
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == null ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen);
+    }
+
+    // Validate optional URL string (https, http, or data URI; length bounded)
+    function isValidOptionalUrl(field) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == null ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() <= 2000 &&
+         (request.resource.data[field].matches('^https?://.*') || request.resource.data[field].matches('^data:image/.*')));
+    }
+
+    // Validate optional list and its maximum size to prevent DoS
+    function isValidOptionalList(field, maxSize) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == null ||
+        (request.resource.data[field] is list &&
+         request.resource.data[field].size() <= maxSize);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    // Validates pin modification by an authorized admin
+    function isValidPinUpdate() {
+      return hasOnlyAllowedFields([
+        'id', 'latitude', 'longitude', 'geohash', 'landmark',
+        'cityNameHindi', 'cityNameEnglish', 'cityState',
+        'imageUrl', 'thumbnailUrl', 'images', 'thumbnails',
+        'reportCount', 'upvotes', 'flagCount', 'status',
+        'photoStatus', 'photoApproved', 'photoApprovedAt',
+        'photoRejectedReason', 'photoRejectedAt', 'moderatedBy',
+        'createdBy', 'reporters', 'createdAt', 'lastReportedAt', 'archivedAt'
+      ]) &&
+      // Immutable identity & location fields (coordinates, creator, creation time cannot be altered)
+      areImmutableFieldsUnchanged(['id', 'latitude', 'longitude', 'geohash', 'createdBy', 'createdAt', 'reporters']) &&
+      // Status enum check
+      request.resource.data.status in ['active', 'archived', 'hidden'] &&
+      // Photo status enum check
+      request.resource.data.photoStatus in ['pending', 'approved', 'rejected', 'none'] &&
+      // Boolean validation
+      request.resource.data.photoApproved is bool &&
+      // Landmark bounds
+      validStringLength('landmark', 1, 200) &&
+      // Bounded text fields
+      isValidOptionalString('cityNameHindi', 1, 100) &&
+      isValidOptionalString('cityNameEnglish', 1, 100) &&
+      isValidOptionalString('cityState', 1, 100) &&
+      isValidOptionalString('moderatedBy', 1, 100) &&
+      isValidOptionalString('photoRejectedReason', 0, 500) &&
+      // Safe URL bounds
+      isValidOptionalUrl('imageUrl') &&
+      isValidOptionalUrl('thumbnailUrl') &&
+      // Safe list bounds
+      isValidOptionalList('images', 20) &&
+      isValidOptionalList('thumbnails', 20) &&
+      // Numeric counters validation
+      request.resource.data.reportCount is number && request.resource.data.reportCount >= 0 &&
+      request.resource.data.upvotes is number && request.resource.data.upvotes >= 0 &&
+      request.resource.data.flagCount is number && request.resource.data.flagCount >= 0;
+    }
+
+    // Validates public/client stats counter atomic increment
+    function isValidStatsCounterUpdate() {
+      let affected = request.resource.data.diff(resource.data).affectedKeys();
+      return affected.hasOnly(['visitorCount', 'bellRings']) &&
+        // Protect core aggregated counters from client tampering
+        !affected.hasAny(['totalReports', 'activePins', 'updatedAt']) &&
+        // Atomic visitor increment: positive change only (max step of 5 to absorb batching)
+        (!affected.hasAny(['visitorCount']) || (
+          request.resource.data.visitorCount is number &&
+          request.resource.data.visitorCount >= resource.data.visitorCount &&
+          request.resource.data.visitorCount <= resource.data.visitorCount + 5
+        )) &&
+        // Atomic temple bell increment: positive change only (max step of 5 to absorb batching)
+        (!affected.hasAny(['bellRings']) || (
+          request.resource.data.bellRings is number &&
+          request.resource.data.bellRings >= resource.data.bellRings &&
+          request.resource.data.bellRings <= resource.data.bellRings + 5
+        ));
+    }
+
+    // Validates admin document structure in /admins/{adminId}
+    function isValidAdminDoc() {
+      return hasOnlyAllowedFields(['email', 'displayName', 'role', 'createdAt', 'lastLoginAt']) &&
+        request.resource.data.role == 'admin' &&
+        request.resource.data.email is string &&
+        request.resource.data.email.size() <= 100 &&
+        isValidOptionalString('displayName', 1, 100);
+    }
+
+    // ===============================================================
+    // Collection Match Rules
+    // ===============================================================
+
+    // -------------------------------------------------------------
+    // 1. Pothole Pins Collection
+    // -------------------------------------------------------------
     match /pins/{pinId} {
-      allow read: if resource == null || resource.data.status == 'active';
-      allow write: if false;
-      
-      // Reporters subcollection (Anti-spam cooldown tracking): Server-only
+      // READ: Public can view active pins; authorized admins can view all pins (including pending/hidden)
+      allow read: if resource == null || resource.data.status == 'active' || isAdmin();
+
+      // CREATE: Strictly forbidden for all direct clients.
+      // All pin creations MUST execute via Cloud Function 'submitReport', which enforces
+      // anti-spam transactions, IP quotas, honeypot traps, and 20m geographic deduplication.
+      allow create: if false;
+
+      // UPDATE: Only authorized admins (by custom claim or verified whitelist email)
+      // Can approve/reject photos, edit landmark text, or archive pins.
+      allow update: if isAdmin() && isValidPinUpdate();
+
+      // DELETE: Only authorized admins can delete pins.
+      allow delete: if isAdmin();
+
+      // Subcollection: Anti-spam cooldown per pin (Strictly server-only)
       match /reporters/{userId} {
         allow read, write: if false;
       }
 
-      // Votes subcollection: Server-only
+      // Subcollection: Upvotes tracking (Strictly server-only)
       match /votes/{userId} {
         allow read, write: if false;
       }
-      
-      // Flags subcollection: Server-only
+
+      // Subcollection: Community spam/abuse flags (Strictly server-only)
       match /flags/{userId} {
         allow read, write: if false;
       }
     }
-    
-    // Anti-spam limits collections: Strictly server-only (Cloud Functions)
+
+    // -------------------------------------------------------------
+    // 2. Anti-Spam & Rate-Limiting Collections (Strictly Server-Only)
+    // -------------------------------------------------------------
+    // Direct client access is completely blocked.
+    // Cloud Functions manage these collections using the Firebase Admin SDK.
     match /limits/{uid} {
       allow read, write: if false;
     }
@@ -33,24 +257,65 @@ service cloud.firestore {
     match /ipLimits/{ipHash} {
       allow read, write: if false;
     }
-    
+
     match /rate_limits/{docId} {
       allow read, write: if false;
     }
 
-    // Aggregated stats (e.g. total pothole counter, temple bell rings, visitor sessions)
+    // -------------------------------------------------------------
+    // 3. Aggregate Stats Collection
+    // -------------------------------------------------------------
     match /stats/{docId} {
+      // READ: Public can view aggregate live stats (total reports, active pins, temple bell rings)
       allow read: if true;
-      allow write: if docId == 'global';
+
+      // CREATE: Only authorized admins can initialize stats documents
+      allow create: if isAdmin();
+
+      // UPDATE: Authorized admins can update all fields;
+      // Normal visitors may only atomically increment 'visitorCount' or 'bellRings'
+      // on 'stats/global' without tampering with core report metrics.
+      allow update: if isAdmin() || (
+        docId == 'global' &&
+        isValidStatsCounterUpdate()
+      );
+
+      // DELETE: Strictly forbidden
+      allow delete: if false;
     }
 
-    // Leaderboard document
+    // -------------------------------------------------------------
+    // 4. Leaderboard Collection
+    // -------------------------------------------------------------
     match /leaderboard/{docId} {
+      // READ: Public can read pre-calculated leaderboard rankings
       allow read: if true;
+
+      // WRITE: Strictly forbidden for clients.
+      // Generated exclusively by Cloud Function 'refreshLeaderboard'.
       allow write: if false;
     }
-    
-    // Default fallback: deny all
+
+    // -------------------------------------------------------------
+    // 5. Admin Profiles & Audit Log Collection
+    // -------------------------------------------------------------
+    match /admins/{adminId} {
+      // READ: Only authorized admins can view admin records
+      allow read: if isAdmin();
+
+      // CREATE / UPDATE: Authorized admin can update their own session record
+      allow create, update: if isAdmin() &&
+        request.auth.uid == adminId &&
+        isValidAdminDoc();
+
+      // DELETE: Forbidden
+      allow delete: if false;
+    }
+
+    // -------------------------------------------------------------
+    // 6. Default Fallback
+    // -------------------------------------------------------------
+    // Deny all reads and writes to any unmapped document or collection
     match /{document=**} {
       allow read, write: if false;
     }
