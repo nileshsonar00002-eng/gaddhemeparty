@@ -2,7 +2,7 @@ import { t, getLanguage } from '../utils/i18n';
 import { modalManager } from '../utils/modalManager';
 import { resolvePinCity } from '../utils/cities';
 import { processPotholeImage } from '../utils/imageProcessor';
-import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved, fetchPinComments, addPinComment } from '../services/firebase';
+import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved, fetchPinComments, addPinComment, deduplicateComments } from '../services/firebase';
 import { showToast } from './Toast';
 import { openPhotoLightbox } from './PhotoLightbox';
 import { hasUserReportedOrUpvoted, hasUserUpvoted, getActionQuota, recordLocalCountedAction } from '../utils/upvoteStorage';
@@ -604,16 +604,24 @@ export function openPinDetailModal(pin) {
     `).join('');
   };
 
+  let loadCommentsPromise = null;
   const loadComments = async () => {
-    try {
-      cachedComments = await fetchPinComments(pin.id);
-      isCommentsLoaded = true;
-      renderCommentsList(cachedComments);
-      // Total count = 1 (original landmark description) + cachedComments.length
-      updateCommentsCountBadges(1 + cachedComments.length);
-    } catch (err) {
-      console.warn('Error loading comments:', err);
-    }
+    if (loadCommentsPromise) return loadCommentsPromise;
+    loadCommentsPromise = (async () => {
+      try {
+        const comments = await fetchPinComments(pin.id);
+        cachedComments = deduplicateComments(comments);
+        isCommentsLoaded = true;
+        renderCommentsList(cachedComments);
+        // Total count = 1 (original landmark description) + cachedComments.length
+        updateCommentsCountBadges(1 + cachedComments.length);
+      } catch (err) {
+        console.warn('Error loading comments:', err);
+      } finally {
+        loadCommentsPromise = null;
+      }
+    })();
+    return loadCommentsPromise;
   };
 
   // Eagerly pre-load comments so counts are accurate immediately
@@ -654,12 +662,16 @@ export function openPinDetailModal(pin) {
     closeCommentsOverlay();
   });
 
-  // Handle posting new comment
+  // Handle posting new comment with rapid double-click guard & deduplication
+  let isSubmittingComment = false;
   reelCommentForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isSubmittingComment) return;
+
     const text = reelCommentInput?.value?.trim();
     if (!text) return;
 
+    isSubmittingComment = true;
     if (reelCommentSubmitBtn) reelCommentSubmitBtn.disabled = true;
 
     try {
@@ -667,7 +679,8 @@ export function openPinDetailModal(pin) {
       if (reelCommentInput) reelCommentInput.value = '';
 
       if (newComment) {
-        cachedComments.push(newComment);
+        // Deduplicate immediately against existing cached comments
+        cachedComments = deduplicateComments([...cachedComments, newComment]);
         renderCommentsList(cachedComments);
         updateCommentsCountBadges(1 + cachedComments.length);
 
@@ -684,6 +697,7 @@ export function openPinDetailModal(pin) {
       console.error('Failed to post comment:', err);
       showToast(isHindi ? 'कमेंट पोस्ट करने में त्रुटि हुई' : 'Failed to post comment', 'error', 3000);
     } finally {
+      isSubmittingComment = false;
       if (reelCommentSubmitBtn) reelCommentSubmitBtn.disabled = false;
     }
   });

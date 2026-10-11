@@ -699,6 +699,44 @@ export function subscribeToBellRings(onCountUpdated) {
 }
 
 /**
+ * Deduplicate a list of comments by unique ID and identical text within a short time window
+ */
+export function deduplicateComments(list) {
+  if (!Array.isArray(list)) return [];
+  const result = [];
+  const seenIds = new Set();
+
+  for (const c of list) {
+    if (!c || !c.text) continue;
+    const cleanText = String(c.text).trim();
+    if (!cleanText) continue;
+
+    // Check unique ID
+    if (c.id && seenIds.has(c.id)) continue;
+
+    // Check identical comment text submitted within 60 seconds
+    const isDuplicateContent = result.some((existing) => {
+      if (existing.id && c.id && existing.id === c.id) return true;
+      const sameText = String(existing.text).trim() === cleanText;
+      const timeDiff = Math.abs((existing.createdAt || 0) - (c.createdAt || 0));
+      return sameText && timeDiff < 60000;
+    });
+
+    if (isDuplicateContent) continue;
+
+    if (c.id) seenIds.add(c.id);
+    result.push({
+      id: c.id,
+      text: cleanText,
+      createdAt: typeof c.createdAt === 'number' ? c.createdAt : (c.createdAt?.toMillis ? c.createdAt.toMillis() : Date.now()),
+      userId: c.userId || 'anon'
+    });
+  }
+
+  return result.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+}
+
+/**
  * Fetch comments for a pin (cached locally + live Firestore sync)
  */
 export async function fetchPinComments(pinId) {
@@ -707,7 +745,7 @@ export async function fetchPinComments(pinId) {
   let cached = [];
   try {
     const raw = localStorage.getItem(localKey);
-    if (raw) cached = JSON.parse(raw);
+    if (raw) cached = deduplicateComments(JSON.parse(raw));
   } catch (e) {}
 
   try {
@@ -724,20 +762,19 @@ export async function fetchPinComments(pinId) {
         userId: data.userId || 'anon'
       });
     });
+
     if (remote.length > 0) {
-      remote.sort((a, b) => a.createdAt - b.createdAt);
-      const map = new Map();
-      cached.forEach((c) => map.set(c.id, c));
-      remote.forEach((c) => map.set(c.id, c));
-      const merged = Array.from(map.values());
+      // Merge remote and cached with content and ID deduplication
+      const combined = deduplicateComments([...remote, ...cached]);
       try {
-        localStorage.setItem(localKey, JSON.stringify(merged));
+        localStorage.setItem(localKey, JSON.stringify(combined));
       } catch (e) {}
-      return merged;
+      return combined;
     }
   } catch (err) {
     console.warn('[Firestore] Comments fetch notice:', err);
   }
+
   return cached;
 }
 
@@ -746,29 +783,40 @@ export async function fetchPinComments(pinId) {
  */
 export async function addPinComment(pinId, text) {
   if (!pinId || !text || !text.trim()) return null;
-  const user = getCurrentUser();
+  let user = getCurrentUser();
+  if (!user) {
+    try {
+      user = await initAnonymousAuth();
+    } catch (e) {}
+  }
+
   const cleanText = text.trim().slice(0, 300);
-  const commentId = 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+  // 1. Generate Firestore doc reference SYNCHRONOUSLY so local ID and Firestore doc ID MATCH EXACTLY!
+  const commentsRef = collection(db, 'pins', pinId, 'comments');
+  const newDocRef = doc(commentsRef);
+  const commentId = newDocRef.id;
+
+  const now = Date.now();
   const newComment = {
     id: commentId,
     text: cleanText,
-    createdAt: Date.now(),
+    createdAt: now,
     userId: user?.uid || 'anon'
   };
 
-  // 1. Optimistic Local Cache
+  // 2. Optimistic Local Cache with deduplication
   const localKey = 'khadda_comments_' + pinId;
   try {
     const raw = localStorage.getItem(localKey);
     const list = raw ? JSON.parse(raw) : [];
-    list.push(newComment);
-    localStorage.setItem(localKey, JSON.stringify(list));
+    const combined = deduplicateComments([...list, newComment]);
+    localStorage.setItem(localKey, JSON.stringify(combined));
   } catch (e) {}
 
-  // 2. Persist to Firestore subcollection
+  // 3. Persist to Firestore subcollection using setDoc with the SAME newDocRef!
   try {
-    const commentsRef = collection(db, 'pins', pinId, 'comments');
-    await addDoc(commentsRef, {
+    await setDoc(newDocRef, {
       text: cleanText,
       createdAt: serverTimestamp(),
       userId: user?.uid || 'anon'
