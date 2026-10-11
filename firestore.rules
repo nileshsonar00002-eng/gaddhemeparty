@@ -243,6 +243,17 @@ service cloud.firestore {
       match /flags/{userId} {
         allow read, write: if false;
       }
+
+      // Subcollection: Comments (Public read, authenticated user create)
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isAuthenticated() &&
+          request.resource.data.keys().hasOnly(['text', 'createdAt', 'userId']) &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() >= 1 &&
+          request.resource.data.text.size() <= 300;
+        allow update, delete: if isAdmin();
+      }
     }
 
     // -------------------------------------------------------------

@@ -698,4 +698,86 @@ export function subscribeToBellRings(onCountUpdated) {
   };
 }
 
+/**
+ * Fetch comments for a pin (cached locally + live Firestore sync)
+ */
+export async function fetchPinComments(pinId) {
+  if (!pinId) return [];
+  const localKey = 'khadda_comments_' + pinId;
+  let cached = [];
+  try {
+    const raw = localStorage.getItem(localKey);
+    if (raw) cached = JSON.parse(raw);
+  } catch (e) {}
+
+  try {
+    const commentsRef = collection(db, 'pins', pinId, 'comments');
+    const q = query(commentsRef, limit(50));
+    const snap = await getDocs(q);
+    const remote = [];
+    snap.forEach((d) => {
+      const data = d.data();
+      remote.push({
+        id: d.id,
+        text: data.text || '',
+        createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt || Date.now()),
+        userId: data.userId || 'anon'
+      });
+    });
+    if (remote.length > 0) {
+      remote.sort((a, b) => a.createdAt - b.createdAt);
+      const map = new Map();
+      cached.forEach((c) => map.set(c.id, c));
+      remote.forEach((c) => map.set(c.id, c));
+      const merged = Array.from(map.values());
+      try {
+        localStorage.setItem(localKey, JSON.stringify(merged));
+      } catch (e) {}
+      return merged;
+    }
+  } catch (err) {
+    console.warn('[Firestore] Comments fetch notice:', err);
+  }
+  return cached;
+}
+
+/**
+ * Add a new comment to a pin
+ */
+export async function addPinComment(pinId, text) {
+  if (!pinId || !text || !text.trim()) return null;
+  const user = getCurrentUser();
+  const cleanText = text.trim().slice(0, 300);
+  const commentId = 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+  const newComment = {
+    id: commentId,
+    text: cleanText,
+    createdAt: Date.now(),
+    userId: user?.uid || 'anon'
+  };
+
+  // 1. Optimistic Local Cache
+  const localKey = 'khadda_comments_' + pinId;
+  try {
+    const raw = localStorage.getItem(localKey);
+    const list = raw ? JSON.parse(raw) : [];
+    list.push(newComment);
+    localStorage.setItem(localKey, JSON.stringify(list));
+  } catch (e) {}
+
+  // 2. Persist to Firestore subcollection
+  try {
+    const commentsRef = collection(db, 'pins', pinId, 'comments');
+    await addDoc(commentsRef, {
+      text: cleanText,
+      createdAt: serverTimestamp(),
+      userId: user?.uid || 'anon'
+    });
+  } catch (err) {
+    console.warn('[Firestore] Comment add error:', err);
+  }
+
+  return newComment;
+}
+
 

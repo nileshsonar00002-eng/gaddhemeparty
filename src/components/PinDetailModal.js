@@ -2,7 +2,7 @@ import { t, getLanguage } from '../utils/i18n';
 import { modalManager } from '../utils/modalManager';
 import { resolvePinCity } from '../utils/cities';
 import { processPotholeImage } from '../utils/imageProcessor';
-import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved } from '../services/firebase';
+import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved, fetchPinComments, addPinComment } from '../services/firebase';
 import { showToast } from './Toast';
 import { openPhotoLightbox } from './PhotoLightbox';
 import { hasUserReportedOrUpvoted, hasUserUpvoted, getActionQuota, recordLocalCountedAction } from '../utils/upvoteStorage';
@@ -174,8 +174,8 @@ export function openPinDetailModal(pin) {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </button>
-                    <span class="text-[10px] font-heading font-bold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5">
-                      ${isHindi ? 'कमेंट्स' : 'Comments'}
+                    <span id="photo-reel-comment-count" class="text-[10px] font-heading font-bold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5 tabular-nums">
+                      1
                     </span>
                   </div>
                 </div>
@@ -294,59 +294,122 @@ export function openPinDetailModal(pin) {
                   </span>
                 ` : ''}
               </button>
+
+              <button
+                id="pin-modal-comments-trigger-btn"
+                type="button"
+                title="${isHindi ? 'कमेंट्स देखें' : 'View comments'}"
+                aria-label="${isHindi ? 'कमेंट्स देखें' : 'View comments'}"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--surface-2)] hover:bg-[var(--border)] text-[var(--text)] border border-[var(--border)] transition cursor-pointer active:scale-95 group shadow-xs"
+              >
+                <svg class="w-3.5 h-3.5 text-[var(--accent)] group-hover:scale-110 transition shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                <span>${isHindi ? 'कमेंट्स' : 'Comments'}</span>
+                <span id="badge-comments-count" class="ml-0.5 px-1.5 py-0.2 rounded-md bg-[var(--surface)] text-[var(--muted)] font-bold text-[10px] font-mono border border-[var(--border)] tabular-nums">
+                  1
+                </span>
+              </button>
             </div>
 
             <span class="text-[11px] text-[var(--muted)] font-mono font-medium">${timeStr}</span>
           </div>
 
-          <!-- Comments & Location Description -->
-          <div id="pin-modal-landmark-box" class="bg-[var(--surface-2)] p-3 rounded-2xl border border-[var(--border)] transition-all duration-300">
-            <div class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-1 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-              <span>${isHindi ? 'कमेंट्स / विवरण' : 'Comments / Description'}</span>
+
+          <!-- Actions: Add Photo & WhatsApp Share (Flag button removed) -->
+          <div class="pt-2 border-t border-[var(--border)] flex items-center gap-2">
+            <!-- Add Photo Button -->
+            <input type="file" id="modal-add-photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden" />
+            <button
+              id="pin-modal-add-photo-btn"
+              type="button"
+              class="btn-secondary flex-1 py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-xs"
+            >
+              <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3" stroke-width="2"/></svg>
+              <span>${isHindi ? '+ फ़ोटो जोड़ें' : '+ Add Photo'}</span>
+            </button>
+
+            <!-- WhatsApp Share Button -->
+            <a
+              href="${whatsappShareUrl}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-secondary flex-1 py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-xs"
+            >
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              <span>${t('shareWhatsapp')}</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Instagram Reel-Style Comments Overlay (Opened on clicking Comments) -->
+        <div
+          id="pin-comments-overlay"
+          class="hidden absolute inset-0 z-50 bg-[var(--surface)] flex flex-col rounded-2xl animate-in slide-in-from-bottom-5 duration-200"
+        >
+          <!-- Top Bar / Header -->
+          <div class="px-4 py-3 border-b border-[var(--border)] flex items-center justify-between bg-[var(--surface-2)] shrink-0">
+            <div class="flex items-center gap-2 min-w-0">
+              <svg class="w-4 h-4 text-[var(--accent)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              <h3 class="font-heading font-extrabold text-sm text-[var(--text)]">
+                ${isHindi ? 'कमेंट्स' : 'Comments'}
+              </h3>
+              <span id="overlay-comments-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[var(--surface)] text-[var(--muted)] border border-[var(--border)] tabular-nums">
+                1
+              </span>
             </div>
-            <p class="text-xs sm:text-sm font-semibold text-[var(--text)] leading-relaxed">
-              ${safeLandmark}
-            </p>
+            <button
+              id="btn-close-comments-overlay"
+              type="button"
+              class="w-7 h-7 rounded-full bg-[var(--surface)] hover:bg-rose-500 hover:text-white text-[var(--muted)] border border-[var(--border)] flex items-center justify-center transition cursor-pointer active:scale-95"
+              aria-label="Close comments"
+              title="Close"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
           </div>
 
-          <!-- Actions: Add Photo, WhatsApp Share & Flag -->
-          <div class="pt-2 border-t border-[var(--border)] flex items-center gap-2 flex-wrap">
-              <!-- Add Photo Button -->
-              <input type="file" id="modal-add-photo-input" accept="image/jpeg,image/png,image/webp" capture="environment" class="hidden" />
-              <button
-                id="pin-modal-add-photo-btn"
-                type="button"
-                class="btn-secondary flex-1 py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-xs"
-              >
-                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3" stroke-width="2"/></svg>
-                <span>${isHindi ? '+ फ़ोटो जोड़ें' : '+ Add Photo'}</span>
-              </button>
-
-              <!-- WhatsApp Share Button -->
-              <a
-                href="${whatsappShareUrl}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn-secondary flex-1 py-2.5 px-3 font-heading font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 text-center cursor-pointer shadow-xs"
-              >
-                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                <span>${t('shareWhatsapp')}</span>
-              </a>
-
-              <!-- Flag Spam Button -->
-              <button
-                id="pin-modal-flag-btn"
-                type="button"
-                title="${t('flagBtn')}"
-                class="btn-secondary p-2.5 rounded-xl transition cursor-pointer flex-shrink-0"
-              >
-                <svg class="w-4 h-4 text-[var(--muted)] hover:text-[var(--danger)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
-                </svg>
-              </button>
+          <!-- Scrollable Comments Feed -->
+          <div id="comments-list-container" class="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-3">
+            <!-- Pinned Original Report Description (Top Comment) -->
+            <div class="p-3 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] space-y-1.5 shadow-xs">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] font-heading">
+                  <span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
+                  ${isHindi ? 'नागरिक रिपोर्ट (मूल विवरण)' : 'Original Report'}
+                </span>
+                <span class="text-[10px] text-[var(--muted)] font-mono">${timeStr}</span>
+              </div>
+              <p class="text-xs sm:text-sm text-[var(--text)] leading-relaxed font-semibold">
+                ${safeLandmark}
+              </p>
             </div>
+
+            <!-- Dynamic List of User Comments -->
+            <div id="dynamic-comments-list" class="space-y-2.5"></div>
           </div>
+
+          <!-- Sticky Bottom Input Bar -->
+          <form id="reel-comment-form" class="p-2.5 border-t border-[var(--border)] bg-[var(--surface-2)]/95 flex items-center gap-2 shrink-0">
+            <input
+              id="reel-comment-input"
+              type="text"
+              autocomplete="off"
+              placeholder="${isHindi ? 'कमेंट लिखें...' : 'Add a comment...'}"
+              maxlength="200"
+              class="flex-1 px-3 py-2 text-xs rounded-xl bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted)] transition"
+            />
+            <button
+              id="btn-submit-reel-comment"
+              type="submit"
+              class="w-8 h-8 rounded-xl bg-[var(--primary)] text-[var(--primary-ink)] flex items-center justify-center font-bold active:scale-90 transition cursor-pointer shrink-0 disabled:opacity-40 shadow-xs"
+              title="${isHindi ? 'भेजें' : 'Send'}"
+            >
+              <svg class="w-4 h-4 rotate-90" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19V5m-7 7l7-7 7 7"/></svg>
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -354,8 +417,6 @@ export function openPinDetailModal(pin) {
 
   const backdrop = document.getElementById('pin-modal-backdrop');
   const closeBtn = document.getElementById('btn-close-pin-modal');
-  const upvoteBtn = document.getElementById('pin-modal-upvote-btn');
-  const flagBtn = document.getElementById('pin-modal-flag-btn');
   const addPhotoInput = container.querySelector('#modal-add-photo-input');
   const addPhotoBtn = container.querySelector('#pin-modal-add-photo-btn');
 
@@ -494,9 +555,141 @@ export function openPinDetailModal(pin) {
     }, { passive: true });
   }
 
-  // Reel Like & Comment button listeners
-  const photoLikeBtn = container.querySelector('#photo-reel-like-btn');
+  // --- Instagram Reels-Style Comments Sheet Logic ---
+  const commentsOverlay = container.querySelector('#pin-comments-overlay');
+  const closeCommentsOverlayBtn = container.querySelector('#btn-close-comments-overlay');
+  const dynamicCommentsList = container.querySelector('#dynamic-comments-list');
+  const reelCommentForm = container.querySelector('#reel-comment-form');
+  const reelCommentInput = container.querySelector('#reel-comment-input');
+  const reelCommentSubmitBtn = container.querySelector('#btn-submit-reel-comment');
+  const overlayCommentsCountBadge = container.querySelector('#overlay-comments-count-badge');
+  const photoReelCommentCount = container.querySelector('#photo-reel-comment-count');
+  const badgeCommentsCount = container.querySelector('#badge-comments-count');
+  const commentsListContainer = container.querySelector('#comments-list-container');
+
+  let cachedComments = [];
+  let isCommentsLoaded = false;
+
+  const updateCommentsCountBadges = (count) => {
+    const text = String(count);
+    if (overlayCommentsCountBadge) overlayCommentsCountBadge.textContent = text;
+    if (photoReelCommentCount) photoReelCommentCount.textContent = text;
+    if (badgeCommentsCount) badgeCommentsCount.textContent = text;
+  };
+
+  const renderCommentsList = (comments) => {
+    if (!dynamicCommentsList) return;
+    if (!comments || comments.length === 0) {
+      dynamicCommentsList.innerHTML = `
+        <div id="no-comments-placeholder" class="py-4 text-center text-xs text-[var(--muted)]">
+          ${isHindi ? 'अभी कोई अन्य कमेंट नहीं है। पहला कमेंट जोड़ें!' : 'No comments yet. Be the first to comment!'}
+        </div>
+      `;
+      return;
+    }
+
+    dynamicCommentsList.innerHTML = comments.map(c => `
+      <div class="p-2.5 rounded-xl bg-[var(--surface-2)]/70 border border-[var(--border)] space-y-1 text-left animate-in fade-in duration-150">
+        <div class="flex items-center justify-between text-[10px]">
+          <span class="inline-flex items-center gap-1 font-semibold text-[var(--muted)]">
+            <svg class="w-3 h-3 text-[var(--muted)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span>${isHindi ? 'नागरिक' : 'Citizen'}</span>
+          </span>
+          <span class="text-[10px] text-[var(--muted)] font-mono">${formatRelativeTime(c.createdAt)}</span>
+        </div>
+        <p class="text-xs text-[var(--text)] leading-relaxed break-words font-medium">
+          ${escapeHtml(c.text)}
+        </p>
+      </div>
+    `).join('');
+  };
+
+  const loadComments = async () => {
+    try {
+      cachedComments = await fetchPinComments(pin.id);
+      isCommentsLoaded = true;
+      renderCommentsList(cachedComments);
+      // Total count = 1 (original landmark description) + cachedComments.length
+      updateCommentsCountBadges(1 + cachedComments.length);
+    } catch (err) {
+      console.warn('Error loading comments:', err);
+    }
+  };
+
+  // Eagerly pre-load comments so counts are accurate immediately
+  loadComments();
+
+  const openCommentsOverlay = async () => {
+    if (!commentsOverlay) return;
+    commentsOverlay.classList.remove('hidden');
+    if (!isCommentsLoaded) {
+      await loadComments();
+    }
+    setTimeout(() => {
+      reelCommentInput?.focus();
+    }, 150);
+  };
+
+  const closeCommentsOverlay = () => {
+    if (!commentsOverlay) return;
+    commentsOverlay.classList.add('hidden');
+  };
+
+  // Triggers for opening comments
   const photoCommentBtn = container.querySelector('#photo-reel-comment-btn');
+  const badgeCommentsBtn = container.querySelector('#pin-modal-comments-trigger-btn');
+
+  photoCommentBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCommentsOverlay();
+  });
+
+  badgeCommentsBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCommentsOverlay();
+  });
+
+  closeCommentsOverlayBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeCommentsOverlay();
+  });
+
+  // Handle posting new comment
+  reelCommentForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = reelCommentInput?.value?.trim();
+    if (!text) return;
+
+    if (reelCommentSubmitBtn) reelCommentSubmitBtn.disabled = true;
+
+    try {
+      const newComment = await addPinComment(pin.id, text);
+      if (reelCommentInput) reelCommentInput.value = '';
+
+      if (newComment) {
+        cachedComments.push(newComment);
+        renderCommentsList(cachedComments);
+        updateCommentsCountBadges(1 + cachedComments.length);
+
+        // Scroll to latest comment
+        setTimeout(() => {
+          if (commentsListContainer) {
+            commentsListContainer.scrollTop = commentsListContainer.scrollHeight;
+          }
+        }, 50);
+
+        showToast(isHindi ? 'कमेंट पोस्ट हो गया!' : 'Comment posted!', 'success', 2500);
+      }
+    } catch (err) {
+      console.error('Failed to post comment:', err);
+      showToast(isHindi ? 'कमेंट पोस्ट करने में त्रुटि हुई' : 'Failed to post comment', 'error', 3000);
+    } finally {
+      if (reelCommentSubmitBtn) reelCommentSubmitBtn.disabled = false;
+    }
+  });
+
+  // Reel Like button listener
+  const photoLikeBtn = container.querySelector('#photo-reel-like-btn');
 
   photoLikeBtn?.addEventListener('click', async (e) => {
     e.stopPropagation();
@@ -506,18 +699,6 @@ export function openPinDetailModal(pin) {
     }
     if (window.__khaddaUpvotePin) {
       await window.__khaddaUpvotePin(pin.id);
-    }
-  });
-
-  photoCommentBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const landmarkBox = container.querySelector('#pin-modal-landmark-box');
-    if (landmarkBox) {
-      landmarkBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      landmarkBox.classList.add('ring-2', 'ring-[var(--primary)]', 'scale-[1.02]');
-      setTimeout(() => {
-        landmarkBox.classList.remove('ring-2', 'ring-[var(--primary)]', 'scale-[1.02]');
-      }, 1500);
     }
   });
 
@@ -538,11 +719,24 @@ export function openPinDetailModal(pin) {
   });
 
   const closeModal = (notifyManager = true) => {
+    window.removeEventListener('keydown', handleKeyDown);
     container.innerHTML = '';
     if (notifyManager) {
       modalManager.notifyClosed('pin-detail-modal');
     }
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      if (commentsOverlay && !commentsOverlay.classList.contains('hidden')) {
+        e.stopPropagation();
+        closeCommentsOverlay();
+        return;
+      }
+      closeModal(true);
+    }
+  };
+  window.addEventListener('keydown', handleKeyDown);
 
   modalManager.openModal('pin-detail-modal', () => closeModal(false));
 
@@ -566,12 +760,6 @@ export function openPinDetailModal(pin) {
       } else if (window.__khaddaFlyToPin) {
         window.__khaddaFlyToPin(pin.id, resolvedRank);
       }
-    }
-  });
-
-  flagBtn?.addEventListener('click', () => {
-    if (window.__khaddaFlagPin) {
-      window.__khaddaFlagPin(pin.id);
     }
   });
 }
