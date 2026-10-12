@@ -145,20 +145,22 @@ export function openPinDetailModal(pin) {
                   onerror="this.parentElement.style.display='none'"
                 />
 
-                <!-- Unified Right Action Column: Close, Like & Comments in a Single Vertical Line -->
-                <div class="absolute right-2.5 sm:right-3 top-2.5 flex flex-col items-center gap-2.5 z-30 pointer-events-auto">
+                <!-- Unified Right Action Column: Close, Like & Comments with Equal Vertical Spacing -->
+                <div class="absolute inset-y-3 right-3 flex flex-col items-center justify-between z-30 pointer-events-auto">
                   <!-- Close Button -->
-                  <button
-                    id="btn-close-pin-modal"
-                    type="button"
-                    class="w-9 h-9 rounded-full bg-black/75 hover:bg-rose-600 backdrop-blur-md text-white border border-white/30 hover:border-rose-400 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-90"
-                    aria-label="Close"
-                    title="Close"
-                  >
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                  </button>
+                  <div class="flex flex-col items-center pb-1">
+                    <button
+                      id="btn-close-pin-modal"
+                      type="button"
+                      class="w-9 h-9 rounded-full bg-black/75 hover:bg-rose-600 backdrop-blur-md text-white border border-white/30 hover:border-rose-400 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-90"
+                      aria-label="Close"
+                      title="Close"
+                    >
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
 
                   <!-- Reel Like Button & Count -->
                   <div class="flex flex-col items-center">
@@ -172,7 +174,7 @@ export function openPinDetailModal(pin) {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                       </svg>
                     </button>
-                    <span id="photo-reel-like-count" class="text-[10px] font-heading font-extrabold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5 tabular-nums leading-tight">
+                    <span id="photo-reel-like-count" class="text-[10px] font-heading font-extrabold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5 tabular-nums leading-none">
                       ${upvoteCount}
                     </span>
                   </div>
@@ -189,7 +191,7 @@ export function openPinDetailModal(pin) {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                       </svg>
                     </button>
-                    <span id="photo-reel-comment-count" class="text-[10px] font-heading font-extrabold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5 tabular-nums leading-tight">
+                    <span id="photo-reel-comment-count" class="text-[10px] font-heading font-extrabold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)] mt-0.5 tabular-nums leading-none">
                       1
                     </span>
                   </div>
