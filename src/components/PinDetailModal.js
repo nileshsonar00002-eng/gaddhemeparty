@@ -2,7 +2,7 @@ import { t, getLanguage } from '../utils/i18n';
 import { modalManager } from '../utils/modalManager';
 import { resolvePinCity } from '../utils/cities';
 import { processPotholeImage } from '../utils/imageProcessor';
-import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved, fetchPinComments, addPinComment, deduplicateComments } from '../services/firebase';
+import { attachPhotoToPin, uploadPotholePhoto, isPinPhotoApproved, fetchPinComments, addPinComment, deduplicateComments, subscribeToPinComments } from '../services/firebase';
 import { showToast } from './Toast';
 import { openPhotoLightbox } from './PhotoLightbox';
 import { hasUserReportedOrUpvoted, hasUserUpvoted, getActionQuota, recordLocalCountedAction } from '../utils/upvoteStorage';
@@ -621,15 +621,19 @@ export function openPinDetailModal(pin) {
     return loadCommentsPromise;
   };
 
-  // Eagerly pre-load comments so counts are accurate immediately
+  // Eagerly pre-load comments so counts are accurate immediately & subscribe to admin hide/delete changes
   loadComments();
+  const unsubscribeComments = subscribeToPinComments(pin.id, (liveComments) => {
+    cachedComments = deduplicateComments(liveComments);
+    isCommentsLoaded = true;
+    renderCommentsList(cachedComments);
+    updateCommentsCountBadges(1 + cachedComments.length);
+  });
 
   const openCommentsOverlay = async () => {
     if (!commentsOverlay) return;
     commentsOverlay.classList.remove('hidden');
-    if (!isCommentsLoaded) {
-      await loadComments();
-    }
+    await loadComments();
     setTimeout(() => {
       reelCommentInput?.focus();
     }, 150);
@@ -754,6 +758,7 @@ export function openPinDetailModal(pin) {
   });
 
   const closeModal = (notifyManager = true) => {
+    try { unsubscribeComments(); } catch (e) {}
     window.removeEventListener('keydown', handleKeyDown);
     container.innerHTML = '';
     if (notifyManager) {

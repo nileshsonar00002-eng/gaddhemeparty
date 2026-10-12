@@ -93,6 +93,23 @@ export function renderQueueFilter(container, options = {}) {
               ${counts.total || 0}
             </span>
           </button>
+
+          <button
+            type="button"
+            data-tab="comments"
+            class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer shrink-0 ${
+              activeTab === 'comments'
+                ? 'bg-violet-500 text-white shadow-md shadow-violet-500/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+            }"
+          >
+            <span>💬 Comments</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-black ${
+              activeTab === 'comments' ? 'bg-violet-950 text-violet-200' : 'bg-slate-800 text-slate-300'
+            }">
+              ${counts.comments || 0}
+            </span>
+          </button>
         </div>
 
         <!-- Filters: City & Sort -->

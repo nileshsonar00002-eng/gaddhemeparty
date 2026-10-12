@@ -716,15 +716,45 @@ export function subscribeToBellRings(onCountUpdated) {
 }
 
 /**
- * Deduplicate a list of comments by unique ID and identical text within a short time window
+ * Read locally tracked deleted/hidden comment IDs (shared across tabs on same browser)
  */
-export function deduplicateComments(list) {
+export function getDeletedCommentIdsSet() {
+  try {
+    const raw = localStorage.getItem('khadda_deleted_comment_ids');
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+
+export function getHiddenCommentIdsSet() {
+  try {
+    const raw = localStorage.getItem('khadda_hidden_comment_ids');
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+
+/**
+ * Deduplicate a list of comments by unique ID and identical text within a short time window.
+ * Automatically filters out deleted or hidden comments for public main panel display.
+ */
+export function deduplicateComments(list, includeHidden = false) {
   if (!Array.isArray(list)) return [];
   const result = [];
   const seenIds = new Set();
+  const deletedSet = getDeletedCommentIdsSet();
+  const hiddenSet = getHiddenCommentIdsSet();
 
   for (const c of list) {
     if (!c || !c.text) continue;
+    if (c.deleted === true) continue;
+    if (c.id && deletedSet.has(c.id)) continue;
+
+    const isHidden = Boolean(c.hidden === true || (c.id && hiddenSet.has(c.id)));
+    if (!includeHidden && isHidden) continue;
+
     const cleanText = String(c.text).trim();
     if (!cleanText) continue;
 
@@ -746,7 +776,8 @@ export function deduplicateComments(list) {
       id: c.id,
       text: cleanText,
       createdAt: typeof c.createdAt === 'number' ? c.createdAt : (c.createdAt?.toMillis ? c.createdAt.toMillis() : Date.now()),
-      userId: c.userId || 'anon'
+      userId: c.userId || 'anon',
+      hidden: isHidden
     });
   }
 
@@ -754,45 +785,164 @@ export function deduplicateComments(list) {
 }
 
 /**
- * Fetch comments for a pin (cached locally + live Firestore sync)
+ * Fetch comments for a pin (live Firestore source of truth + local cache sync)
+ * Ensures comments hidden or deleted in Admin Panel are never shown in Main Panel
  */
 export async function fetchPinComments(pinId) {
   if (!pinId) return [];
   const localKey = 'khadda_comments_' + pinId;
-  let cached = [];
+  const deletedSet = getDeletedCommentIdsSet();
+  const hiddenSet = getHiddenCommentIdsSet();
+
+  let cachedRaw = [];
   try {
     const raw = localStorage.getItem(localKey);
-    if (raw) cached = deduplicateComments(JSON.parse(raw));
+    if (raw) cachedRaw = JSON.parse(raw);
   } catch (e) {}
 
   try {
     const commentsRef = collection(db, 'pins', pinId, 'comments');
-    const q = query(commentsRef, limit(50));
-    const snap = await getDocs(q);
-    const remote = [];
+    const q = query(commentsRef, limit(100));
+    const [snap, pinSnap] = await Promise.all([
+      getDocs(q),
+      getDoc(doc(db, 'pins', pinId)).catch(() => null)
+    ]);
+
+    const pinData = pinSnap && pinSnap.exists() ? pinSnap.data() : {};
+    const remoteDeletedIds = new Set(Array.isArray(pinData.deletedCommentIds) ? pinData.deletedCommentIds : []);
+    const remoteHiddenIds = new Set(Array.isArray(pinData.hiddenCommentIds) ? pinData.hiddenCommentIds : []);
+
+    // Sync remote deleted/hidden IDs into local sets so all tabs stay consistent
+    if (remoteDeletedIds.size > 0) {
+      remoteDeletedIds.forEach((id) => deletedSet.add(id));
+      try {
+        localStorage.setItem('khadda_deleted_comment_ids', JSON.stringify(Array.from(deletedSet)));
+      } catch (e) {}
+    }
+
+    const remoteAll = [];
+    const remoteIds = new Set();
+
     snap.forEach((d) => {
       const data = d.data();
-      remote.push({
+      remoteIds.add(d.id);
+      if (data.deleted === true || deletedSet.has(d.id) || remoteDeletedIds.has(d.id)) {
+        return;
+      }
+      const isHidden = Boolean(data.hidden === true || hiddenSet.has(d.id) || remoteHiddenIds.has(d.id));
+      remoteAll.push({
         id: d.id,
         text: data.text || '',
-        createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : (data.createdAt || Date.now()),
-        userId: data.userId || 'anon'
+        createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : (typeof data.createdAt === 'number' ? data.createdAt : Date.now()),
+        userId: data.userId || 'anon',
+        hidden: isHidden,
+        synced: true
       });
     });
 
-    if (remote.length > 0) {
-      // Merge remote and cached with content and ID deduplication
-      const combined = deduplicateComments([...remote, ...cached]);
-      try {
-        localStorage.setItem(localKey, JSON.stringify(combined));
-      } catch (e) {}
-      return combined;
+    // Also check pinData.userComments if any comments were mirrored on the pin doc
+    if (Array.isArray(pinData.userComments)) {
+      pinData.userComments.forEach((c) => {
+        if (!c || !c.id || remoteIds.has(c.id)) return;
+        if (c.deleted === true || deletedSet.has(c.id) || remoteDeletedIds.has(c.id)) return;
+        const isHidden = Boolean(c.hidden === true || hiddenSet.has(c.id) || remoteHiddenIds.has(c.id));
+        remoteAll.push({
+          id: c.id,
+          text: c.text || '',
+          createdAt: typeof c.createdAt === 'number' ? c.createdAt : Date.now(),
+          userId: c.userId || 'anon',
+          hidden: isHidden,
+          synced: true
+        });
+      });
     }
+
+    // Only keep cached items that were created very recently (< 10s ago, pending write)
+    // and NOT deleted by admin. Anything older that is missing from Firestore was deleted!
+    const now = Date.now();
+    const pendingLocal = (Array.isArray(cachedRaw) ? cachedRaw : []).filter((c) => {
+      if (!c || !c.id) return false;
+      if (deletedSet.has(c.id) || remoteDeletedIds.has(c.id) || c.deleted === true) return false;
+      if (remoteIds.has(c.id)) return false;
+      // Only retain if not yet marked synced and created within last 10 seconds
+      return !c.synced && Math.abs(now - (c.createdAt || 0)) < 10000;
+    });
+
+    const allNonDeleted = deduplicateComments([...remoteAll, ...pendingLocal], true);
+    try {
+      localStorage.setItem(localKey, JSON.stringify(allNonDeleted));
+    } catch (e) {}
+
+    // Return only visible (non-hidden, non-deleted) comments for the Main Panel
+    return allNonDeleted.filter((c) => !c.hidden);
   } catch (err) {
     console.warn('[Firestore] Comments fetch notice:', err);
   }
 
-  return cached;
+  return deduplicateComments(cachedRaw, false);
+}
+
+/**
+ * Subscribe in real-time to a pin's visible comments for the Main Panel
+ * Automatically reacts when Admin hides, unhides, or deletes a comment
+ */
+export function subscribeToPinComments(pinId, onCommentsUpdated) {
+  if (!pinId || typeof onCommentsUpdated !== 'function') return () => {};
+
+  let isCleanedUp = false;
+  const triggerRefresh = async () => {
+    if (isCleanedUp) return;
+    try {
+      const visible = await fetchPinComments(pinId);
+      if (!isCleanedUp) {
+        onCommentsUpdated(visible);
+      }
+    } catch (e) {}
+  };
+
+  let unsubSubcollection = () => {};
+  let unsubPinDoc = () => {};
+
+  try {
+    const commentsRef = collection(db, 'pins', pinId, 'comments');
+    unsubSubcollection = onSnapshot(
+      query(commentsRef, limit(100)),
+      () => triggerRefresh(),
+      () => {}
+    );
+  } catch (e) {}
+
+  try {
+    unsubPinDoc = onSnapshot(
+      doc(db, 'pins', pinId),
+      () => triggerRefresh(),
+      () => {}
+    );
+  } catch (e) {}
+
+  const handleStorageEvent = (e) => {
+    if (
+      !e.key ||
+      e.key === 'khadda_comments_' + pinId ||
+      e.key === 'khadda_deleted_comment_ids' ||
+      e.key === 'khadda_hidden_comment_ids'
+    ) {
+      triggerRefresh();
+    }
+  };
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', handleStorageEvent);
+  }
+
+  return () => {
+    isCleanedUp = true;
+    try { unsubSubcollection(); } catch (e) {}
+    try { unsubPinDoc(); } catch (e) {}
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('storage', handleStorageEvent);
+    }
+  };
 }
 
 /**
@@ -819,7 +969,9 @@ export async function addPinComment(pinId, text) {
     id: commentId,
     text: cleanText,
     createdAt: now,
-    userId: user?.uid || 'anon'
+    userId: user?.uid || 'anon',
+    hidden: false,
+    synced: false
   };
 
   // 2. Optimistic Local Cache with deduplication
@@ -827,7 +979,7 @@ export async function addPinComment(pinId, text) {
   try {
     const raw = localStorage.getItem(localKey);
     const list = raw ? JSON.parse(raw) : [];
-    const combined = deduplicateComments([...list, newComment]);
+    const combined = deduplicateComments([...list, newComment], true);
     localStorage.setItem(localKey, JSON.stringify(combined));
   } catch (e) {}
 
@@ -838,11 +990,20 @@ export async function addPinComment(pinId, text) {
       createdAt: serverTimestamp(),
       userId: user?.uid || 'anon'
     });
+    // Mark as synced in localStorage so if deleted later on Firestore, local cache knows it was deleted
+    newComment.synced = true;
+    try {
+      const raw = localStorage.getItem(localKey);
+      const list = raw ? JSON.parse(raw) : [];
+      const updated = list.map((c) => (c.id === commentId ? { ...c, synced: true } : c));
+      localStorage.setItem(localKey, JSON.stringify(updated));
+    } catch (e) {}
   } catch (err) {
     console.warn('[Firestore] Comment add error:', err);
   }
 
   return newComment;
 }
+
 
 

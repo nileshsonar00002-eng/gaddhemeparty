@@ -14,6 +14,9 @@ import {
   archivePin,
   hardDeletePin,
   deletePinPhoto,
+  fetchAllPinCommentsForAdmin,
+  toggleHidePinComment,
+  deletePinCommentAdmin,
   observeAdminAuthState,
   auth
 } from './services/firebase';
@@ -21,6 +24,7 @@ import { checkIsAdminAuthenticated, setAdminAuthenticated, renderAuthGate } from
 import { renderNavbar } from './components/Navbar';
 import { renderStatsBar } from './components/StatsBar';
 import { renderQueueFilter } from './components/QueueFilter';
+import { renderCommentsPanel, formatCommentDateKey } from './components/CommentsPanel';
 import { createReportCardHtml } from './components/ReportCard';
 import { openLightbox } from './components/ImageLightbox';
 import { openRejectModal } from './components/RejectModal';
@@ -37,6 +41,10 @@ class AdminApp {
   constructor() {
     this.appEl = document.getElementById('app');
     this.allPins = [];
+    this.allComments = [];
+    this.commentSort = 'new'; // 'new' | 'old'
+    this.commentDate = ''; // 'YYYY-MM-DD'
+    this.isCommentsLoading = false;
     this.activeTab = 'pending';
     this.selectedCity = 'all';
     this.sortBy = 'newest';
@@ -47,6 +55,7 @@ class AdminApp {
     this.initialLoadDone = false;
     this.previousPendingIds = new Set();
     this.unsubscribeFirestore = null;
+    this.storageListenerBound = false;
   }
 
   async init() {
@@ -89,6 +98,15 @@ class AdminApp {
     this.renderSkeleton();
     await initAdminAuth();
 
+    if (!this.storageListenerBound && typeof window !== 'undefined') {
+      this.storageListenerBound = true;
+      window.addEventListener('storage', (e) => {
+        if (!e.key || e.key.startsWith('khadda_comments_') || e.key.includes('comment')) {
+          this.loadAllComments(false);
+        }
+      });
+    }
+
     // Setup Realtime Firestore Listener
     this.unsubscribeFirestore = subscribeToModerationQueue(
       (pins) => {
@@ -108,6 +126,7 @@ class AdminApp {
       <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         <div id="admin-stats-mount"></div>
         <div id="admin-filter-mount"></div>
+        <div id="admin-comments-mount"></div>
         <div id="admin-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <div class="col-span-full py-16 flex flex-col items-center justify-center text-slate-400 gap-3">
             <div class="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
@@ -147,6 +166,132 @@ class AdminApp {
     this.initialLoadDone = true;
 
     this.render();
+    this.loadAllComments(!this.allComments.length);
+  }
+
+  async loadAllComments(showSpinner = false) {
+    if (showSpinner) {
+      this.isCommentsLoading = true;
+      this.renderCommentsSection();
+    }
+    try {
+      const comments = await fetchAllPinCommentsForAdmin(this.allPins);
+      this.allComments = comments;
+    } catch (err) {
+      console.warn('[Admin] Error loading comments:', err);
+    } finally {
+      this.isCommentsLoading = false;
+      this.renderCommentsSection();
+      // Update comment badge count in tab button if present
+      const commentTabBadge = document.querySelector('[data-tab="comments"] span:last-child');
+      if (commentTabBadge) {
+        commentTabBadge.textContent = String(this.allComments.length);
+      }
+    }
+  }
+
+  getFilteredComments() {
+    return this.allComments
+      .filter((c) => {
+        // City filter (if active)
+        if (this.selectedCity !== 'all') {
+          if (c.pinCity !== this.selectedCity) return false;
+        }
+        // Date filter (YYYY-MM-DD)
+        if (this.commentDate) {
+          const itemDateKey = formatCommentDateKey(c.createdAt);
+          if (itemDateKey !== this.commentDate) return false;
+        }
+        // Search query filter
+        if (this.searchQuery) {
+          const q = this.searchQuery.toLowerCase();
+          const text = (c.text || '').toLowerCase();
+          const landmark = (c.pinLandmark || '').toLowerCase();
+          const city = (c.pinCity || '').toLowerCase();
+          const pinId = (c.pinId || '').toLowerCase();
+          if (!text.includes(q) && !landmark.includes(q) && !city.includes(q) && !pinId.includes(q)) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (this.commentSort === 'old') {
+          return (a.createdAt || 0) - (b.createdAt || 0);
+        }
+        // Default 'new': Newest first
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
+  }
+
+  renderCommentsSection() {
+    const commentsMount = document.getElementById('admin-comments-mount');
+    if (!commentsMount) return;
+
+    const filteredComments = this.getFilteredComments();
+    const visibleCount = this.allComments.filter((c) => !c.hidden).length;
+    const hiddenCount = this.allComments.filter((c) => c.hidden).length;
+
+    renderCommentsPanel(commentsMount, {
+      comments: filteredComments,
+      allCommentsCount: this.allComments.length,
+      visibleCount,
+      hiddenCount,
+      commentSort: this.commentSort,
+      commentDate: this.commentDate,
+      isLoading: this.isCommentsLoading,
+      onSortChange: (newSort) => {
+        this.commentSort = newSort;
+        this.renderCommentsSection();
+      },
+      onDateChange: (newDate) => {
+        this.commentDate = newDate;
+        this.renderCommentsSection();
+      },
+      onRefresh: async () => {
+        await this.loadAllComments(true);
+        showToast('💬 Comments synced with Firestore!', 'info', 2000);
+      },
+      onToggleHide: async (pinId, commentId, shouldHide) => {
+        // Optimistic UI update
+        this.allComments = this.allComments.map((c) =>
+          c.id === commentId ? { ...c, hidden: shouldHide } : c
+        );
+        this.renderCommentsSection();
+
+        try {
+          await toggleHidePinComment(pinId, commentId, shouldHide);
+          showToast(
+            shouldHide
+              ? '🙈 Comment hidden from main panel'
+              : '👁️ Comment unhidden & visible on main panel',
+            shouldHide ? 'warning' : 'success'
+          );
+        } catch (err) {
+          showToast('Failed to update comment visibility', 'error');
+        }
+      },
+      onDeleteComment: async (pinId, commentId) => {
+        if (!confirm('Are you sure you want to permanently delete this comment from both Admin Panel and Main Panel?')) {
+          return;
+        }
+
+        // Optimistic UI removal
+        this.allComments = this.allComments.filter((c) => c.id !== commentId);
+        this.renderCommentsSection();
+        const commentTabBadge = document.querySelector('[data-tab="comments"] span:last-child');
+        if (commentTabBadge) {
+          commentTabBadge.textContent = String(this.allComments.length);
+        }
+
+        try {
+          await deletePinCommentAdmin(pinId, commentId);
+          showToast('🗑️ Comment deleted from Admin Panel & Main Panel!', 'info');
+        } catch (err) {
+          showToast('Failed to delete comment', 'error');
+        }
+      }
+    });
   }
 
   getPhotoStatus(pin) {
@@ -211,9 +356,10 @@ class AdminApp {
     const navbarMount = document.getElementById('admin-navbar-mount');
     const statsMount = document.getElementById('admin-stats-mount');
     const filterMount = document.getElementById('admin-filter-mount');
+    const commentsMount = document.getElementById('admin-comments-mount');
     const gridEl = document.getElementById('admin-cards-grid');
 
-    if (!navbarMount || !statsMount || !filterMount || !gridEl) {
+    if (!navbarMount || !statsMount || !filterMount || !commentsMount || !gridEl) {
       this.renderSkeleton();
       return this.render();
     }
@@ -250,7 +396,10 @@ class AdminApp {
       },
       onSearch: (q) => {
         this.searchQuery = q.trim();
-        this.renderCardsGrid(this.getFilteredPins());
+        this.renderCommentsSection();
+        if (this.activeTab !== 'comments') {
+          this.renderCardsGrid(this.getFilteredPins());
+        }
       }
     });
 
@@ -273,13 +422,14 @@ class AdminApp {
         pending: pendingCount,
         approved: approvedCount,
         rejected: rejectedCount,
-        total: this.allPins.length
+        total: this.allPins.length,
+        comments: this.allComments.length
       },
       cities: citiesList,
       selectedCity: this.selectedCity,
       sortBy: this.sortBy,
       selectedCount: this.selectedPinIds.size,
-      totalVisible: filteredPins.length,
+      totalVisible: this.activeTab === 'comments' ? 0 : filteredPins.length,
       isAllSelected,
       onTabChange: (tab) => {
         this.activeTab = tab;
@@ -293,7 +443,9 @@ class AdminApp {
       },
       onSortChange: (sort) => {
         this.sortBy = sort;
-        this.renderCardsGrid(this.getFilteredPins());
+        if (this.activeTab !== 'comments') {
+          this.renderCardsGrid(this.getFilteredPins());
+        }
       },
       onSelectAll: (checked) => {
         if (checked) {
@@ -356,8 +508,18 @@ class AdminApp {
       }
     });
 
-    // 5. Render Cards Grid
-    this.renderCardsGrid(filteredPins);
+    // 5. Render User Comments Row Section
+    this.renderCommentsSection();
+
+    // 6. Render Cards Grid (hidden when exclusively on the 'comments' tab)
+    if (this.activeTab === 'comments') {
+      cleanupAllMiniMaps();
+      gridEl.classList.add('hidden');
+      gridEl.innerHTML = '';
+    } else {
+      gridEl.classList.remove('hidden');
+      this.renderCardsGrid(filteredPins);
+    }
   }
 
   renderCardsGrid(pins) {

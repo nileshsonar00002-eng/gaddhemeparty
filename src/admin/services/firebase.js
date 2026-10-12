@@ -7,6 +7,7 @@ import {
   onSnapshot,
   doc,
   getDoc,
+  getDocs,
   setDoc,
   updateDoc,
   deleteDoc,
@@ -535,3 +536,270 @@ export async function hardDeletePin(pinId) {
   await deleteDoc(pinRef);
   return true;
 }
+
+// ========================================================
+// Admin User Comments Management (Fetch, Hide/Unhide, Delete)
+// ========================================================
+
+function getLocalDeletedSet() {
+  try {
+    const raw = localStorage.getItem('khadda_deleted_comment_ids');
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+
+function getLocalHiddenSet() {
+  try {
+    const raw = localStorage.getItem('khadda_hidden_comment_ids');
+    return new Set(raw ? JSON.parse(raw) : []);
+  } catch (e) {
+    return new Set();
+  }
+}
+
+/**
+ * Fetch all user comments across all active pins for the Admin Panel
+ */
+export async function fetchAllPinCommentsForAdmin(pins = []) {
+  if (!Array.isArray(pins) || pins.length === 0) return [];
+
+  const localDeletedSet = getLocalDeletedSet();
+  const localHiddenSet = getLocalHiddenSet();
+  const allComments = [];
+
+  await Promise.all(
+    pins.map(async (pin) => {
+      if (!pin || !pin.id) return;
+      const pinId = pin.id;
+      const pinDeletedIds = new Set(Array.isArray(pin.deletedCommentIds) ? pin.deletedCommentIds : []);
+      const pinHiddenIds = new Set(Array.isArray(pin.hiddenCommentIds) ? pin.hiddenCommentIds : []);
+
+      // Sync pin-level deleted IDs into localDeletedSet
+      if (pinDeletedIds.size > 0) {
+        pinDeletedIds.forEach((id) => localDeletedSet.add(id));
+      }
+
+      const seenForPin = new Set();
+      const pinComments = [];
+
+      const pushCommentItem = (c) => {
+        if (!c || !c.id || !c.text) return;
+        const cleanText = String(c.text).trim();
+        if (!cleanText) return;
+        if (c.deleted === true || localDeletedSet.has(c.id) || pinDeletedIds.has(c.id)) return;
+        if (seenForPin.has(c.id)) return;
+
+        const createdAtMs =
+          typeof c.createdAt === 'number'
+            ? c.createdAt
+            : c.createdAt?.toMillis
+            ? c.createdAt.toMillis()
+            : c.createdAt?.toDate
+            ? c.createdAt.toDate().getTime()
+            : new Date(c.createdAt || Date.now()).getTime();
+
+        // Deduplicate identical text within 60s on same pin
+        const isDup = pinComments.some((existing) => {
+          const sameText = existing.text === cleanText;
+          const diff = Math.abs((existing.createdAt || 0) - createdAtMs);
+          return sameText && diff < 60000;
+        });
+        if (isDup) return;
+
+        seenForPin.add(c.id);
+        const isHidden = Boolean(
+          c.hidden === true || localHiddenSet.has(c.id) || pinHiddenIds.has(c.id)
+        );
+
+        const pinThumb =
+          (Array.isArray(pin.images) && pin.images[0]) ||
+          pin.imageUrl ||
+          pin.thumbnailUrl ||
+          null;
+
+        pinComments.push({
+          id: c.id,
+          pinId,
+          pinLandmark: pin.landmark || 'Road Pothole Report',
+          pinCity: pin.cityNameEnglish || pin.cityNameHindi || 'India',
+          pinState: pin.cityState || '',
+          pinThumb,
+          text: cleanText,
+          createdAt: createdAtMs,
+          userId: c.userId || 'anon',
+          hidden: isHidden
+        });
+      };
+
+      // 1. Fetch from Firestore subcollection pins/{pinId}/comments
+      try {
+        const commentsRef = collection(db, 'pins', pinId, 'comments');
+        const snap = await getDocs(query(commentsRef, limit(100)));
+        snap.forEach((d) => {
+          pushCommentItem({ id: d.id, ...d.data() });
+        });
+      } catch (err) {
+        console.warn(`[Admin Comments] Fetch notice for pin ${pinId}:`, err);
+      }
+
+      // 2. Also include any comments mirrored on pin.userComments
+      if (Array.isArray(pin.userComments)) {
+        pin.userComments.forEach((c) => pushCommentItem(c));
+      }
+
+      // 3. Also check localStorage cache (in case comment was posted on same browser)
+      try {
+        const rawLocal = localStorage.getItem('khadda_comments_' + pinId);
+        if (rawLocal) {
+          const parsedLocal = JSON.parse(rawLocal);
+          if (Array.isArray(parsedLocal)) {
+            parsedLocal.forEach((c) => pushCommentItem(c));
+          }
+        }
+      } catch (e) {}
+
+      allComments.push(...pinComments);
+    })
+  );
+
+  try {
+    localStorage.setItem('khadda_deleted_comment_ids', JSON.stringify(Array.from(localDeletedSet)));
+  } catch (e) {}
+
+  return allComments.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+/**
+ * Hide or Unhide a user comment from Admin Panel
+ * Hidden comments are immediately hidden from the Main Panel
+ */
+export async function toggleHidePinComment(pinId, commentId, shouldHide) {
+  if (!pinId || !commentId) return false;
+  const hideFlag = Boolean(shouldHide);
+
+  // 1. Update localStorage immediately for instant same-browser sync
+  try {
+    const hiddenSet = getLocalHiddenSet();
+    if (hideFlag) hiddenSet.add(commentId);
+    else hiddenSet.delete(commentId);
+    localStorage.setItem('khadda_hidden_comment_ids', JSON.stringify(Array.from(hiddenSet)));
+
+    const localKey = 'khadda_comments_' + pinId;
+    const raw = localStorage.getItem(localKey);
+    if (raw) {
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        const updated = list.map((c) => (c && c.id === commentId ? { ...c, hidden: hideFlag } : c));
+        localStorage.setItem(localKey, JSON.stringify(updated));
+      }
+    }
+  } catch (e) {}
+
+  // 2. Update Firestore comment document in pins/{pinId}/comments/{commentId}
+  try {
+    const commentRef = doc(db, 'pins', pinId, 'comments', commentId);
+    await setDoc(
+      commentRef,
+      {
+        hidden: hideFlag,
+        moderatedBy: auth.currentUser?.email || 'admin',
+        moderatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  } catch (err) {
+    console.warn('[Admin Comments] Subcollection hide update notice:', err);
+  }
+
+  // 3. Also sync hiddenCommentIds on parent pin document if allowed
+  try {
+    const pinRef = doc(db, 'pins', pinId);
+    const snap = await getDoc(pinRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      const hiddenSet = new Set(Array.isArray(data.hiddenCommentIds) ? data.hiddenCommentIds : []);
+      if (hideFlag) hiddenSet.add(commentId);
+      else hiddenSet.delete(commentId);
+      await updateDoc(pinRef, {
+        hiddenCommentIds: Array.from(hiddenSet)
+      });
+    }
+  } catch (e) {
+    // Non-fatal if strict pin schema rules don't include hiddenCommentIds on remote
+  }
+
+  return true;
+}
+
+/**
+ * Permanently Delete a user comment from Admin Panel AND Main Panel
+ */
+export async function deletePinCommentAdmin(pinId, commentId) {
+  if (!pinId || !commentId) return false;
+
+  // 1. Immediately purge from localStorage & record in deleted IDs so Main Panel never resurrects it
+  try {
+    const deletedSet = getLocalDeletedSet();
+    deletedSet.add(commentId);
+    localStorage.setItem('khadda_deleted_comment_ids', JSON.stringify(Array.from(deletedSet)));
+
+    const hiddenSet = getLocalHiddenSet();
+    if (hiddenSet.has(commentId)) {
+      hiddenSet.delete(commentId);
+      localStorage.setItem('khadda_hidden_comment_ids', JSON.stringify(Array.from(hiddenSet)));
+    }
+
+    const localKey = 'khadda_comments_' + pinId;
+    const raw = localStorage.getItem(localKey);
+    if (raw) {
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        const filtered = list.filter((c) => c && c.id !== commentId);
+        localStorage.setItem(localKey, JSON.stringify(filtered));
+      }
+    }
+  } catch (e) {}
+
+  // 2. Delete document from Firestore subcollection pins/{pinId}/comments/{commentId}
+  const commentRef = doc(db, 'pins', pinId, 'comments', commentId);
+  try {
+    await deleteDoc(commentRef);
+  } catch (delErr) {
+    console.warn('[Admin Comments] Hard delete fallback to soft delete flag:', delErr);
+    try {
+      await setDoc(
+        commentRef,
+        {
+          deleted: true,
+          hidden: true,
+          deletedBy: auth.currentUser?.email || 'admin',
+          deletedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (softErr) {
+      console.warn('[Admin Comments] Soft delete notice:', softErr);
+    }
+  }
+
+  // 3. Also record deletedCommentIds on parent pin document if allowed
+  try {
+    const pinRef = doc(db, 'pins', pinId);
+    const snap = await getDoc(pinRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      const deletedSet = new Set(Array.isArray(data.deletedCommentIds) ? data.deletedCommentIds : []);
+      deletedSet.add(commentId);
+      await updateDoc(pinRef, {
+        deletedCommentIds: Array.from(deletedSet)
+      });
+    }
+  } catch (e) {
+    // Non-fatal if strict pin schema rules don't include deletedCommentIds on remote
+  }
+
+  return true;
+}
+
