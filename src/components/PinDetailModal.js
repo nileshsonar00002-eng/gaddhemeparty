@@ -114,18 +114,20 @@ export function openPinDetailModal(pin) {
         class="relative w-full max-w-[315px] sm:max-w-[350px] max-h-[75dvh] sm:max-h-[78dvh] bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 text-[var(--text)]"
         onclick="event.stopPropagation()"
       >
-        <!-- Floating Close Button (Top Right) -->
-        <button
-          id="btn-close-pin-modal"
-          type="button"
-          class="absolute top-2.5 right-2.5 w-9 h-9 rounded-full bg-slate-900/90 text-white border-2 border-slate-700 hover:bg-rose-600 hover:border-rose-500 flex items-center justify-center transition-all duration-150 shadow-xl z-40 cursor-pointer active:scale-95"
-          aria-label="Close"
-          title="Close"
-        >
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
+        <!-- Floating Close Button (Fallback when no approved photo container is shown) -->
+        ${!(photoApproved && allImages.length > 0) ? `
+          <button
+            id="btn-close-pin-modal"
+            type="button"
+            class="absolute top-2.5 right-2.5 w-9 h-9 rounded-full bg-slate-900/90 text-white border border-white/30 hover:bg-rose-600 hover:border-rose-400 flex items-center justify-center transition-all duration-200 shadow-lg z-40 cursor-pointer active:scale-90"
+            aria-label="Close"
+            title="Close"
+          >
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        ` : ''}
 
         <!-- Scrollable Content -->
         <div class="overflow-y-auto overscroll-contain p-3.5 sm:p-4 space-y-3">
@@ -143,15 +145,28 @@ export function openPinDetailModal(pin) {
                   onerror="this.parentElement.style.display='none'"
                 />
 
-                <!-- Instagram Reel-Style Overlay (Like & Comments) on Right Side (Below Close Button) -->
-                <div class="absolute right-2 sm:right-2.5 top-9 sm:top-10 flex flex-col items-center gap-2 z-30 pointer-events-auto">
+                <!-- Unified Right Action Column: Close, Like & Comments in a Single Vertical Line -->
+                <div class="absolute right-2.5 sm:right-3 top-2.5 flex flex-col items-center gap-2.5 z-30 pointer-events-auto">
+                  <!-- Close Button -->
+                  <button
+                    id="btn-close-pin-modal"
+                    type="button"
+                    class="w-9 h-9 rounded-full bg-black/75 hover:bg-rose-600 backdrop-blur-md text-white border border-white/30 hover:border-rose-400 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-90"
+                    aria-label="Close"
+                    title="Close"
+                  >
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+
                   <!-- Reel Like Button & Count -->
                   <div class="flex flex-col items-center">
                     <button
                       id="photo-reel-like-btn"
                       type="button"
                       title="${isLiked ? (isHindi ? 'पसंद किया (Liked)' : 'Liked') : (isHindi ? 'लाइक करें' : 'Like')}"
-                      class="w-[34px] h-[34px] sm:w-9 sm:h-9 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group ${isLiked ? 'text-rose-500 border-rose-500/50 bg-rose-950/60' : 'text-white border-white/30'}"
+                      class="w-9 h-9 rounded-full bg-black/75 hover:bg-black/90 backdrop-blur-md border flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group ${isLiked ? 'text-rose-500 border-rose-500/60 bg-rose-950/70' : 'text-white border-white/30'}"
                     >
                       <svg class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110 ${isLiked ? 'fill-rose-500 text-rose-500 stroke-rose-500' : 'fill-none stroke-current'}" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
@@ -168,7 +183,7 @@ export function openPinDetailModal(pin) {
                       id="photo-reel-comment-btn"
                       type="button"
                       title="${isHindi ? 'कमेंट्स देखें' : 'View Comments'}"
-                      class="w-[34px] h-[34px] sm:w-9 sm:h-9 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group text-white"
+                      class="w-9 h-9 rounded-full bg-black/75 hover:bg-black/90 backdrop-blur-md border border-white/30 flex items-center justify-center transition-all duration-200 shadow-lg cursor-pointer active:scale-85 group text-white"
                     >
                       <svg class="w-4.5 h-4.5 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -208,7 +223,7 @@ export function openPinDetailModal(pin) {
                     id="btn-gallery-next"
                     type="button"
                     aria-label="Next photo"
-                    class="absolute right-2.5 top-2.5 w-7 h-7 rounded-full bg-black/60 hover:bg-[var(--primary)] text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition shadow-lg z-20 cursor-pointer active:scale-90"
+                    class="absolute left-11 bottom-10 w-7 h-7 rounded-full bg-black/60 hover:bg-[var(--primary)] text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition shadow-lg z-20 cursor-pointer active:scale-90"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                   </button>
@@ -723,6 +738,7 @@ export function openPinDetailModal(pin) {
   const galleryMainContainer = document.getElementById('gallery-main-container');
   galleryMainContainer?.addEventListener('click', (e) => {
     if (
+      e.target.closest('#btn-close-pin-modal') ||
       e.target.closest('#btn-gallery-prev') ||
       e.target.closest('#btn-gallery-next') ||
       e.target.closest('#photo-reel-like-btn') ||
@@ -763,7 +779,8 @@ export function openPinDetailModal(pin) {
     }
   });
 
-  closeBtn?.addEventListener('click', () => {
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
     closeModal(true);
   });
 
