@@ -120,8 +120,9 @@ export class LeaderboardSection {
                 </h3>
 
                 <div class="flex items-center gap-2 mt-2 text-xs tabular-nums font-mono text-[var(--muted)] flex-wrap">
-                  <span class="bg-[#D93025]/15 text-[#D93025] border border-[#D93025]/30 px-2 py-0.5 rounded-lg font-bold shadow-xs">
-                    ${t('rankRowReports', { n: heroPin.reportCount || 1 })}
+                  <span class="bg-[var(--primary)]/15 text-[var(--primary)] border border-[var(--primary)]/30 px-2.5 py-0.5 rounded-lg font-bold shadow-xs inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                    <span>${heroPin.upvotes || 0}</span>
                   </span>
                   <span class="bg-[var(--surface-2)] text-[var(--text)] border border-[var(--border)] px-2 py-0.5 rounded-lg shadow-xs">
                     ${t('daysOpenText', { n: heroPin.daysOpen || 1 })}
@@ -177,14 +178,10 @@ export class LeaderboardSection {
                     <svg class="w-3 h-3 text-[var(--primary)] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span>${pinLabels.city}</span>
                   </p>
-                  <div class="flex items-center gap-2 mt-1 text-[10px] tabular-nums font-mono text-[var(--primary)]">
+                  <div class="flex items-center gap-2 mt-1 text-[11px] tabular-nums font-mono font-bold text-[var(--primary)]">
                     <span class="flex items-center gap-1">
-                      <svg class="w-3 h-3 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                      <span>${pin.reportCount || 1} reps</span>
-                    </span>
-                    <span class="flex items-center gap-1">
-                      <svg class="w-3 h-3 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
-                      <span>${pin.upvotes || 0} votes</span>
+                      <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                      <span>${pin.upvotes || 0}</span>
                     </span>
                   </div>
                 </div>
@@ -525,12 +522,10 @@ export class LeaderboardSheet {
 
             <!-- Counts -->
             <div class="text-right flex-shrink-0">
-              <div class="text-xs font-heading font-extrabold text-[var(--accent)]">
-                ${t('rankRowReports', { n: reports })}
-              </div>
-              <div class="text-[10px] text-[var(--muted)]">
-                +${upvotes} votes
-              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--primary)]/15 border border-[var(--primary)]/30 text-[var(--primary)] tabular-nums font-mono font-bold text-xs">
+                <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                <span>${upvotes}</span>
+              </span>
             </div>
           </div>
         `;
@@ -636,12 +631,10 @@ export class LeaderboardSheet {
           </div>
 
           <div class="text-right flex-shrink-0">
-            <div class="text-xs font-heading font-extrabold text-rose-400">
-              ${t('rankRowReports', { n: reports })}
-            </div>
-            <div class="text-[10px] text-slate-400">
-              +${upvotes} votes
-            </div>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 tabular-nums font-mono font-bold text-xs">
+              <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+              <span>${upvotes}</span>
+            </span>
           </div>
         </div>
       `;
