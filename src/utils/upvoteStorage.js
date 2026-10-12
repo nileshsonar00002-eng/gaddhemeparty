@@ -63,15 +63,20 @@ export function getActionQuota() {
   };
 }
 
+const sessionUpvotedPins = new Set();
+
 export function recordLocalCountedAction(pinId) {
+  const normalizedId = pinId ? String(pinId).trim() : undefined;
+  if (normalizedId) {
+    sessionUpvotedPins.add(normalizedId);
+    markPinAsUpvoted(normalizedId);
+  }
   try {
     const now = Date.now();
     const actions = getStoredActions();
-    actions.push({ timestamp: now, pinId: pinId ? String(pinId) : undefined });
-    localStorage.setItem(ACTIONS_KEY, JSON.stringify(actions));
-
-    if (pinId) {
-      markPinAsUpvoted(pinId);
+    if (!normalizedId || !actions.some((a) => String(a.pinId).trim() === normalizedId)) {
+      actions.push({ timestamp: now, pinId: normalizedId });
+      localStorage.setItem(ACTIONS_KEY, JSON.stringify(actions));
     }
   } catch (e) {
     console.warn('LocalStorage action write notice:', e);
@@ -80,15 +85,21 @@ export function recordLocalCountedAction(pinId) {
 
 export function hasUserReportedOrUpvoted(pinId) {
   if (!pinId) return false;
-  const targetId = String(pinId);
+  const targetId = String(pinId).trim();
+  if (!targetId) return false;
+
+  if (sessionUpvotedPins.has(targetId)) return true;
 
   // Check 24h actions
   const actions = getStoredActions();
-  const recentAction = actions.some((a) => a.pinId === targetId);
-  if (recentAction) return true;
+  const recentAction = actions.some((a) => String(a.pinId || '').trim() === targetId);
+  if (recentAction) {
+    sessionUpvotedPins.add(targetId);
+    return true;
+  }
 
-  // Fallback to legacy upvotes list
-  return hasUserUpvoted(pinId);
+  // Fallback to permanent upvotes list
+  return hasUserUpvoted(targetId);
 }
 
 export function getUpvotedPinIds() {
@@ -102,16 +113,23 @@ export function getUpvotedPinIds() {
 
 export function hasUserUpvoted(pinId) {
   if (!pinId) return false;
+  const targetId = String(pinId).trim();
+  if (sessionUpvotedPins.has(targetId)) return true;
   const list = getUpvotedPinIds();
-  return list.includes(String(pinId));
+  const found = list.some((id) => String(id).trim() === targetId);
+  if (found) sessionUpvotedPins.add(targetId);
+  return found;
 }
 
 export function markPinAsUpvoted(pinId) {
   if (!pinId) return;
+  const targetId = String(pinId).trim();
+  if (!targetId) return;
+  sessionUpvotedPins.add(targetId);
   try {
     const list = getUpvotedPinIds();
-    if (!list.includes(String(pinId))) {
-      list.push(String(pinId));
+    if (!list.some((id) => String(id).trim() === targetId)) {
+      list.push(targetId);
       localStorage.setItem(UPVOTES_KEY, JSON.stringify(list));
     }
   } catch (e) {

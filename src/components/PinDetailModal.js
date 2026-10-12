@@ -370,14 +370,19 @@ export function openPinDetailModal(pin) {
 
           <!-- Sticky Bottom Input Bar -->
           <form id="reel-comment-form" class="p-2.5 border-t border-[var(--border)] bg-[var(--surface-2)]/95 flex items-center gap-2 shrink-0">
-            <input
-              id="reel-comment-input"
-              type="text"
-              autocomplete="off"
-              placeholder="${isHindi ? 'कमेंट लिखें...' : 'Add a comment...'}"
-              maxlength="200"
-              class="flex-1 px-3 py-2 text-xs rounded-xl bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted)] transition"
-            />
+            <div class="relative flex-1 flex items-center">
+              <input
+                id="reel-comment-input"
+                type="text"
+                autocomplete="off"
+                placeholder="${isHindi ? 'कमेंट लिखें (अधिकतम 50 अक्षर)...' : 'Add a comment (max 50 chars)...'}"
+                maxlength="50"
+                class="w-full pl-3 pr-11 py-2 text-xs rounded-xl bg-[var(--surface)] text-[var(--text)] border border-[var(--border)] focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--muted)] transition"
+              />
+              <span id="reel-comment-char-count" class="absolute right-2.5 text-[10px] font-mono text-[var(--muted)] pointer-events-none tabular-nums">
+                0/50
+              </span>
+            </div>
             <button
               id="btn-submit-reel-comment"
               type="submit"
@@ -631,13 +636,24 @@ export function openPinDetailModal(pin) {
     closeCommentsOverlay();
   });
 
+  // Enforce 50-character limit & update live counter
+  const reelCommentCharCount = container.querySelector('#reel-comment-char-count');
+  reelCommentInput?.addEventListener('input', () => {
+    if (reelCommentInput.value.length > 50) {
+      reelCommentInput.value = reelCommentInput.value.slice(0, 50);
+    }
+    if (reelCommentCharCount) {
+      reelCommentCharCount.textContent = `${reelCommentInput.value.length}/50`;
+    }
+  });
+
   // Handle posting new comment with rapid double-click guard & deduplication
   let isSubmittingComment = false;
   reelCommentForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (isSubmittingComment) return;
 
-    const text = reelCommentInput?.value?.trim();
+    const text = reelCommentInput?.value?.trim().slice(0, 50);
     if (!text) return;
 
     isSubmittingComment = true;
@@ -646,6 +662,7 @@ export function openPinDetailModal(pin) {
     try {
       const newComment = await addPinComment(pin.id, text);
       if (reelCommentInput) reelCommentInput.value = '';
+      if (reelCommentCharCount) reelCommentCharCount.textContent = '0/50';
 
       if (newComment) {
         // Deduplicate immediately against existing cached comments
@@ -671,17 +688,34 @@ export function openPinDetailModal(pin) {
     }
   });
 
-  // Reel Like button listener
+  // Reel Like button listener (Strict 1 like per user per report)
   const photoLikeBtn = container.querySelector('#photo-reel-like-btn');
+  const photoLikeCountEl = container.querySelector('#photo-reel-like-count');
+  let isLikeClicked = isLiked;
 
   photoLikeBtn?.addEventListener('click', async (e) => {
     e.stopPropagation();
-    if (hasUserReportedOrUpvoted(pin.id)) {
+    if (isLikeClicked || hasUserReportedOrUpvoted(pin.id)) {
       showToast(t('alreadyReportedAlert'), 'warning');
       return;
     }
+
+    isLikeClicked = true;
+
+    // Immediate optimistic UI update so repeat taps are visually & functionally locked
+    photoLikeBtn.classList.remove('text-white', 'border-white/30');
+    photoLikeBtn.classList.add('text-rose-500', 'border-rose-500/50', 'bg-rose-950/60');
+    const heartSvg = photoLikeBtn.querySelector('svg');
+    if (heartSvg) {
+      heartSvg.classList.remove('fill-none', 'stroke-current');
+      heartSvg.classList.add('fill-rose-500', 'text-rose-500', 'stroke-rose-500');
+    }
+    if (photoLikeCountEl) {
+      photoLikeCountEl.textContent = String(upvoteCount + 1);
+    }
+
     if (window.__khaddaUpvotePin) {
-      await window.__khaddaUpvotePin(pin.id);
+      await window.__khaddaUpvotePin(pin.id, pin);
     }
   });
 

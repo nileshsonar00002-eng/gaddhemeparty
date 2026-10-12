@@ -570,8 +570,12 @@ class KhaddaApp {
     });
 
     // Expose Upvote & Flag methods to window
-    window.__khaddaUpvotePin = async (pinId) => {
-      if (hasUserReportedOrUpvoted(pinId)) {
+    this.upvotingPinIds = new Set();
+    window.__khaddaUpvotePin = async (pinId, modalPinRef = null) => {
+      const normalizedId = String(pinId || '').trim();
+      if (!normalizedId) return;
+
+      if (this.upvotingPinIds.has(normalizedId) || hasUserReportedOrUpvoted(normalizedId)) {
         showToast(t('alreadyReportedAlert'), 'warning');
         return;
       }
@@ -582,15 +586,34 @@ class KhaddaApp {
         return;
       }
 
+      this.upvotingPinIds.add(normalizedId);
+      const existingPin = this.currentPins.find((p) => String(p.id).trim() === normalizedId) || modalPinRef;
+      const baseUpvotes = existingPin ? (Number(existingPin.upvotes) || 0) : 0;
+      const targetUpvotes = baseUpvotes + 1;
+
+      if (existingPin) {
+        existingPin.upvotes = targetUpvotes;
+      }
+
       try {
-        const res = await callUpvotePin(pinId);
-        markPinAsUpvoted(pinId);
-        showToast(res.message || t('upvoteSuccess'), 'success');
-        
-        // Optimistic UI update for pins
-        const pin = this.currentPins.find((p) => p.id === pinId);
+        const res = await callUpvotePin(normalizedId);
+        markPinAsUpvoted(normalizedId);
+
+        if (res?.alreadyVoted) {
+          if (existingPin && typeof res.upvotes === 'number') {
+            existingPin.upvotes = res.upvotes;
+          }
+          showToast(t('alreadyReportedAlert'), 'warning');
+        } else {
+          showToast(res.message || t('upvoteSuccess'), 'success');
+        }
+
+        const pin = this.currentPins.find((p) => String(p.id).trim() === normalizedId) || existingPin;
         if (pin) {
-          pin.upvotes = (pin.upvotes || 0) + 1;
+          pin.upvotes = typeof res?.upvotes === 'number' ? res.upvotes : targetUpvotes;
+          if (modalPinRef && modalPinRef !== pin) {
+            modalPinRef.upvotes = pin.upvotes;
+          }
           this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
           this.leaderboardSection?.render();
           if (this.panelManager && this.panelManager.activePanelId === 'leaderboard') {
@@ -600,6 +623,8 @@ class KhaddaApp {
         }
       } catch (err) {
         showToast(err.message || t('alreadyReportedAlert'), 'warning');
+      } finally {
+        this.upvotingPinIds.delete(normalizedId);
       }
     };
 

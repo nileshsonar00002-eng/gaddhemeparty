@@ -287,9 +287,10 @@ export async function callSubmitReport(reportPayload) {
 
 export async function callUpvotePin(pinId, userCoords = null) {
   if (!pinId) throw new Error('Invalid pin ID');
+  const normalizedId = String(pinId).trim();
 
-  // 1. Client-side fast local checks
-  if (hasUserReportedOrUpvoted(pinId)) {
+  // 1. Client-side fast local checks (synchronous before any await)
+  if (hasUserReportedOrUpvoted(normalizedId)) {
     throw new Error('आपने इस गड्ढे की रिपोर्ट पहले ही कर दी है।');
   }
 
@@ -298,8 +299,11 @@ export async function callUpvotePin(pinId, userCoords = null) {
     throw new Error(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }));
   }
 
+  // Record locally IMMEDIATELY before any network await so rapid repeat clicks are blocked!
+  recordLocalCountedAction(normalizedId);
+
   const payload = {
-    pinId,
+    pinId: normalizedId,
     userLatitude: userCoords?.latitude,
     userLongitude: userCoords?.longitude,
   };
@@ -307,7 +311,6 @@ export async function callUpvotePin(pinId, userCoords = null) {
   try {
     const upvoteFn = httpsCallable(functions, 'upvotePin');
     const result = await upvoteFn(payload);
-    recordLocalCountedAction(pinId);
     return result.data;
   } catch (fnErr) {
     console.warn('[Cloud Functions] upvotePin notice:', fnErr);
@@ -317,20 +320,34 @@ export async function callUpvotePin(pinId, userCoords = null) {
     }
 
     try {
-      const pinRef = doc(db, 'pins', pinId);
-      const snap = await getDocs(query(collection(db, 'pins'), where('__name__', '==', pinId)));
+      const user = getCurrentUser();
+      const uid = user?.uid || 'anon';
+      const pinRef = doc(db, 'pins', normalizedId);
+      const snap = await getDocs(query(collection(db, 'pins'), where('__name__', '==', normalizedId)));
       if (!snap.empty) {
         const d = snap.docs[0].data();
+        const existingVoters = Array.isArray(d.upvotedBy) ? d.upvotedBy : [];
+        const existingReporters = Array.isArray(d.reporters) ? d.reporters : [];
+        if (uid !== 'anon' && (existingVoters.includes(uid) || existingReporters.includes(uid) || d.createdBy === uid)) {
+          return {
+            success: true,
+            alreadyVoted: true,
+            pinId: normalizedId,
+            upvotes: d.upvotes || 0,
+            message: 'आपने इस गड्ढे की रिपोर्ट पहले ही कर दी है।'
+          };
+        }
+        const newUpvotes = (d.upvotes || 0) + 1;
         await updateDoc(pinRef, {
-          upvotes: (d.upvotes || 0) + 1,
+          upvotes: newUpvotes,
+          upvotedBy: uid !== 'anon' ? [...existingVoters, uid] : existingVoters,
           lastReportedAt: serverTimestamp()
         });
+        return { success: true, pinId: normalizedId, upvotes: newUpvotes, message: 'Aapka +1 record ho gaya!' };
       }
-      recordLocalCountedAction(pinId);
-      return { success: true, pinId, message: 'Aapka +1 record ho gaya!' };
+      return { success: true, pinId: normalizedId, message: 'Aapka +1 record ho gaya!' };
     } catch (err) {
-      recordLocalCountedAction(pinId);
-      return { success: true, pinId, message: 'Aapka +1 record ho gaya!' };
+      return { success: true, pinId: normalizedId, message: 'Aapka +1 record ho gaya!' };
     }
   }
 }
@@ -790,7 +807,7 @@ export async function addPinComment(pinId, text) {
     } catch (e) {}
   }
 
-  const cleanText = text.trim().slice(0, 300);
+  const cleanText = text.trim().slice(0, 50);
 
   // 1. Generate Firestore doc reference SYNCHRONOUSLY so local ID and Firestore doc ID MATCH EXACTLY!
   const commentsRef = collection(db, 'pins', pinId, 'comments');
