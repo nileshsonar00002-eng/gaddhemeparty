@@ -21,8 +21,8 @@ export function createNavbar(options = {}) {
   const isHindi = currentLang === 'hindi';
   const shareUrl = window.location.origin;
   const shareText = isHindi
-    ? `🚗💥 *गड्ढे में पार्टी* (Gaddhe Me Party)\n"मेरा गड्ढा, मेरी शान"\n\nसड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें! लाइव मैप पर अपने शहर के गड्ढे देखें:\n👉 ${shareUrl}`
-    : `🚗💥 *Gaddhe Me Party*\n"Mera Gaddha, Meri Shan"\n\nReport & track road hazards without login across India! Check live pothole map:\n👉 ${shareUrl}`;
+    ? `🚗💥 *RoadTok*\n"मेरा गड्ढा, मेरी शान"\n\nसड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें! लाइव मैप पर अपने शहर के गड्ढे देखें:\n👉 ${shareUrl}`
+    : `🚗💥 *RoadTok*\n"Mera Gaddha, Meri Shan"\n\nReport & track road hazards without login across India! Check live pothole map:\n👉 ${shareUrl}`;
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
     container.innerHTML = `
@@ -30,7 +30,7 @@ export function createNavbar(options = {}) {
       
       <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
       <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
-        <button type="button" id="nav-brand-btn" class="shrink-0 cursor-pointer focus:outline-none flex items-center justify-center" title="${t('appNameHindi')}">
+        <button type="button" id="nav-brand-btn" class="shrink-0 cursor-pointer focus:outline-none flex items-center justify-center" title="RoadTok">
           <img src="/logo.png" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full transition transform duration-150 hover:scale-105" />
         </button>
 
@@ -180,7 +180,7 @@ export function createNavbar(options = {}) {
             <div class="flex items-center gap-2.5">
               <img src="/logo.png" alt="Logo" class="w-8 h-8 rounded-lg" />
               <div class="flex flex-col">
-                <span class="font-heading font-bold text-sm text-[var(--text)]">${t('appNameHindi')}</span>
+                <span class="brand-roadtok text-base text-[var(--text)] leading-tight">RoadTok</span>
                 <span class="text-[11px] text-[var(--muted)]">"${t('tagline')}"</span>
               </div>
             </div>

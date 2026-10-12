@@ -3,8 +3,8 @@
 
 export const translations = {
   hindi: {
-    appNameHindi: 'गड्ढे में पार्टी',
-    appNameEnglish: 'Gaddhe Me Party',
+    appNameHindi: 'RoadTok',
+    appNameEnglish: 'RoadTok',
     tagline: 'मेरा गड्ढा, मेरी शान',
     heroBadge: 'मुफ़्त • बिना लॉगिन',
     heroTitleHtml: 'Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>',
@@ -206,7 +206,7 @@ export const translations = {
     legalRemovalText: 'यदि कोई फोटो गलत या आपत्तिजनक है, तो आप फ्लैग बटन का उपयोग कर सकते हैं या inforoadtok@gmail.com पर हटाए जाने का अनुरोध भेज सकते हैं।',
     
     // Footer
-    footerCopyright: '© 2026 गड्ढे में पार्टी • 100% Free Civic Tech',
+    footerCopyright: '© 2026 RoadTok • 100% Free Civic Tech',
     footerLinksHeader: 'त्वरित लिंक',
     footerLegalHeader: 'कानूनी व प्राइवेसी',
     footerTagline: '"मेरा गड्ढा, मेरी शान"',
@@ -219,8 +219,8 @@ export const translations = {
     closeBtn: 'बंद करें'
   },
   english: {
-    appNameHindi: 'Gaddhe Me Party',
-    appNameEnglish: 'Pothole Tracker',
+    appNameHindi: 'RoadTok',
+    appNameEnglish: 'RoadTok',
     tagline: 'मेरा गड्ढा, मेरी शान',
     heroBadge: 'Free · No login',
     heroTitleHtml: 'Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>',
@@ -432,7 +432,7 @@ export const translations = {
     legalRemovalText: 'If you believe a photo violates guidelines or needs removal, use the Flag button or email inforoadtok@gmail.com with the pin details.',
     
     // Footer
-    footerCopyright: '© 2026 Gaddhe Me Party • 100% Free Civic Tech',
+    footerCopyright: '© 2026 RoadTok • 100% Free Civic Tech',
     footerLinksHeader: 'Quick Links',
     footerLegalHeader: 'Legal & Privacy',
     footerTagline: '"मेरा गड्ढा, मेरी शान"',
