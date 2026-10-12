@@ -10,7 +10,7 @@ export const translations = {
     heroTitleHtml: 'Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>',
     heroDescription: 'सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें और अपने शहर की रैंकिंग देखें। 100% खुली व सुरक्षित नागरिक पहल।',
     navMap: 'नक्शा',
-    navLeaderboard: 'लीडरबोर्ड',
+    navLeaderboard: 'टाइमलाइन',
     navMission: 'हमारा उद्देश्य',
     navHowItWorks: 'कैसे काम करता है',
     navAbout: 'हमारे बारे में',
@@ -126,7 +126,7 @@ export const translations = {
     whatsappShareTemplate: 'सड़क पर गड्ढे की रिपोर्ट!\nलैंडमार्क: {landmark}\n{count} नागरिकों ने पुष्टि की\nलाइव मैप पर देखें और +1 करें: {url}\n\n(RoadTok - "मेरा गड्ढा, मेरी शान")',
     
     // Leaderboard Strings
-    leaderboardTitle: 'लाइव गड्ढा लीडरबोर्ड',
+    leaderboardTitle: 'लाइव गड्ढा टाइमलाइन',
     leaderboardSubtitle: 'देशभर में सबसे चर्चित और गहरे गड्ढों की लाइव रैंकिंग',
     liveBadge: 'LIVE',
     liveUpdatedMinAgo: 'अपडेटेड {n} मिनट पहले',
@@ -145,7 +145,7 @@ export const translations = {
     rankRowUpvotes: '{n} वोट',
     cityReportsCount: '{n} गड्ढे दर्ज',
     leaderboardEmptyTitle: 'अभी कोई गड्ढा नहीं मिला',
-    leaderboardEmptyDesc: 'अपने इलाके का गड्ढा रिपोर्ट करें और लीडरबोर्ड पर लाएं!',
+    leaderboardEmptyDesc: 'अपने इलाके का गड्ढा रिपोर्ट करें और टाइमलाइन पर लाएं!',
     tapToViewOnMap: 'मैप पर देखें ↗',
 
     // Mission (3 Pillars)
@@ -157,7 +157,7 @@ export const translations = {
     pillar2Title: '२. नागरिकों की सीधी आवाज़',
     pillar2Desc: 'बिना किसी जटिल ऐप या सरकारी लॉगिन के, हर भारतीय केवल ३० सेकंड में अपने इलाके की सड़क समस्या दर्ज और वोट कर सकता है।',
     pillar3Title: '३. सड़कों को जल्द ठीक कराना',
-    pillar3Desc: 'जब गड्ढे सोशल मीडिया और लीडरबोर्ड पर ट्रेंड करते हैं, तो नगर निगम और पीडब्ल्यूडी प्रशासन पर त्वरित मरम्मत का सकारात्मक दबाव बनता है।',
+    pillar3Desc: 'जब गड्ढे सोशल मीडिया और टाइमलाइन पर ट्रेंड करते हैं, तो नगर निगम और पीडब्ल्यूडी प्रशासन पर त्वरित मरम्मत का सकारात्मक दबाव बनता है।',
 
     // How it Works & FAQs
     howItWorksBadge: 'सरल व पारदर्शी',
@@ -168,7 +168,7 @@ export const translations = {
     hwStep2Title: 'GPS लोकेशन लॉक',
     hwStep2Desc: 'सिस्टम सटीक GPS लोकेशन लेता है और 5m के दायरे में डुप्लीकेट को रोकता है।',
     hwStep3Title: 'तुरंत लाइव रिपोर्ट',
-    hwStep3Desc: 'पिन लाइव मैप और लीडरबोर्ड पर आ जाता है, जहाँ अन्य नागरिक पुष्टि कर सकते हैं।',
+    hwStep3Desc: 'पिन लाइव मैप और टाइमलाइन पर आ जाता है, जहाँ अन्य नागरिक पुष्टि कर सकते हैं।',
     
     faqTitle: 'अक्सर पूछे जाने वाले सवाल (FAQ)',
     faq1Q: 'क्या मुझे रिपोर्ट करने के लिए लॉगिन या साइन अप करना होगा?',
@@ -211,7 +211,7 @@ export const translations = {
     footerLegalHeader: 'कानूनी व प्राइवेसी',
     footerTagline: '"मेरा गड्ढा, मेरी शान"',
     footerMap: 'नक्शा',
-    footerLeaderboard: 'लीडरबोर्ड',
+    footerLeaderboard: 'टाइमलाइन',
     footerMission: 'उद्देश्य',
     footerFaq: 'FAQ',
     footerAbout: 'हमारे बारे में',
@@ -226,7 +226,7 @@ export const translations = {
     heroTitleHtml: 'Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>',
     heroDescription: 'Map road hazards and pothole hotspots with live GPS and instant community verification. 100% free and open citizen tool.',
     navMap: 'Map',
-    navLeaderboard: 'Leaderboard',
+    navLeaderboard: 'Timeline',
     navMission: 'Our Mission',
     navHowItWorks: 'How it Works',
     navAbout: 'About Us',
@@ -352,7 +352,7 @@ export const translations = {
     whatsappShareTemplate: 'Pothole Alert on Road!\nLandmark: {landmark}\n{count} citizens confirmed\nView on live map & +1: {url}\n\n(RoadTok - "Mera Gaddha, Meri Shan")',
     
     // Leaderboard
-    leaderboardTitle: 'Live Pothole Leaderboard',
+    leaderboardTitle: 'Live Pothole Timeline',
     leaderboardSubtitle: 'Real-time ranking of most severe and reported road hazards across India',
     liveBadge: 'LIVE',
     liveUpdatedMinAgo: 'Updated {n}m ago',
@@ -371,7 +371,7 @@ export const translations = {
     rankRowUpvotes: '{n} votes',
     cityReportsCount: '{n} potholes',
     leaderboardEmptyTitle: 'No potholes reported yet',
-    leaderboardEmptyDesc: 'Be the first to report road damage in your area to put it on the leaderboard!',
+    leaderboardEmptyDesc: 'Be the first to report road damage in your area to put it on the timeline!',
     tapToViewOnMap: 'View on Map ↗',
 
     // Mission (3 Pillars)
@@ -383,7 +383,7 @@ export const translations = {
     pillar2Title: '2. Give Citizens a Direct Voice',
     pillar2Desc: 'Without cumbersome app downloads or government portal logins, anyone can log and upvote road issues in less than 30 seconds.',
     pillar3Title: '3. Accelerate Road Repairs',
-    pillar3Desc: 'When hazardous potholes trend on community leaderboards and social media, local municipal corporations and PWD authorities are prompted to act quickly.',
+    pillar3Desc: 'When hazardous potholes trend on community timelines and social media, local municipal corporations and PWD authorities are prompted to act quickly.',
 
     // How it Works & FAQs
     howItWorksBadge: 'Simple & Transparent',
@@ -394,7 +394,7 @@ export const translations = {
     hwStep2Title: 'Lock GPS Location',
     hwStep2Desc: 'System captures accurate GPS coordinates and merges duplicates within a 5m radius.',
     hwStep3Title: 'Instant Live Report',
-    hwStep3Desc: 'Your pin goes live on the interactive map and leaderboard, where fellow citizens can verify with +1 votes.',
+    hwStep3Desc: 'Your pin goes live on the interactive map and timeline, where fellow citizens can verify with +1 votes.',
     
     faqTitle: 'Frequently Asked Questions (FAQ)',
     faq1Q: 'Do I need to sign up or create an account to report?',
@@ -437,7 +437,7 @@ export const translations = {
     footerLegalHeader: 'Legal & Privacy',
     footerTagline: '"मेरा गड्ढा, मेरी शान"',
     footerMap: 'Map',
-    footerLeaderboard: 'Leaderboard',
+    footerLeaderboard: 'Timeline',
     footerMission: 'Mission',
     footerFaq: 'FAQ',
     footerAbout: 'About Us',

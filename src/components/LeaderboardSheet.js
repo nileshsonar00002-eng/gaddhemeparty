@@ -82,7 +82,7 @@ export class LeaderboardSection {
             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-none btn-primary text-xs sm:text-sm font-heading font-extrabold shadow-md transition cursor-pointer"
           >
             ${getLucideIcon('trophy', 'w-4 h-4 text-inherit shrink-0')}
-            <span>${isHindi ? 'पूरा लीडरबोर्ड देखें' : 'View Full Leaderboard'}</span>
+            <span>${isHindi ? 'पूरी टाइमलाइन देखें' : 'View Full Timeline'}</span>
             <span class="text-xs">➔</span>
           </button>
         </div>
