@@ -1475,6 +1475,10 @@ body.map-confirm-active {
   box-shadow: 0 0 28px rgba(140, 255, 63, .25);
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
+.ring-btn .ring-bell {
+  width: 44px;
+  height: 44px;
+}
 .ring-btn:hover {
   box-shadow: 0 0 34px rgba(140, 255, 63, .45);
 }
@@ -1506,6 +1510,19 @@ body.map-confirm-active {
   20% { transform: rotate(18deg); }
   45% { transform: rotate(-14deg); }
   70% { transform: rotate(8deg); }
+}
+
+/* 20% size reduction on mobile view (76px -> 60.8px, 44px -> 35.2px) */
+@media (max-width: 640px) {
+  .ring-btn {
+    width: 60.8px;
+    height: 60.8px;
+    box-shadow: 0 0 22px rgba(140, 255, 63, .25);
+  }
+  .ring-btn .ring-bell {
+    width: 35.2px;
+    height: 35.2px;
+  }
 }
 
 @keyframes sparkleFloat {
