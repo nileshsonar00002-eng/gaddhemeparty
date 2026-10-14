@@ -768,9 +768,9 @@ body.map-confirm-active #sticky-mobile-cta {
   }
 }
 
-/* Golden Bell Wrapper Standout Elevation over Photographic Backdrop */
+/* Neon Line Bell Wrapper Standout Elevation over Photographic Backdrop */
 #temple-bell-mount .temple-bell-wrapper {
-  filter: drop-shadow(0 12px 24px rgba(45, 18, 8, 0.35));
+  filter: drop-shadow(0 8px 24px rgba(163, 230, 53, 0.25));
 }
 
 /* Modal Scroll Lock */
@@ -1464,6 +1464,51 @@ body.map-confirm-active {
   }
 }
 
+@keyframes neonBellRing {
+  0% { transform: rotate(0deg); }
+  12% { transform: rotate(-14deg); }
+  25% { transform: rotate(12deg); }
+  40% { transform: rotate(-8deg); }
+  55% { transform: rotate(6deg); }
+  70% { transform: rotate(-3deg); }
+  85% { transform: rotate(1.5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes soundwavePulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 12px #a3e635);
+  }
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+.animate-neon-bell-ring {
+  animation: neonBellRing 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.animate-soundwave-pulse {
+  animation: soundwavePulse 0.85s ease-out forwards;
+}
+
+.neon-soundwave {
+  filter: drop-shadow(0 0 6px rgba(163, 230, 53, 0.75));
+  transition: all 0.2s ease;
+}
+
+.neon-bell-graphic {
+  filter: drop-shadow(0 0 8px rgba(163, 230, 53, 0.8));
+  transform-origin: 60px 20px;
+}
+
 .animate-bell-swing {
   animation: templeBellSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
@@ -1481,6 +1526,8 @@ body.map-confirm-active {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-neon-bell-ring,
+  .animate-soundwave-pulse,
   .animate-bell-swing,
   .animate-clapper-counter-swing,
   .animate-shockwave-burst,
