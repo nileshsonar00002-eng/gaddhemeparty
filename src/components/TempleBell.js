@@ -11,6 +11,7 @@ import { subscribeToBellRings, recordBellRing } from '../services/firebase';
 class TempleBellAudio {
   constructor() {
     this.ctx = null;
+    this.limiter = null;
   }
 
   initContext() {
@@ -23,6 +24,17 @@ class TempleBellAudio {
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
+    if (this.ctx && !this.limiter) {
+      // Dynamics compressor / soft limiter to guarantee zero distortion/clipping
+      const comp = this.ctx.createDynamicsCompressor();
+      comp.threshold.setValueAtTime(-6, this.ctx.currentTime);
+      comp.knee.setValueAtTime(6, this.ctx.currentTime);
+      comp.ratio.setValueAtTime(12, this.ctx.currentTime);
+      comp.attack.setValueAtTime(0.003, this.ctx.currentTime);
+      comp.release.setValueAtTime(0.25, this.ctx.currentTime);
+      comp.connect(this.ctx.destination);
+      this.limiter = comp;
+    }
   }
 
   playChime() {
@@ -31,41 +43,46 @@ class TempleBellAudio {
       if (!this.ctx) return;
 
       const now = this.ctx.currentTime;
-      const masterGain = this.ctx.createGain();
-      masterGain.gain.setValueAtTime(0.85, now);
-      masterGain.gain.exponentialRampToValueAtTime(0.0008, now + 3.8);
-      masterGain.connect(this.ctx.destination);
+      const destination = this.limiter || this.ctx.destination;
 
-      // Authentic Temple Bell partials (Hum tone, Prime, Tierce, Quint, Nominal, Strike transient)
+      // Master envelope: smooth 4ms attack prevents popping/clicking, gentle resonant ring out
+      const masterGain = this.ctx.createGain();
+      masterGain.gain.setValueAtTime(0.0001, now);
+      masterGain.gain.linearRampToValueAtTime(0.32, now + 0.004);
+      masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.2);
+      masterGain.connect(destination);
+
+      // Authentic Temple Bell partials (Hum tone, Prime, Tierce, Quint, Nominal, Shimmer)
+      // Tuned to clear, soothing brass D5 resonance with zero digital distortion
       const harmonics = [
-        { freq: 220, gain: 0.45, decay: 3.6 },   // Hum tone
-        { freq: 440, gain: 0.90, decay: 3.2 },   // Fundamental prime tone
-        { freq: 528, gain: 0.65, decay: 2.6 },   // Tierce (minor 3rd)
-        { freq: 660, gain: 0.50, decay: 2.2 },   // Quint (5th)
-        { freq: 880, gain: 0.70, decay: 1.8 },   // Nominal octave
-        { freq: 1320, gain: 0.35, decay: 1.2 },  // Upper harmonic
-        { freq: 1760, gain: 0.40, decay: 0.9 },  // Super octave
-        { freq: 2640, gain: 0.30, decay: 0.35 }, // Clapper metallic strike
-        { freq: 3520, gain: 0.18, decay: 0.12 }  // High sparkle ping
+        { freq: 293.66, gain: 0.20, decay: 3.0 },  // Hum tone (D4) - warm undertone
+        { freq: 587.33, gain: 0.35, decay: 2.8 },  // Prime tone (D5) - sacred fundamental
+        { freq: 700.00, gain: 0.20, decay: 2.2 },  // Tierce (minor 3rd) - bell character
+        { freq: 880.00, gain: 0.16, decay: 1.8 },  // Quint (A5, 5th) - chime clarity
+        { freq: 1174.66, gain: 0.14, decay: 1.4 }, // Nominal (D6) - clear ring
+        { freq: 1760.00, gain: 0.06, decay: 0.9 }, // High sheen (A6)
+        { freq: 2349.32, gain: 0.04, decay: 0.15 } // Clapper metallic strike transient
       ];
 
       harmonics.forEach(({ freq, gain, decay }) => {
         const osc = this.ctx.createOscillator();
         const oscGain = this.ctx.createGain();
 
-        // Slight frequency spread for rich brass resonance
-        const detune = (Math.random() - 0.5) * 3.5;
+        // Subtle natural detuning (+-1.2 Hz) for rich metallic chorus
+        const detune = (Math.random() - 0.5) * 2.4;
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq + detune, now);
 
-        oscGain.gain.setValueAtTime(gain, now);
+        // Smooth attack to avoid DC clicks
+        oscGain.gain.setValueAtTime(0.0001, now);
+        oscGain.gain.linearRampToValueAtTime(gain, now + 0.003);
         oscGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
         osc.connect(oscGain);
         oscGain.connect(masterGain);
 
         osc.start(now);
-        osc.stop(now + decay);
+        osc.stop(now + decay + 0.05);
       });
     } catch (e) {
       console.warn('[TempleBell] Audio playback notice:', e);
