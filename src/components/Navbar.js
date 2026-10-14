@@ -19,10 +19,10 @@ export function createNavbar(options = {}) {
 
   const currentLang = getLanguage();
   const isHindi = currentLang === 'hindi';
-  const shareUrl = window.location.origin;
-  const shareText = isHindi
-    ? `🚗💥 *RoadTok*\n"मेरा गड्ढा, मेरी शान"\n\nसड़कों के गड्ढों को बिना लॉगिन रिपोर्ट और ट्रैक करें! लाइव मैप पर अपने शहर के गड्ढे देखें:\n👉 ${shareUrl}`
-    : `🚗💥 *RoadTok*\n"Mera Gaddha, Meri Shan"\n\nReport & track road hazards without login across India! Check live pothole map:\n👉 ${shareUrl}`;
+  const shareUrl = (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost'))
+    ? window.location.origin
+    : 'https://www.roadtok.in';
+  const shareText = `🚧 तुमच्या शहरातील खड्डे आता लपून राहणार नाहीत! 📸\n\nखड्डा दिसला की लगेच www.roadtok.in वर रिपोर्ट करा आणि रस्ते सुधारण्यासाठी आपला हातभार लावा! 💪\n\nखड्डा दिसला? RoadTok करा! 🛣️🔥\n${shareUrl}`;
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
     container.innerHTML = `
