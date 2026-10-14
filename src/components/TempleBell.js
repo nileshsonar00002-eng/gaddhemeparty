@@ -2,11 +2,10 @@ import { t, getLanguage } from '../utils/i18n';
 import { subscribeToBellRings, recordBellRing } from '../services/firebase';
 
 /**
- * Interactive Neon Line Bell Widget
- * - Clean, lightweight inline SVG matching RoadTok neon lime brand identity
- * - Left and right sound wave arcs radiating on ring
+ * Interactive Temple Bell (Ghanta) Widget
+ * - Inline SVG Ring Button with ripple waves and lime bell icon
  * - Authentic Temple Bell acoustic synthesis via Web Audio API (zero external MP3)
- * - Tactile ring animation & real-time synchronized chime counter across all users
+ * - Swing animation and persistent multi-user synchronized chime counter
  */
 
 class TempleBellAudio {
@@ -102,9 +101,9 @@ export class TempleBellWidget {
     if (counterText) {
       counterText.textContent = this.ringCount.toLocaleString('en-IN');
       if (animate) {
-        counterText.classList.add('text-lime-400', 'scale-110');
+        counterText.classList.add('text-[#8CFF3F]', 'scale-110');
         setTimeout(() => {
-          counterText.classList.remove('text-lime-400', 'scale-110');
+          counterText.classList.remove('scale-110');
         }, 300);
       }
     }
@@ -136,89 +135,17 @@ export class TempleBellWidget {
     container.innerHTML = `
       <div class="temple-bell-wrapper relative flex flex-col items-center justify-center select-none py-2 cursor-pointer group" title="${isHindi ? 'घंटी बजाएं (Click to Ring)' : 'Ring Bell'}">
         
-        <!-- Ambient Neon Glow & Shockwave Emitter -->
-        <div id="bell-glow-emitter" class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-          <div class="bell-neon-aura w-44 h-44 rounded-full bg-lime-400/20 blur-xl opacity-0 transition-opacity duration-300"></div>
-          <div id="bell-shockwave" class="absolute w-20 h-20 rounded-full border-2 border-lime-400/80 opacity-0 pointer-events-none"></div>
-        </div>
-
         <!-- Floating +1 Sparkle Burst Container -->
         <div id="bell-sparkles-container" class="absolute inset-0 pointer-events-none z-40 overflow-visible flex items-center justify-center"></div>
 
-        <!-- Neon Line Bell Interactive Ring Button -->
-        <button
-          type="button"
-          id="btn-neon-bell"
-          class="relative z-10 flex items-center justify-center p-3 sm:p-4 rounded-3xl bg-slate-950/70 hover:bg-slate-950/90 border border-lime-400/40 hover:border-lime-400/80 shadow-lg shadow-lime-500/10 hover:shadow-lime-500/25 transition-all duration-200 cursor-pointer active:scale-90 group-hover:scale-105"
-          aria-label="${isHindi ? 'घंटी बजाएं' : 'Ring Bell'}"
-        >
-          <svg
-            id="neon-bell-svg"
-            class="w-24 h-24 sm:w-32 sm:h-32 overflow-visible select-none"
-            viewBox="0 0 120 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <!-- Left Sound Wave Arc -->
-            <path
-              id="soundwave-left"
-              d="M 18 42 A 26 26 0 0 0 18 78"
-              class="neon-soundwave"
-              stroke="#a3e635"
-              stroke-width="4.5"
-              stroke-linecap="round"
-            />
-
-            <!-- Right Sound Wave Arc -->
-            <path
-              id="soundwave-right"
-              d="M 102 42 A 26 26 0 0 1 102 78"
-              class="neon-soundwave"
-              stroke="#a3e635"
-              stroke-width="4.5"
-              stroke-linecap="round"
-            />
-
-            <!-- Main Neon Bell Body Assembly -->
-            <g id="neon-bell-body" class="neon-bell-graphic">
-              <!-- Top Loop Handle -->
-              <circle
-                cx="60"
-                cy="20"
-                r="7"
-                stroke="#a3e635"
-                stroke-width="4.5"
-                stroke-linecap="round"
-                fill="none"
-              />
-
-              <!-- Bell Dome Body -->
-              <path
-                d="M 53 27
-                   C 53 45, 45 56, 41 68
-                   C 38 76, 31 78, 30 81
-                   C 29 83.5, 31 85, 34 85
-                   L 86 85
-                   C 89 85, 91 83.5, 90 81
-                   C 89 78, 82 76, 79 68
-                   C 75 56, 67 45, 67 27
-                   Z"
-                stroke="#a3e635"
-                stroke-width="4.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                fill="rgba(163, 230, 53, 0.05)"
-              />
-
-              <!-- Bottom Clapper Arc -->
-              <path
-                id="neon-bell-clapper"
-                d="M 50 91 A 10 10 0 0 0 70 91"
-                stroke="#a3e635"
-                stroke-width="4.5"
-                stroke-linecap="round"
-                fill="none"
-              />
+        <!-- Inline SVG Ring Button -->
+        <button class="ring-btn" id="ringBtn" aria-label="${isHindi ? 'सड़क सुधार की घंटी बजाएं' : 'Ring for safer Indian roads'}">
+          <span class="ripple"></span><span class="ripple r2"></span>
+          <svg class="ring-bell" viewBox="0 0 400 400" width="44" height="44" aria-hidden="true">
+            <g fill="none" stroke="#8CFF3F" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="200" cy="98" r="11"/>
+              <path d="M104 290C104 290 136 264 136 198C136 150 163 118 200 118C237 118 264 150 264 198C264 264 296 290 296 290Z"/>
+              <path d="M172 320Q200 350 228 320"/>
             </g>
           </svg>
         </button>
@@ -227,13 +154,13 @@ export class TempleBellWidget {
         <div class="mt-3 flex flex-col items-center gap-1.5 z-20">
           <button
             type="button"
-            id="btn-ring-bell"
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] hover:border-lime-400/50 text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-lime-400/60 group-hover:shadow-lime-500/20"
+            id="btn-ring-counter"
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] hover:border-[#8CFF3F]/50 text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-[#8CFF3F]/60 group-hover:shadow-[rgba(140,255,63,0.2)]"
           >
-            <svg class="w-4 h-4 text-lime-400 animate-pulse shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-[#8CFF3F] animate-pulse shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
-            <span id="bell-counter-text" class="tabular-nums font-mono text-lime-400 font-extrabold">
+            <span id="bell-counter-text" class="tabular-nums font-mono text-[#8CFF3F] font-extrabold">
               ${this.ringCount.toLocaleString('en-IN')}
             </span>
             <span class="text-[11px] text-[var(--muted)] font-normal border-l border-[var(--border)] pl-2">
@@ -253,8 +180,8 @@ export class TempleBellWidget {
 
   attachEvents() {
     const wrapper = document.querySelector('.temple-bell-wrapper');
-    const neonBellBtn = document.getElementById('btn-neon-bell');
-    const ringBtn = document.getElementById('btn-ring-bell');
+    const ringBtn = document.getElementById('ringBtn');
+    const ringCounter = document.getElementById('btn-ring-counter');
 
     const handleRing = (e) => {
       e?.preventDefault?.();
@@ -262,10 +189,10 @@ export class TempleBellWidget {
       this.ring();
     };
 
-    neonBellBtn?.addEventListener('click', handleRing);
     ringBtn?.addEventListener('click', handleRing);
+    ringCounter?.addEventListener('click', handleRing);
     wrapper?.addEventListener('click', (e) => {
-      if (e.target.closest('#btn-neon-bell') || e.target.closest('#btn-ring-bell')) return;
+      if (e.target.closest('#ringBtn') || e.target.closest('#btn-ring-counter')) return;
       handleRing(e);
     });
   }
@@ -284,50 +211,19 @@ export class TempleBellWidget {
     // Update Counter UI with animation
     this.updateCounterDOM(true);
 
-    // 4. Trigger Neon Bell Ring & Soundwave Pulse Animations
-    const bellBody = document.getElementById('neon-bell-body');
-    const waveLeft = document.getElementById('soundwave-left');
-    const waveRight = document.getElementById('soundwave-right');
-    const aura = document.querySelector('.bell-neon-aura');
-    const shockwave = document.getElementById('bell-shockwave');
-
-    if (bellBody) {
-      bellBody.classList.remove('animate-neon-bell-ring');
-      void bellBody.offsetWidth; // Force reflow
-      bellBody.classList.add('animate-neon-bell-ring');
+    // 4. Trigger Ring Button Swing Animation (.rung class)
+    const ringBtn = document.getElementById('ringBtn');
+    if (ringBtn) {
+      ringBtn.classList.remove('rung');
+      void ringBtn.offsetWidth; // Force reflow
+      ringBtn.classList.add('rung');
+      if (this.animTimer) clearTimeout(this.animTimer);
+      this.animTimer = setTimeout(() => {
+        ringBtn.classList.remove('rung');
+      }, 650);
     }
 
-    if (waveLeft && waveRight) {
-      waveLeft.classList.remove('animate-soundwave-pulse');
-      waveRight.classList.remove('animate-soundwave-pulse');
-      void waveLeft.offsetWidth;
-      void waveRight.offsetWidth;
-      waveLeft.classList.add('animate-soundwave-pulse');
-      waveRight.classList.add('animate-soundwave-pulse');
-    }
-
-    if (this.animTimer) clearTimeout(this.animTimer);
-    this.animTimer = setTimeout(() => {
-      bellBody?.classList.remove('animate-neon-bell-ring');
-      waveLeft?.classList.remove('animate-soundwave-pulse');
-      waveRight?.classList.remove('animate-soundwave-pulse');
-    }, 850);
-
-    // 5. Neon Aura Flash & Shockwave Ripple Burst
-    if (aura) {
-      aura.classList.add('opacity-100', 'scale-125');
-      setTimeout(() => {
-        aura.classList.remove('opacity-100', 'scale-125');
-      }, 500);
-    }
-
-    if (shockwave) {
-      shockwave.classList.remove('animate-shockwave-burst');
-      void shockwave.offsetWidth;
-      shockwave.classList.add('animate-shockwave-burst');
-    }
-
-    // 6. Spawn Floating +1 Particle Sparkle
+    // 5. Spawn Floating +1 Particle Sparkle
     this.spawnSparkle();
   }
 
@@ -337,9 +233,9 @@ export class TempleBellWidget {
 
     const sparkle = document.createElement('div');
     const randomX = (Math.random() - 0.5) * 48;
-    sparkle.className = 'absolute text-xs font-heading font-black text-lime-400 select-none pointer-events-none animate-sparkle-float';
+    sparkle.className = 'absolute text-xs font-heading font-black text-[#8CFF3F] select-none pointer-events-none animate-sparkle-float';
     sparkle.style.left = `calc(50% + ${randomX}px)`;
-    sparkle.style.top = '40%';
+    sparkle.style.top = '15%';
     sparkle.innerHTML = '✨ +1';
 
     container.appendChild(sparkle);

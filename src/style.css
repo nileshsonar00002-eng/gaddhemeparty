@@ -1464,61 +1464,65 @@ body.map-confirm-active {
   }
 }
 
-@keyframes neonBellRing {
-  0% { transform: rotate(0deg); }
-  12% { transform: rotate(-14deg); }
-  25% { transform: rotate(12deg); }
-  40% { transform: rotate(-8deg); }
-  55% { transform: rotate(6deg); }
-  70% { transform: rotate(-3deg); }
-  85% { transform: rotate(1.5deg); }
-  100% { transform: rotate(0deg); }
+/* ========================================================
+   Inline SVG Ring Button (.ring-btn)
+   ======================================================== */
+.ring-btn {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 2px solid #8CFF3F;
+  background: rgba(7, 17, 29, .62);
+  backdrop-filter: blur(6px);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 0 28px rgba(140, 255, 63, .25);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.ring-btn:hover {
+  box-shadow: 0 0 34px rgba(140, 255, 63, .45);
+}
+.ring-btn:active {
+  transform: scale(0.92);
+}
+.ring-btn .ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #8CFF3F;
+  opacity: 0;
+  animation: ripple 2.6s ease-out infinite;
+  pointer-events: none;
+}
+.ring-btn .r2 {
+  animation-delay: 1.3s;
+}
+@keyframes ripple {
+  0% { transform: scale(1); opacity: .5; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.ring-btn.rung .ring-bell {
+  animation: swing .6s ease-in-out;
+  transform-origin: 50% 25%;
+}
+@keyframes swing {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(18deg); }
+  45% { transform: rotate(-14deg); }
+  70% { transform: rotate(8deg); }
 }
 
-@keyframes soundwavePulse {
+@keyframes sparkleFloat {
   0% {
-    opacity: 0.5;
-    transform: scale(0.92);
-  }
-  50% {
+    transform: translateY(0) scale(0.6);
     opacity: 1;
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 12px #a3e635);
   }
   100% {
-    opacity: 0.85;
-    transform: scale(1);
+    transform: translateY(-56px) scale(1.15);
+    opacity: 0;
   }
-}
-
-.animate-neon-bell-ring {
-  animation: neonBellRing 0.85s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-.animate-soundwave-pulse {
-  animation: soundwavePulse 0.85s ease-out forwards;
-}
-
-.neon-soundwave {
-  filter: drop-shadow(0 0 6px rgba(163, 230, 53, 0.75));
-  transition: all 0.2s ease;
-}
-
-.neon-bell-graphic {
-  filter: drop-shadow(0 0 8px rgba(163, 230, 53, 0.8));
-  transform-origin: 60px 20px;
-}
-
-.animate-bell-swing {
-  animation: templeBellSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-.animate-clapper-counter-swing {
-  animation: clapperCounterSwing 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-.animate-shockwave-burst {
-  animation: shockwaveBurst 0.9s ease-out forwards;
 }
 
 .animate-sparkle-float {
@@ -1526,11 +1530,8 @@ body.map-confirm-active {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-neon-bell-ring,
-  .animate-soundwave-pulse,
-  .animate-bell-swing,
-  .animate-clapper-counter-swing,
-  .animate-shockwave-burst,
+  .ring-btn .ripple,
+  .ring-bell,
   .animate-sparkle-float {
     animation: none !important;
   }
