@@ -107,7 +107,7 @@
                   <button
                     id="btn-hero-report"
                     type="button"
-                    class="btn-hero-pulse btn-primary py-2.5 px-6 sm:py-3 sm:px-7 rounded-xl text-xs sm:text-sm font-bold shadow-lg flex items-center justify-center gap-2 cursor-pointer transition"
+                    class="btn-primary py-2.5 px-6 sm:py-3 sm:px-7 rounded-xl text-xs sm:text-sm font-bold shadow-lg flex items-center justify-center gap-2 cursor-pointer transition"
                   >
                     <!-- Location Pin Symbol -->
                     <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -120,8 +120,8 @@
                     </svg>
                   </button>
 
-                  <!-- Short Concrete Badge Chip (Free / No login) -->
-                  <div class="chip-neutral mt-0.5">
+                  <!-- Short Concrete Badge Chip (Free / No login) - Hidden in mobile view -->
+                  <div id="hero-free-badge" class="chip-neutral hero-free-badge mt-0.5 hidden sm:inline-flex">
                     <span data-i18n="heroBadge">मुफ़्त • बिना लॉगिन</span>
                   </div>
                 </div>
