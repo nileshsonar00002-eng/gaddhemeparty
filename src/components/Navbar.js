@@ -111,17 +111,6 @@ export function createNavbar(options = {}) {
           </button>
         </div>
 
-        <button
-          id="btn-chai-tip-desktop"
-          type="button"
-          class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs min-h-[38px] rounded-full border border-[var(--band-ink)]/35 bg-transparent hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all cursor-pointer chai-tip-spark font-medium"
-          title="${t('tipChai')}"
-          aria-label="${t('tipChai')}"
-        >
-          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--band-ink)]')}
-          <span>${t('tipChai')}</span>
-        </button>
-
         <a
           href="${whatsappShareUrl}"
           target="_blank"
@@ -135,18 +124,8 @@ export function createNavbar(options = {}) {
         </a>
       </div>
 
-      <!-- Mobile Right Controls (< 1024px): Exactly TWO 40-44px tap targets with 8px gap -->
+      <!-- Mobile Right Controls (< 1024px) -->
       <div class="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
-        <button
-          id="btn-chai-tip-mobile"
-          type="button"
-          class="w-9 h-9 min-w-[36px] min-h-[36px] p-0 flex items-center justify-center rounded-full border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer chai-tip-spark"
-          title="${t('tipChai')}"
-          aria-label="${t('tipChai')}"
-        >
-          ${getLucideIcon('coffee', 'w-4 h-4 text-[var(--band-ink)]')}
-        </button>
-
         <button
           id="btn-mobile-menu-toggle"
           type="button"
@@ -239,17 +218,8 @@ export function createNavbar(options = {}) {
           </div>
         </div>
 
-        <!-- Drawer Bottom Actions: Tip Chai + WhatsApp Share -->
+        <!-- Drawer Bottom Actions: WhatsApp Share -->
         <div class="pt-5 border-t border-[var(--border)] space-y-2.5 mt-4">
-          <button
-            type="button"
-            id="btn-drawer-chai-tip"
-            class="btn-primary w-full h-12 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl"
-          >
-            ${getLucideIcon('coffee', 'w-4 h-4 text-inherit')}
-            <span>${isHindi ? 'सर्वर चाय टिप' : 'Tip Server Chai'}</span>
-          </button>
-
           <a
             href="${whatsappShareUrl}"
             target="_blank"
