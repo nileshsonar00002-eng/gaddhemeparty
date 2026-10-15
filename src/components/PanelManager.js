@@ -86,7 +86,7 @@ export class PanelManager {
             <button
               id="btn-panel-refresh-lb"
               type="button"
-              class="hidden p-1.5 text-[#94A3B8] hover:text-[#8CFF3F] hover:bg-white/10 rounded-xl transition cursor-pointer"
+              class="hidden p-1.5 text-[#94A3B8] hover:text-[#84CC16] hover:bg-white/10 rounded-xl transition cursor-pointer"
               title="Refresh Timeline"
               aria-label="Refresh"
             >
@@ -97,7 +97,7 @@ export class PanelManager {
             <button
               id="btn-panel-close"
               type="button"
-              class="w-8 h-8 rounded-xl bg-white/10 hover:bg-[#8CFF3F]/20 text-[#F5F7FA] hover:text-[#8CFF3F] border border-white/15 flex items-center justify-center transition cursor-pointer"
+              class="w-8 h-8 rounded-xl bg-white/10 hover:bg-[#84CC16]/20 text-[#F5F7FA] hover:text-[#84CC16] border border-white/15 flex items-center justify-center transition cursor-pointer"
               title="Close panel"
               aria-label="Close panel"
             >
@@ -355,35 +355,35 @@ export class PanelManager {
   populatePanelData(panelId) {
     switch (panelId) {
       case 'leaderboard':
-        this.headerIcon.innerHTML = getLucideIcon('trophy', 'w-5 h-5 text-[#8CFF3F]');
+        this.headerIcon.innerHTML = getLucideIcon('trophy', 'w-5 h-5 text-[#84CC16]');
         this.headerTitle.innerText = t('leaderboardTitle');
         this.updateLeaderboardTimeAgo();
         this.renderLeaderboardBody();
         break;
 
       case 'mission':
-        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#8CFF3F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>`;
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#84CC16]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>`;
         this.headerTitle.innerText = t('missionTitle');
         this.headerSub.innerText = t('missionSubtitle');
         this.renderMissionBody();
         break;
 
       case 'how':
-        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#8CFF3F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#84CC16]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
         this.headerTitle.innerText = t('howItWorksTitle');
         this.headerSub.innerText = t('howItWorksSubtitle');
         this.renderHowItWorksBody();
         break;
 
       case 'about':
-        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#8CFF3F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>`;
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#84CC16]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>`;
         this.headerTitle.innerText = t('aboutTitle');
         this.headerSub.innerText = t('aboutSubtitle');
         this.renderAboutBody();
         break;
 
       case 'terms':
-        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#8CFF3F]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
+        this.headerIcon.innerHTML = `<svg class="w-5 h-5 text-[#84CC16]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
         this.headerTitle.innerText = t('termsTitle');
         this.headerSub.innerText = t('termsSubtitle');
         this.renderTermsBody();
@@ -414,7 +414,7 @@ export class PanelManager {
         ${tabs.map((tab) => `
           <button
             type="button"
-            class="panel-lb-tab flex-1 py-1.5 px-2 rounded-xl transition text-center cursor-pointer ${this.leaderboardTab === tab.id ? 'bg-[#8CFF3F] text-[#06100A] font-extrabold shadow-[0_0_12px_rgba(140,255,63,0.30)]' : 'text-[#94A3B8] hover:text-[#F5F7FA] hover:bg-white/5'}"
+            class="panel-lb-tab flex-1 py-1.5 px-2 rounded-xl transition text-center cursor-pointer ${this.leaderboardTab === tab.id ? 'bg-[#84CC16] text-[#06100A] font-extrabold shadow-[0_0_12px_rgba(132,204,22,0.30)]' : 'text-[#94A3B8] hover:text-[#F5F7FA] hover:bg-white/5'}"
             data-tab="${tab.id}"
           >
             ${tab.label}
@@ -461,18 +461,18 @@ export class PanelManager {
     if (hasHeroCard) {
       const heroLabels = getPinLabels(heroPin);
       heroCardHtml = `
-        <div class="p-4.5 sm:p-5 rounded-2xl bg-gradient-to-br from-[#8CFF3F]/15 via-[#101D2E] to-[#0B1626] border-2 border-[#8CFF3F]/40 space-y-3 relative overflow-hidden group shadow-md ring-1 ring-[#8CFF3F]/20">
+        <div class="p-4.5 sm:p-5 rounded-2xl bg-gradient-to-br from-[#84CC16]/15 via-[#101D2E] to-[#0B1626] border-2 border-[#84CC16]/40 space-y-3 relative overflow-hidden group shadow-md ring-1 ring-[#84CC16]/20">
           <div class="flex items-center justify-between">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8CFF3F] text-[#06100A] text-xs tabular-nums font-mono font-black uppercase shadow-sm">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#84CC16] text-[#06100A] text-xs tabular-nums font-mono font-black uppercase shadow-sm">
               #1 ${isHindi ? 'सप्ताह का गड्ढा' : 'Pothole of the Week'}
             </span>
           </div>
 
           <div class="flex gap-3.5 items-center">
             ${(heroPin.thumbnailUrl || heroPin.imageUrl) && isPinPhotoApproved(heroPin) ? `
-              <img src="${heroPin.thumbnailUrl || heroPin.imageUrl}" alt="Hero Pothole" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-[#8CFF3F]/50 shadow-sm flex-shrink-0" />
+              <img src="${heroPin.thumbnailUrl || heroPin.imageUrl}" alt="Hero Pothole" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-[#84CC16]/50 shadow-sm flex-shrink-0" />
             ` : `
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#8CFF3F]/15 border-2 border-[#8CFF3F]/40 flex items-center justify-center text-[#8CFF3F] flex-shrink-0">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#84CC16]/15 border-2 border-[#84CC16]/40 flex items-center justify-center text-[#84CC16] flex-shrink-0">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
               </div>
             `}
@@ -480,8 +480,8 @@ export class PanelManager {
               <h3 class="font-heading font-extrabold text-sm sm:text-base text-[#F5F7FA] truncate leading-tight">${heroLabels.title}</h3>
               <p class="text-xs text-[#94A3B8] mt-0.5">${heroLabels.subtitle}</p>
               <div class="flex gap-2.5 text-xs text-[#94A3B8] mt-1.5 tabular-nums font-mono font-bold">
-                <span class="px-2.5 py-0.5 rounded-md bg-[#8CFF3F]/15 text-[#8CFF3F] border border-[#8CFF3F]/30 flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5 text-[#8CFF3F] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                <span class="px-2.5 py-0.5 rounded-md bg-[#84CC16]/15 text-[#84CC16] border border-[#84CC16]/30 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5 text-[#84CC16] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
                   <span>${heroPin.upvotes || 0}</span>
                 </span>
               </div>
@@ -490,7 +490,7 @@ export class PanelManager {
 
           <button
             type="button"
-            class="panel-pin-row-btn w-full py-2 px-3 rounded-xl bg-[#8CFF3F] hover:bg-[#A7FF68] text-[#06100A] text-xs font-heading font-extrabold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm active:scale-[0.99]"
+            class="panel-pin-row-btn w-full py-2 px-3 rounded-xl bg-[#84CC16] hover:bg-[#A3E635] text-[#06100A] text-xs font-heading font-extrabold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-sm active:scale-[0.99]"
             data-pin-id="${heroPin.id}"
           >
             <svg class="w-4 h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -509,7 +509,7 @@ export class PanelManager {
         listHtml = topCities.map((c, idx) => {
           const isTop3 = idx < 3;
           const badgeClass = idx === 0 
-            ? 'w-8 h-8 rounded-xl bg-[#8CFF3F] text-[#06100A] font-black text-sm shadow-sm ring-1 ring-[#8CFF3F]/40' 
+            ? 'w-8 h-8 rounded-xl bg-[#84CC16] text-[#06100A] font-black text-sm shadow-sm ring-1 ring-[#84CC16]/40' 
             : (idx === 1 
               ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 text-slate-950 font-black text-sm shadow-sm ring-1 ring-slate-400/40' 
               : (idx === 2 
@@ -518,7 +518,7 @@ export class PanelManager {
 
           const cardClass = isTop3
             ? (idx === 0 
-              ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#8CFF3F]/15 via-[#101D2E] to-[#101D2E] border border-[#8CFF3F]/40 shadow-sm' 
+              ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#84CC16]/15 via-[#101D2E] to-[#101D2E] border border-[#84CC16]/40 shadow-sm' 
               : (idx === 1 
                 ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-300/15 via-[#101D2E] to-[#101D2E] border border-slate-400/40 shadow-sm' 
                 : 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-[#101D2E] to-[#101D2E] border border-amber-500/40 shadow-sm'))
@@ -535,7 +535,7 @@ export class PanelManager {
                   <p class="text-[11px] text-[#94A3B8]">${c.count || 0} ${isHindi ? 'कुल रिपोर्ट्स' : 'Total Reports'}</p>
                 </div>
               </div>
-              <span class="text-xs ${isTop3 ? 'sm:text-sm font-black text-[#8CFF3F]' : 'font-bold text-[#8CFF3F]'} tabular-nums font-mono flex items-center gap-1">
+              <span class="text-xs ${isTop3 ? 'sm:text-sm font-black text-[#84CC16]' : 'font-bold text-[#84CC16]'} tabular-nums font-mono flex items-center gap-1">
                 <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 <span>${c.count || 0}</span>
               </span>
@@ -560,7 +560,7 @@ export class PanelManager {
           const pinLabels = getPinLabels(pin);
 
           const badgeClass = rankNumber === 1 
-            ? 'w-8 h-8 rounded-xl bg-[#8CFF3F] text-[#06100A] font-black text-sm shadow-sm ring-1 ring-[#8CFF3F]/50' 
+            ? 'w-8 h-8 rounded-xl bg-[#84CC16] text-[#06100A] font-black text-sm shadow-sm ring-1 ring-[#84CC16]/50' 
             : (rankNumber === 2 
               ? 'w-8 h-8 rounded-xl bg-gradient-to-br from-slate-200 via-slate-300 to-slate-400 text-slate-950 font-black text-sm shadow-sm ring-1 ring-slate-400/50' 
               : (rankNumber === 3 
@@ -569,11 +569,11 @@ export class PanelManager {
 
           const cardClass = isTop3
             ? (rankNumber === 1 
-              ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#8CFF3F]/15 via-[#101D2E] to-[#101D2E] border border-[#8CFF3F]/40 hover:border-[#8CFF3F]/70 shadow-sm' 
+              ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#84CC16]/15 via-[#101D2E] to-[#101D2E] border border-[#84CC16]/40 hover:border-[#84CC16]/70 shadow-sm' 
               : (rankNumber === 2 
                 ? 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-300/15 via-[#101D2E] to-[#101D2E] border border-slate-400/40 hover:border-slate-300 shadow-sm' 
                 : 'p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-[#101D2E] to-[#101D2E] border border-amber-500/40 hover:border-amber-400 shadow-sm'))
-            : 'p-3 rounded-2xl bg-[#101D2E] hover:bg-[#16273D] border border-[#243449] hover:border-[#8CFF3F]/40 shadow-sm';
+            : 'p-3 rounded-2xl bg-[#101D2E] hover:bg-[#16273D] border border-[#243449] hover:border-[#84CC16]/40 shadow-sm';
 
           const thumbSize = isTop3 ? 'w-12 h-12' : 'w-10 h-10';
 
@@ -596,14 +596,14 @@ export class PanelManager {
                 `}
 
                 <div class="min-w-0">
-                  <h4 class="font-heading ${isTop3 ? 'font-extrabold text-sm sm:text-base' : 'font-bold text-xs sm:text-sm'} text-[#F5F7FA] truncate group-hover:text-[#8CFF3F] transition">${pinLabels.title}</h4>
+                  <h4 class="font-heading ${isTop3 ? 'font-extrabold text-sm sm:text-base' : 'font-bold text-xs sm:text-sm'} text-[#F5F7FA] truncate group-hover:text-[#84CC16] transition">${pinLabels.title}</h4>
                   <p class="text-[11px] text-[#94A3B8] truncate">${pinLabels.subtitle}</p>
                 </div>
               </div>
 
               <div class="flex items-center gap-2 flex-shrink-0">
-                <span class="px-2.5 py-1 rounded-lg ${isTop3 ? 'bg-[#8CFF3F]/20 border-[#8CFF3F]/40 text-[#8CFF3F] font-extrabold' : 'bg-[#8CFF3F]/15 border-[#8CFF3F]/30 text-[#8CFF3F] font-bold'} border tabular-nums font-mono text-xs flex items-center gap-1">
-                  <svg class="w-3 h-3 text-[#8CFF3F] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
+                <span class="px-2.5 py-1 rounded-lg ${isTop3 ? 'bg-[#84CC16]/20 border-[#84CC16]/40 text-[#84CC16] font-extrabold' : 'bg-[#84CC16]/15 border-[#84CC16]/30 text-[#84CC16] font-bold'} border tabular-nums font-mono text-xs flex items-center gap-1">
+                  <svg class="w-3 h-3 text-[#84CC16] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/></svg>
                   <span>${pin.upvotes || 0}</span>
                 </span>
                 <span class="text-[#94A3B8] group-hover:text-[#F5F7FA] transition text-xs">➔</span>
@@ -650,8 +650,8 @@ export class PanelManager {
     const isHindi = getLanguage() === 'hindi';
     this.bodyContainer.innerHTML = `
       <div class="space-y-4 text-[#F5F7FA]">
-        <div class="p-4 rounded-2xl bg-[#8CFF3F]/10 border border-[#8CFF3F]/30">
-          <p class="text-xs sm:text-sm text-[#8CFF3F] font-medium leading-relaxed">
+        <div class="p-4 rounded-2xl bg-[#84CC16]/10 border border-[#84CC16]/30">
+          <p class="text-xs sm:text-sm text-[#84CC16] font-medium leading-relaxed">
             ${isHindi
               ? '"हमारा लक्ष्य केवल गड्ढों की शिकायत करना नहीं, बल्कि तकनीक और पारदर्शी जन-भागीदारी से प्रशासन को त्वरित मरम्मत के लिए प्रेरित करना है।"'
               : '"Our goal is not just complaining about potholes, but leveraging technology and citizen collaboration to accelerate accountable road repairs across India."'}
@@ -698,7 +698,7 @@ export class PanelManager {
       <div class="space-y-5 text-[#F5F7FA]">
         <div class="space-y-3">
           <div class="p-3.5 rounded-2xl bg-[#101D2E] border border-[#243449] flex gap-3 items-center shadow-sm">
-            <span class="w-8 h-8 rounded-xl bg-[#8CFF3F] text-[#06100A] tabular-nums font-mono font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+            <span class="w-8 h-8 rounded-xl bg-[#84CC16] text-[#06100A] tabular-nums font-mono font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
             <div>
               <h4 class="font-heading font-bold text-xs sm:text-sm text-[#F5F7FA]">${t('hwStep1Title')}</h4>
               <p class="text-[11px] text-[#94A3B8]">${t('hwStep1Desc')}</p>
@@ -706,7 +706,7 @@ export class PanelManager {
           </div>
 
           <div class="p-3.5 rounded-2xl bg-[#101D2E] border border-[#243449] flex gap-3 items-center shadow-sm">
-            <span class="w-8 h-8 rounded-xl bg-[#8CFF3F] text-[#06100A] tabular-nums font-mono font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+            <span class="w-8 h-8 rounded-xl bg-[#84CC16] text-[#06100A] tabular-nums font-mono font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
             <div>
               <h4 class="font-heading font-bold text-xs sm:text-sm text-[#F5F7FA]">${t('hwStep2Title')}</h4>
               <p class="text-[11px] text-[#94A3B8]">${t('hwStep2Desc')}</p>
@@ -714,7 +714,7 @@ export class PanelManager {
           </div>
 
           <div class="p-3.5 rounded-2xl bg-[#101D2E] border border-[#243449] flex gap-3 items-center shadow-sm">
-            <span class="w-8 h-8 rounded-xl bg-[#8CFF3F] text-[#06100A] tabular-nums font-mono font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+            <span class="w-8 h-8 rounded-xl bg-[#84CC16] text-[#06100A] tabular-nums font-mono font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
             <div>
               <h4 class="font-heading font-bold text-xs sm:text-sm text-[#F5F7FA]">${t('hwStep3Title')}</h4>
               <p class="text-[11px] text-[#94A3B8]">${t('hwStep3Desc')}</p>
@@ -728,7 +728,7 @@ export class PanelManager {
           <details class="group rounded-xl bg-[#101D2E] border border-[#243449] p-3 open:bg-[#16273D] shadow-sm">
             <summary class="font-heading font-bold text-xs text-[#F5F7FA] cursor-pointer list-none flex items-center justify-between">
               <span>${t('faq1Q')}</span>
-              <span class="text-[#8CFF3F] group-open:rotate-180 transition transform">▼</span>
+              <span class="text-[#84CC16] group-open:rotate-180 transition transform">▼</span>
             </summary>
             <p class="text-xs text-[#94A3B8] mt-2 leading-relaxed">${t('faq1A')}</p>
           </details>
@@ -736,7 +736,7 @@ export class PanelManager {
           <details class="group rounded-xl bg-[#101D2E] border border-[#243449] p-3 open:bg-[#16273D] shadow-sm">
             <summary class="font-heading font-bold text-xs text-[#F5F7FA] cursor-pointer list-none flex items-center justify-between">
               <span>${t('faq2Q')}</span>
-              <span class="text-[#8CFF3F] group-open:rotate-180 transition transform">▼</span>
+              <span class="text-[#84CC16] group-open:rotate-180 transition transform">▼</span>
             </summary>
             <p class="text-xs text-[#94A3B8] mt-2 leading-relaxed">${t('faq2A')}</p>
           </details>
@@ -744,7 +744,7 @@ export class PanelManager {
           <details class="group rounded-xl bg-[#101D2E] border border-[#243449] p-3 open:bg-[#16273D] shadow-sm">
             <summary class="font-heading font-bold text-xs text-[#F5F7FA] cursor-pointer list-none flex items-center justify-between">
               <span>${t('faq3Q')}</span>
-              <span class="text-[#8CFF3F] group-open:rotate-180 transition transform">▼</span>
+              <span class="text-[#84CC16] group-open:rotate-180 transition transform">▼</span>
             </summary>
             <p class="text-xs text-[#94A3B8] mt-2 leading-relaxed">${t('faq3A')}</p>
           </details>
@@ -760,18 +760,18 @@ export class PanelManager {
           <img src="/logo.png" alt="RoadTok Logo" class="w-14 h-14 rounded-2xl mb-2.5 shadow-md object-contain" />
           <div>
             <h3 class="brand-roadtok text-2xl text-[#F5F7FA] leading-none mb-1">RoadTok</h3>
-            <p class="text-xs text-[#8CFF3F] font-semibold mt-0.5">${t('aboutSubtitle')}</p>
+            <p class="text-xs text-[#84CC16] font-semibold mt-0.5">${t('aboutSubtitle')}</p>
           </div>
         </div>
 
         <p class="text-xs sm:text-sm text-[#94A3B8] leading-relaxed text-center p-2">${t('aboutStory')}</p>
 
         <div class="p-4 rounded-2xl bg-[#101D2E] border border-[#243449] text-center space-y-1.5 shadow-sm">
-          <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#8CFF3F]/15 border border-[#8CFF3F]/30 text-[#8CFF3F] mb-1">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#84CC16]/15 border border-[#84CC16]/30 text-[#84CC16] mb-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
           </div>
           <h4 class="font-heading font-bold text-sm text-[#F5F7FA]">${t('aboutContactHeader') || 'Contact Us'}</h4>
-          <a href="mailto:inforoadtok@gmail.com" class="inline-block text-xs sm:text-sm text-[#8CFF3F] font-mono font-bold hover:underline transition">
+          <a href="mailto:inforoadtok@gmail.com" class="inline-block text-xs sm:text-sm text-[#84CC16] font-mono font-bold hover:underline transition">
             inforoadtok@gmail.com
           </a>
         </div>
@@ -783,22 +783,22 @@ export class PanelManager {
     this.bodyContainer.innerHTML = `
       <div class="space-y-3 text-[#F5F7FA]">
         <div class="p-3 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[#8CFF3F]">${t('legalDisclaimerHeader') || t('terms1Title')}</h4>
+          <h4 class="font-heading font-bold text-xs text-[#84CC16]">${t('legalDisclaimerHeader') || t('terms1Title')}</h4>
           <p class="text-xs text-[#94A3B8] leading-relaxed">${t('legalDisclaimerText') || t('terms1Desc')}</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[#8CFF3F]">${t('legalContentRulesHeader') || t('terms2Title')}</h4>
+          <h4 class="font-heading font-bold text-xs text-[#84CC16]">${t('legalContentRulesHeader') || t('terms2Title')}</h4>
           <p class="text-xs text-[#94A3B8] leading-relaxed">${t('legalContentRulesText') || t('terms2Desc')}</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[#8CFF3F]">${t('legalDataRetentionHeader') || t('terms3Title')}</h4>
+          <h4 class="font-heading font-bold text-xs text-[#84CC16]">${t('legalDataRetentionHeader') || t('terms3Title')}</h4>
           <p class="text-xs text-[#94A3B8] leading-relaxed">${t('legalDataRetentionText') || t('terms3Desc')}</p>
         </div>
 
         <div class="p-3 rounded-2xl bg-[#101D2E] border border-[#243449] space-y-1 shadow-sm">
-          <h4 class="font-heading font-bold text-xs text-[#8CFF3F]">${t('legalRemovalHeader') || t('terms4Title')}</h4>
+          <h4 class="font-heading font-bold text-xs text-[#84CC16]">${t('legalRemovalHeader') || t('terms4Title')}</h4>
           <p class="text-xs text-[#94A3B8] leading-relaxed">${t('legalRemovalText') || t('terms4Desc')}</p>
         </div>
       </div>
