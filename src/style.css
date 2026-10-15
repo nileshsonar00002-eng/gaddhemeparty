@@ -706,16 +706,10 @@ body.map-confirm-active #sticky-mobile-cta {
   }
 }
 
-/* Hero Subtitle Glass Card with grey border and pre-line spacing */
+/* Hero Subtitle Glass Card with pre-line spacing and borderless glass look */
 .hero-subtitle-glass {
   white-space: pre-line;
-  border-color: rgba(148, 163, 184, 0.55);
-}
-
-@media (max-width: 640px) {
-  .hero-subtitle-glass {
-    border-color: #94A3B8 !important; /* Defined clean grey border on mobile */
-  }
+  border: none !important;
 }
 
 /* Fallback for browsers without backdrop-filter support */
