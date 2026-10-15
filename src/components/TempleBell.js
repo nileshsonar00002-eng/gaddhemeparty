@@ -185,7 +185,7 @@ export class TempleBellWidget {
             </span>
           </button>
           
-          <span class="text-[10px] text-[var(--muted)] font-medium tracking-tight">
+          <span class="bell-caption-text text-xs text-white/90 font-medium tracking-tight" style="text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6);">
             ${isHindi ? 'सड़क सुधार की घंटी बजाएं!' : 'Ring for safer Indian roads!'}
           </span>
         </div>
