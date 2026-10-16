@@ -5,7 +5,7 @@ export const translations = {
   hindi: {
     appNameHindi: 'RoadTok',
     appNameEnglish: 'RoadTok',
-    tagline: 'मेरा गड्ढा, मेरी शान',
+    tagline: 'अब सड़क भी बोलेगी।',
     heroBadge: 'मुफ़्त • बिना लॉगिन',
     heroTitleHtml: 'Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>',
     heroDescription: 'सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें।\n100%\u00A0खुली\u00A0व\u00A0सुरक्षित\u00A0नागरिक\u00A0पहल।',
@@ -123,7 +123,7 @@ export const translations = {
     timeMinutesAgo: '{n} मिनट पहले',
     timeHoursAgo: '{n} घंटे पहले',
     timeDaysAgo: '{n} दिन पहले',
-    whatsappShareTemplate: 'सड़क पर गड्ढे की रिपोर्ट!\nलैंडमार्क: {landmark}\n{count} नागरिकों ने पुष्टि की\nलाइव मैप पर देखें और +1 करें: {url}\n\n(RoadTok - "मेरा गड्ढा, मेरी शान")',
+    whatsappShareTemplate: 'सड़क पर गड्ढे की रिपोर्ट!\nलैंडमार्क: {landmark}\n{count} नागरिकों ने पुष्टि की\nलाइव मैप पर देखें और +1 करें: {url}\n\n(RoadTok - "अब सड़क भी बोलेगी।")',
     
     // Leaderboard Strings
     leaderboardTitle: 'लाइव गड्ढा टाइमलाइन',
@@ -209,7 +209,7 @@ export const translations = {
     footerCopyright: '© 2026 RoadTok • 100% Free Civic Tech',
     footerLinksHeader: 'त्वरित लिंक',
     footerLegalHeader: 'कानूनी व प्राइवेसी',
-    footerTagline: '"मेरा गड्ढा, मेरी शान"',
+    footerTagline: '"अब सड़क भी बोलेगी।"',
     footerMap: 'नक्शा',
     footerLeaderboard: 'टाइमलाइन',
     footerMission: 'उद्देश्य',
@@ -221,7 +221,7 @@ export const translations = {
   english: {
     appNameHindi: 'RoadTok',
     appNameEnglish: 'RoadTok',
-    tagline: 'मेरा गड्ढा, मेरी शान',
+    tagline: 'अब सड़क भी बोलेगी।',
     heroBadge: 'Free · No login',
     heroTitleHtml: 'Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>',
     heroDescription: 'Map road hazards and pothole hotspots with live GPS.\n100%\u00A0free\u00A0and\u00A0open\u00A0citizen\u00A0tool.',
@@ -349,7 +349,7 @@ export const translations = {
     timeMinutesAgo: '{n}m ago',
     timeHoursAgo: '{n}h ago',
     timeDaysAgo: '{n}d ago',
-    whatsappShareTemplate: 'Pothole Alert on Road!\nLandmark: {landmark}\n{count} citizens confirmed\nView on live map & +1: {url}\n\n(RoadTok - "Mera Gaddha, Meri Shan")',
+    whatsappShareTemplate: 'Pothole Alert on Road!\nLandmark: {landmark}\n{count} citizens confirmed\nView on live map & +1: {url}\n\n(RoadTok - "अब सड़क भी बोलेगी।")',
     
     // Leaderboard
     leaderboardTitle: 'Live Pothole Timeline',
@@ -435,7 +435,7 @@ export const translations = {
     footerCopyright: '© 2026 RoadTok • 100% Free Civic Tech',
     footerLinksHeader: 'Quick Links',
     footerLegalHeader: 'Legal & Privacy',
-    footerTagline: '"मेरा गड्ढा, मेरी शान"',
+    footerTagline: '"अब सड़क भी बोलेगी।"',
     footerMap: 'Map',
     footerLeaderboard: 'Timeline',
     footerMission: 'Mission',
