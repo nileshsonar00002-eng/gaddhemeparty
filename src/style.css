@@ -961,11 +961,11 @@ body.panel-scroll-locked {
   transform-origin: 50% 50%;
   pointer-events: auto;
   cursor: pointer;
-  transition: opacity 100ms ease, width 150ms ease, height 150ms ease;
+  transition: opacity 100ms ease;
   will-change: transform;
 }
 
-/* Tap Target: Default >=44px touch area without changing visible size */
+/* Tap Target: >=44px touch area (transparent padding) without changing visible pin size */
 .pin-scale-wrapper .civic-pin::after,
 .pin-scale-wrapper .custom-cluster-civic::after {
   content: '';
@@ -982,97 +982,29 @@ body.panel-scroll-locked {
   pointer-events: auto;
 }
 
-/* Tap Target: 36px touch area where another pin is within 44px */
-.pin-scale-wrapper.tap-36,
-.pin-scale-wrapper.tap-compact {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-}
-
-.pin-scale-wrapper.tap-36 .civic-pin::after,
-.pin-scale-wrapper.tap-36 .custom-cluster-civic::after,
-.pin-scale-wrapper.tap-compact .civic-pin::after,
-.pin-scale-wrapper.tap-compact .custom-cluster-civic::after {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-}
-
-/* ========================================================
-   Marker Tier CSS Variables:
-   Light:
-   - grey: rgba(107,114,128,.62) 22px, 2px ring at 90%, white text, hairline box-shadow
-   - maroon: rgba(163,21,38,.62) 26px, 2px ring at 90%, white text, hairline box-shadow
-   - black: rgba(11,13,18,.78) 32px, 2px ring at 90%, white text, hairline box-shadow
-   Dark:
-   - grey: #9CA3AF, fill alpha .6 (rgba(156,163,175,.6)), 2px ring at 90%, no hairline
-   - maroon: #D1364A, fill alpha .6 (rgba(209,54,74,.6)), 2px ring at 90%, no hairline
-   - black: #F5F5F5 with dark text, fill alpha .6 (rgba(245,245,245,.6)), 2px ring at 90%, no hairline
-   ======================================================== */
-:root,
-.theme-light,
-[data-map-theme="light"] {
-  --marker-grey-fill: rgba(107, 114, 128, 0.62);
-  --marker-grey-ring: rgba(107, 114, 128, 0.9);
-  --marker-grey-selected: rgba(107, 114, 128, 0.75);
-
-  --marker-maroon-fill: rgba(163, 21, 38, 0.62);
-  --marker-maroon-ring: rgba(163, 21, 38, 0.9);
-  --marker-maroon-selected: rgba(163, 21, 38, 0.75);
-
-  --marker-black-fill: rgba(11, 13, 18, 0.78);
-  --marker-black-ring: rgba(11, 13, 18, 0.9);
-  --marker-black-selected: rgba(11, 13, 18, 0.75);
-
-  --marker-hairline: 0 0 0 1px rgba(255, 255, 255, 0.85);
-  --marker-text-color: #FFFFFF;
-  --marker-text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
-}
-
-.theme-dark,
-[data-map-theme="dark"] {
-  --marker-grey-fill: rgba(156, 163, 175, 0.6);
-  --marker-grey-ring: rgba(156, 163, 175, 0.9);
-  --marker-grey-selected: rgba(156, 163, 175, 0.75);
-
-  --marker-maroon-fill: rgba(209, 54, 74, 0.6);
-  --marker-maroon-ring: rgba(209, 54, 74, 0.9);
-  --marker-maroon-selected: rgba(209, 54, 74, 0.75);
-
-  --marker-black-fill: rgba(245, 245, 245, 0.6);
-  --marker-black-ring: rgba(245, 245, 245, 0.9);
-  --marker-black-selected: rgba(245, 245, 245, 0.75);
-
-  --marker-hairline: none;
-  --marker-text-color: #FFFFFF;
-  --marker-text-shadow: 0 0 2px #000000, 0 1px 2px #000000;
-}
-
-/* Base Civic Pin & Cluster Bubble (Common Behavior) */
+/* Base Civic Pin */
 .pin-scale-wrapper .civic-pin,
-.pin-scale-wrapper .custom-cluster-civic,
-.pin-scale-wrapper .custom-cluster-orb {
+.pin-scale-wrapper .glowing-orb-pin {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   border-radius: 9999px;
   font-family: 'Average Sans', 'Inter', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   font-weight: 800;
+  font-size: 11px;
   line-height: 1;
   user-select: none;
   box-sizing: border-box;
-  cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: none;
+  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
 }
 
 .pin-scale-wrapper .civic-pin:hover,
-.pin-scale-wrapper .custom-cluster-civic:hover {
-  transform: scale(1.12);
+.pin-scale-wrapper .glowing-orb-pin:hover {
+  transform: scale(1.15);
   z-index: 999;
 }
 
@@ -1082,73 +1014,105 @@ body.panel-scroll-locked {
   z-index: 9999;
 }
 
-/* Tier: Grey (22px) */
-.pin-scale-wrapper .civic-pin.tier-grey,
-.pin-scale-wrapper .custom-cluster-civic.tier-grey {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  min-height: 22px;
-  background: var(--marker-grey-fill);
-  border: 2px solid var(--marker-grey-ring);
-  box-shadow: var(--marker-hairline);
-  color: var(--marker-text-color);
-  text-shadow: var(--marker-text-shadow);
-  font-size: 11px;
+/* ========================================================
+   Light Theme Palettes
+   0-7d: rgba(245,166,35,.5) & 2px ring at 90%
+   8-30d: rgba(232,84,42,.5) & 2px ring at 90%
+   30+d: rgba(142,17,25,.5) & 2px ring at 90%
+   Text: #3E060A with thin white text-shadow
+   ======================================================== */
+.pin-scale-wrapper .civic-pin.theme-light,
+.pin-scale-wrapper .civic-pin:not(.theme-dark) {
+  color: #3E060A;
+  text-shadow: 0 0 2px #FFFFFF, 0 1px 1px #FFFFFF;
 }
 
-.pin-scale-wrapper .civic-pin.is-selected.tier-grey {
-  background: var(--marker-grey-selected);
-  border: 3px solid var(--marker-grey-ring);
+.pin-scale-wrapper .civic-pin.theme-light.pin-days-0-7,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).pin-days-0-7,
+.pin-scale-wrapper .civic-pin.pin-tier-1 {
+  background: rgba(245, 166, 35, 0.5);
+  border: 2px solid rgba(245, 166, 35, 0.9);
+  box-shadow: none;
 }
 
-/* Tier: Maroon (26px) */
-.pin-scale-wrapper .civic-pin.tier-maroon,
-.pin-scale-wrapper .custom-cluster-civic.tier-maroon {
-  width: 26px;
-  height: 26px;
-  min-width: 26px;
-  min-height: 26px;
-  background: var(--marker-maroon-fill);
-  border: 2px solid var(--marker-maroon-ring);
-  box-shadow: var(--marker-hairline);
-  color: var(--marker-text-color);
-  text-shadow: var(--marker-text-shadow);
-  font-size: 12px;
+.pin-scale-wrapper .civic-pin.theme-light.pin-days-8-30,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).pin-days-8-30,
+.pin-scale-wrapper .civic-pin.pin-tier-2 {
+  background: rgba(232, 84, 42, 0.5);
+  border: 2px solid rgba(232, 84, 42, 0.9);
+  box-shadow: none;
 }
 
-.pin-scale-wrapper .civic-pin.is-selected.tier-maroon {
-  background: var(--marker-maroon-selected);
-  border: 3px solid var(--marker-maroon-ring);
+.pin-scale-wrapper .civic-pin.theme-light.pin-days-30-plus,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).pin-days-30-plus,
+.pin-scale-wrapper .civic-pin.pin-tier-3 {
+  background: rgba(142, 17, 25, 0.5);
+  border: 2px solid rgba(142, 17, 25, 0.9);
+  box-shadow: none;
 }
 
-/* Tier: Black (32px) */
-.pin-scale-wrapper .civic-pin.tier-black,
-.pin-scale-wrapper .custom-cluster-civic.tier-black {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  min-height: 32px;
-  background: var(--marker-black-fill);
-  border: 2px solid var(--marker-black-ring);
-  box-shadow: var(--marker-hairline);
-  color: var(--marker-text-color);
-  text-shadow: var(--marker-text-shadow);
-  font-size: 13px;
+/* Light Theme Selected Pin: ring 3px, fill alpha .75 */
+.pin-scale-wrapper .civic-pin.theme-light.is-selected.pin-days-0-7,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).is-selected.pin-days-0-7 {
+  background: rgba(245, 166, 35, 0.75);
+  border: 3px solid rgba(245, 166, 35, 0.9);
 }
 
-.pin-scale-wrapper .civic-pin.is-selected.tier-black {
-  background: var(--marker-black-selected);
-  border: 3px solid var(--marker-black-ring);
+.pin-scale-wrapper .civic-pin.theme-light.is-selected.pin-days-8-30,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).is-selected.pin-days-8-30 {
+  background: rgba(232, 84, 42, 0.75);
+  border: 3px solid rgba(232, 84, 42, 0.9);
 }
 
-/* Dark Map Black Tier Special Rule: #F5F5F5 with dark text, fill alpha .6, no hairline */
-.pin-scale-wrapper .civic-pin.theme-dark.tier-black,
-.pin-scale-wrapper .custom-cluster-civic.theme-dark.tier-black,
-[data-map-theme="dark"] .pin-scale-wrapper .civic-pin.tier-black,
-[data-map-theme="dark"] .pin-scale-wrapper .custom-cluster-civic.tier-black {
-  color: #0B0D12;
-  text-shadow: none;
+.pin-scale-wrapper .civic-pin.theme-light.is-selected.pin-days-30-plus,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).is-selected.pin-days-30-plus {
+  background: rgba(142, 17, 25, 0.75);
+  border: 3px solid rgba(142, 17, 25, 0.9);
+}
+
+/* ========================================================
+   Dark Theme Palettes
+   Fill alpha .6, brighter colours:
+   Amber #FFB84D (0-7d), Orange #FF7A4D (8-30d), Red #FF4D5A (30+d)
+   Text: white with a dark halo
+   ======================================================== */
+.pin-scale-wrapper .civic-pin.theme-dark {
+  color: #FFFFFF;
+  text-shadow: 0 0 2px #000000, 0 1px 2px #000000, 0 0 3px #000000;
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.pin-days-0-7 {
+  background: rgba(255, 184, 77, 0.6);
+  border: 2px solid rgba(255, 184, 77, 0.9);
+  box-shadow: none;
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.pin-days-8-30 {
+  background: rgba(255, 122, 77, 0.6);
+  border: 2px solid rgba(255, 122, 77, 0.9);
+  box-shadow: none;
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.pin-days-30-plus {
+  background: rgba(255, 77, 90, 0.6);
+  border: 2px solid rgba(255, 77, 90, 0.9);
+  box-shadow: none;
+}
+
+/* Dark Theme Selected Pin: ring 3px, fill alpha .75 */
+.pin-scale-wrapper .civic-pin.theme-dark.is-selected.pin-days-0-7 {
+  background: rgba(255, 184, 77, 0.75);
+  border: 3px solid rgba(255, 184, 77, 0.9);
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.is-selected.pin-days-8-30 {
+  background: rgba(255, 122, 77, 0.75);
+  border: 3px solid rgba(255, 122, 77, 0.9);
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.is-selected.pin-days-30-plus {
+  background: rgba(255, 77, 90, 0.75);
+  border: 3px solid rgba(255, 77, 90, 0.9);
 }
 
 /* Clean Cluster Orbs */
@@ -1174,6 +1138,50 @@ body.panel-scroll-locked {
 
 .pin-rank-bounce {
   animation: rankBeaconBounce 1.2s ease-in-out infinite;
+}
+
+/* ========================================================
+   Clusters:
+   Light theme: charcoal rgba(22,26,34,.5) with 90% ring
+   Dark theme: charcoal rgba(22,26,34,.6) with ring rgba(209,213,219,.6)
+   White count text
+   ======================================================== */
+.pin-scale-wrapper .custom-cluster-civic,
+.pin-scale-wrapper .custom-cluster-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  color: #FFFFFF;
+  text-shadow: 0 0 2px #000000, 0 1px 2px #000000;
+  font-family: 'Average Sans', 'Inter', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  box-shadow: none;
+  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
+}
+
+.pin-scale-wrapper .custom-cluster-civic:hover,
+.pin-scale-wrapper .custom-cluster-orb:hover {
+  transform: scale(1.12);
+}
+
+.pin-scale-wrapper .custom-cluster-civic.theme-light,
+.pin-scale-wrapper .custom-cluster-civic:not(.theme-dark) {
+  background: rgba(22, 26, 34, 0.5);
+  border: 2px solid rgba(22, 26, 34, 0.9);
+}
+
+.pin-scale-wrapper .custom-cluster-civic.theme-dark {
+  background: rgba(22, 26, 34, 0.6);
+  border: 2px solid rgba(209, 213, 219, 0.6);
 }
 
 /* Popup Overrides */

@@ -221,7 +221,92 @@ export function getDaysOpen(pin) {
   return Math.floor(diffMs / (1000 * 60 * 60 * 24));
 }
 
-export { TIERS, getTierForCount, getMarkerTierStyle, calculateCrowdedMarkers, latLngToPixel } from './markerConfig.js';
+/**
+ * Returns theme-aware translucent fill, 90% ring, selectedFill (.75 alpha),
+ * text color, text halo, and CSS class by days open:
+ * 
+ * Dark theme (fill alpha .6, brighter colours, white text with dark halo):
+ * - 0-7d: amber #FFB84D (rgba(255, 184, 77, 0.6))
+ * - 8-30d: orange #FF7A4D (rgba(255, 122, 77, 0.6))
+ * - 30+d: red #FF4D5A (rgba(255, 77, 90, 0.6))
+ * 
+ * Light theme (fill alpha .5, text #3E060A with white halo):
+ * - 0-7d: rgba(245, 166, 35, 0.5)
+ * - 8-30d: rgba(232, 84, 42, 0.5)
+ * - 30+d: rgba(142, 17, 25, 0.5)
+ */
+export function getPinColorByDays(days, theme = 'light') {
+  const isDark = theme === 'dark';
+  let className;
+  let fill;
+  let ring;
+  let selectedFill;
+
+  if (days > 30) {
+    className = 'pin-days-30-plus';
+    if (isDark) {
+      fill = 'rgba(255, 77, 90, 0.6)';
+      ring = 'rgba(255, 77, 90, 0.9)';
+      selectedFill = 'rgba(255, 77, 90, 0.75)';
+    } else {
+      fill = 'rgba(142, 17, 25, 0.5)';
+      ring = 'rgba(142, 17, 25, 0.9)';
+      selectedFill = 'rgba(142, 17, 25, 0.75)';
+    }
+  } else if (days >= 8) {
+    className = 'pin-days-8-30';
+    if (isDark) {
+      fill = 'rgba(255, 122, 77, 0.6)';
+      ring = 'rgba(255, 122, 77, 0.9)';
+      selectedFill = 'rgba(255, 122, 77, 0.75)';
+    } else {
+      fill = 'rgba(232, 84, 42, 0.5)';
+      ring = 'rgba(232, 84, 42, 0.9)';
+      selectedFill = 'rgba(232, 84, 42, 0.75)';
+    }
+  } else {
+    className = 'pin-days-0-7';
+    if (isDark) {
+      fill = 'rgba(255, 184, 77, 0.6)';
+      ring = 'rgba(255, 184, 77, 0.9)';
+      selectedFill = 'rgba(255, 184, 77, 0.75)';
+    } else {
+      fill = 'rgba(245, 166, 35, 0.5)';
+      ring = 'rgba(245, 166, 35, 0.9)';
+      selectedFill = 'rgba(245, 166, 35, 0.75)';
+    }
+  }
+
+  const textColor = isDark ? '#FFFFFF' : '#3E060A';
+  const textShadow = isDark
+    ? '0 0 2px #000000, 0 1px 2px #000000, 0 0 3px #000000'
+    : '0 0 2px #FFFFFF, 0 1px 1px #FFFFFF';
+
+  return {
+    fill,
+    ring,
+    selectedFill,
+    className,
+    textColor,
+    textShadow
+  };
+}
+
+/**
+ * Returns cluster bubble colors:
+ * - Light theme: charcoal rgba(22, 26, 34, 0.5) with 90% ring rgba(22, 26, 34, 0.9)
+ * - Dark theme: charcoal rgba(22, 26, 34, 0.6) with ring rgba(209, 213, 219, 0.6)
+ * - White count text on both
+ */
+export function getClusterColor(theme = 'light') {
+  const isDark = theme === 'dark';
+  return {
+    fill: isDark ? 'rgba(22, 26, 34, 0.6)' : 'rgba(22, 26, 34, 0.5)',
+    ring: isDark ? 'rgba(209, 213, 219, 0.6)' : 'rgba(22, 26, 34, 0.9)',
+    textColor: '#FFFFFF',
+    textShadow: '0 0 2px #000000, 0 1px 2px #000000'
+  };
+}
 
 export class GoogleMapsAdapter extends MapAdapter {
   constructor() {
@@ -503,94 +588,54 @@ export class GoogleMapsAdapter extends MapAdapter {
 
     const zoom = this.map.getZoom() || this.defaultZoom;
 
-    // Prepare all rendered items (single pins and cluster centroids)
-    const renderItems = [];
-
     // At zoom >= 14, always render individual unclustered pins
     if (zoom >= 14) {
-      allPins.forEach((pin) => {
-        if (pin.latitude && pin.longitude) {
-          renderItems.push({
-            type: 'single',
-            lat: pin.latitude,
-            lng: pin.longitude,
-            pin,
-            count: pin.reportCount || 1,
-            id: pin.id
-          });
-        }
-      });
-    } else {
-      // Grid-based Centroid Clustering for lower zoom levels
-      const threshold = 180 / (256 * Math.pow(2, zoom)) * 42;
-      const clusters = [];
-
-      allPins.forEach((pin) => {
-        if (!pin.latitude || !pin.longitude) return;
-        const weight = Math.max(1, pin.reportCount || 1);
-
-        let matchedCluster = null;
-        for (const cl of clusters) {
-          const dLat = Math.abs(cl.centerLat - pin.latitude);
-          const dLng = Math.abs(cl.centerLng - pin.longitude);
-          if (dLat < threshold && dLng < threshold) {
-            matchedCluster = cl;
-            break;
-          }
-        }
-
-        if (matchedCluster) {
-          matchedCluster.pins.push(pin);
-          matchedCluster.totalWeight += weight;
-          matchedCluster.weightedLatSum += pin.latitude * weight;
-          matchedCluster.weightedLngSum += pin.longitude * weight;
-          matchedCluster.centerLat = matchedCluster.weightedLatSum / matchedCluster.totalWeight;
-          matchedCluster.centerLng = matchedCluster.weightedLngSum / matchedCluster.totalWeight;
-        } else {
-          clusters.push({
-            pins: [pin],
-            totalWeight: weight,
-            weightedLatSum: pin.latitude * weight,
-            weightedLngSum: pin.longitude * weight,
-            centerLat: pin.latitude,
-            centerLng: pin.longitude
-          });
-        }
-      });
-
-      clusters.forEach((cl, idx) => {
-        if (cl.pins.length === 1) {
-          renderItems.push({
-            type: 'single',
-            lat: cl.pins[0].latitude,
-            lng: cl.pins[0].longitude,
-            pin: cl.pins[0],
-            count: cl.pins[0].reportCount || 1,
-            id: cl.pins[0].id
-          });
-        } else {
-          const count = cl.pins.reduce((sum, p) => sum + (p.reportCount || 1), 0);
-          renderItems.push({
-            type: 'cluster',
-            lat: cl.centerLat,
-            lng: cl.centerLng,
-            cluster: cl,
-            count,
-            id: `cluster-${idx}`
-          });
-        }
-      });
+      allPins.forEach((pin) => this.createSinglePinMarker(pin));
+      return;
     }
 
-    // Proximity tap targets: 44px default (36px where another pin is within 44px)
-    const crowdedSet = calculateCrowdedMarkers(renderItems, zoom, 44);
+    // Grid-based Centroid Clustering for lower zoom levels
+    const threshold = 180 / (256 * Math.pow(2, zoom)) * 42;
+    const clusters = [];
 
-    renderItems.forEach((item, index) => {
-      const isCrowded = crowdedSet.has(index);
-      if (item.type === 'single') {
-        this.createSinglePinMarker(item.pin, isCrowded);
+    allPins.forEach((pin) => {
+      if (!pin.latitude || !pin.longitude) return;
+      const weight = Math.max(1, pin.reportCount || 1);
+
+      let matchedCluster = null;
+      for (const cl of clusters) {
+        const dLat = Math.abs(cl.centerLat - pin.latitude);
+        const dLng = Math.abs(cl.centerLng - pin.longitude);
+        if (dLat < threshold && dLng < threshold) {
+          matchedCluster = cl;
+          break;
+        }
+      }
+
+      if (matchedCluster) {
+        matchedCluster.pins.push(pin);
+        matchedCluster.totalWeight += weight;
+        matchedCluster.weightedLatSum += pin.latitude * weight;
+        matchedCluster.weightedLngSum += pin.longitude * weight;
+        matchedCluster.centerLat = matchedCluster.weightedLatSum / matchedCluster.totalWeight;
+        matchedCluster.centerLng = matchedCluster.weightedLngSum / matchedCluster.totalWeight;
       } else {
-        this.createClusterMarker(item.cluster, item.id, item.count, isCrowded);
+        clusters.push({
+          pins: [pin],
+          totalWeight: weight,
+          weightedLatSum: pin.latitude * weight,
+          weightedLngSum: pin.longitude * weight,
+          centerLat: pin.latitude,
+          centerLng: pin.longitude
+        });
+      }
+    });
+
+    clusters.forEach((cl, idx) => {
+      if (cl.pins.length === 1) {
+        this.createSinglePinMarker(cl.pins[0]);
+      } else {
+        this.createClusterMarker(cl, `cluster-${idx}`);
       }
     });
   }
@@ -605,10 +650,10 @@ export class GoogleMapsAdapter extends MapAdapter {
           prevEl.classList.remove('is-selected');
           const pin = this.pinsData?.find((p) => p.id === this.selectedPinId);
           if (pin) {
-            const tierStyle = getMarkerTierStyle(pin.reportCount || 1, this.theme);
-            prevEl.style.background = tierStyle.fill;
-            prevEl.style.border = `2px solid ${tierStyle.ring}`;
-            prevEl.style.boxShadow = tierStyle.boxShadow;
+            const daysOpen = getDaysOpen(pin);
+            const colorInfo = getPinColorByDays(daysOpen, this.theme);
+            prevEl.style.background = colorInfo.fill;
+            prevEl.style.border = `2px solid ${colorInfo.ring}`;
             prevEl.style.transform = '';
           }
         }
@@ -630,34 +675,46 @@ export class GoogleMapsAdapter extends MapAdapter {
         el.classList.add('is-selected');
         const pin = this.pinsData?.find((p) => p.id === pinId);
         if (pin) {
-          const tierStyle = getMarkerTierStyle(pin.reportCount || 1, this.theme);
-          el.style.background = tierStyle.selectedFill;
-          el.style.border = `3px solid ${tierStyle.ring}`;
+          const daysOpen = getDaysOpen(pin);
+          const colorInfo = getPinColorByDays(daysOpen, this.theme);
+          el.style.background = colorInfo.selectedFill;
+          el.style.border = `3px solid ${colorInfo.ring}`;
           el.style.transform = 'scale(1.15)';
         }
       }
     }
   }
 
-  createSinglePinMarker(pin, isCrowded = false) {
-    const count = pin.reportCount || 1;
-    const tierStyle = getMarkerTierStyle(count, this.theme);
+  createSinglePinMarker(pin) {
+    const reportCount = pin.reportCount || 1;
+    const upvotes = pin.upvotes || 0;
+    const photoCount = Array.isArray(pin.images) ? pin.images.length : (pin.imageUrl ? 1 : 0);
+    const isSevere = reportCount >= 5 || upvotes >= 5 || photoCount >= 5;
+    const isMedium = (reportCount >= 2 || upvotes >= 2 || photoCount >= 2) && !isSevere;
+
+    // Preserving existing size logic
+    const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
+    const badgeCount = Math.max(reportCount, photoCount);
+    const daysOpen = getDaysOpen(pin);
+    const colorInfo = getPinColorByDays(daysOpen, this.theme);
+
     const isSelected = this.selectedPinId === pin.id;
     const selectedClass = isSelected ? 'is-selected' : '';
     const initialZIndex = isSelected ? 9999 : 10;
-    const tapClass = isCrowded ? 'tap-36' : 'tap-44';
-    const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
-
-    const currentFill = isSelected ? tierStyle.selectedFill : tierStyle.fill;
-    const currentBorder = isSelected ? `3px solid ${tierStyle.ring}` : `2px solid ${tierStyle.ring}`;
+    const currentFill = isSelected ? colorInfo.selectedFill : colorInfo.fill;
+    const currentBorder = isSelected ? `3px solid ${colorInfo.ring}` : `2px solid ${colorInfo.ring}`;
     const currentTransform = isSelected ? 'transform: scale(1.15);' : '';
 
+    const badgeText = badgeCount > 1 ? badgeCount : '!';
+    const fontSize = orbSize >= 28 ? '12px' : (orbSize >= 24 ? '11px' : '10px');
+    const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
+
     const iconHtml = `
-      <div class="pin-scale-wrapper ${tapClass}">
-        <div class="civic-pin ${themeClass} ${tierStyle.className} ${selectedClass}" 
-             style="width: ${tierStyle.size}px; height: ${tierStyle.size}px; background: ${currentFill}; border: ${currentBorder}; box-shadow: ${tierStyle.boxShadow}; ${currentTransform} color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};" 
-             title="${pin.landmark || 'Hazard'} (${count} report${count > 1 ? 's' : ''})">
-          <span class="tabular-nums font-black leading-none" style="font-size: ${tierStyle.fontSize}; color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};">${tierStyle.badgeText}</span>
+      <div class="pin-scale-wrapper">
+        <div class="civic-pin ${themeClass} ${colorInfo.className} ${selectedClass}" 
+             style="width: ${orbSize}px; height: ${orbSize}px; background: ${currentFill}; border: ${currentBorder}; ${currentTransform} color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};" 
+             title="${pin.landmark || 'Hazard'} (${daysOpen}d)">
+          <span class="tabular-nums font-black leading-none" style="font-size: ${fontSize}; color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};">${badgeText}</span>
         </div>
       </div>
     `;
@@ -681,18 +738,16 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.markersMap.set(pin.id, marker);
   }
 
-  createClusterMarker(cl, id, totalCount = null, isCrowded = false) {
-    const count = totalCount !== null ? totalCount : cl.pins.reduce((sum, p) => sum + (p.reportCount || 1), 0);
-    const tierStyle = getMarkerTierStyle(count, this.theme);
+  createClusterMarker(cl, id) {
+    const count = cl.pins.reduce((sum, p) => sum + (p.reportCount || 1), 0);
+    const clusterInfo = getClusterColor(this.theme);
     const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
-    const tapClass = isCrowded ? 'tap-36' : 'tap-44';
 
     const iconHtml = `
-      <div class="pin-scale-wrapper ${tapClass}">
-        <div class="custom-cluster-civic ${themeClass} ${tierStyle.className}" 
-             style="width: ${tierStyle.size}px; height: ${tierStyle.size}px; cursor: pointer; background: ${tierStyle.fill}; border: 2px solid ${tierStyle.ring}; box-shadow: ${tierStyle.boxShadow}; color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};"
-             title="Cluster: ${count} reports">
-          <span class="tabular-nums font-black leading-none" style="font-size: ${tierStyle.fontSize}; color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};">${tierStyle.badgeText}</span>
+      <div class="pin-scale-wrapper">
+        <div class="custom-cluster-civic ${themeClass}" 
+             style="cursor: pointer; background: ${clusterInfo.fill}; border: 2px solid ${clusterInfo.ring}; color: ${clusterInfo.textColor}; text-shadow: ${clusterInfo.textShadow};">
+          <span class="tabular-nums font-black leading-none" style="font-size: 13px; color: ${clusterInfo.textColor}; text-shadow: ${clusterInfo.textShadow};">${count}</span>
         </div>
       </div>
     `;

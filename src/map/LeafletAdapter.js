@@ -2,7 +2,7 @@ import L from 'leaflet';
 import 'leaflet.markercluster';
 import { MapAdapter } from './MapAdapter';
 import { t } from '../utils/i18n';
-import { TIERS, getTierForCount, getMarkerTierStyle, calculateCrowdedMarkers, latLngToPixel } from './markerConfig.js';
+import { getDaysOpen, getPinColorByDays, getClusterColor } from './GoogleMapsAdapter';
 
 export class LeafletAdapter extends MapAdapter {
   constructor() {
@@ -12,8 +12,6 @@ export class LeafletAdapter extends MapAdapter {
     this.clusterGroup = null;
     this.markersMap = new Map();
     this.userMarker = null;
-    this.selectedPinId = null;
-    this.pinsData = [];
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     this.defaultCenter = isMobile ? [21.8, 77.5] : [22.5937, 78.9629];
     this.defaultZoom = isMobile ? 4.5 : 5;
@@ -61,14 +59,6 @@ export class LeafletAdapter extends MapAdapter {
       this.lastGestureEndTime = Date.now();
     });
 
-    this.map.on('click', () => {
-      this.deselectPin();
-    });
-
-    this.map.on('popupclose', () => {
-      this.deselectPin();
-    });
-
     // Zoom-responsive marker and cluster scale synchronization (throttled with rAF)
     this.map.on('zoom zoomend', () => {
       this.updateZoomScales();
@@ -79,7 +69,7 @@ export class LeafletAdapter extends MapAdapter {
 
     this.applyTheme(this.theme);
 
-    // Marker cluster group with report-count tiers matching single pins
+    // Marker cluster group with glowing energy orbs and zoom-adaptive cluster radius
     this.clusterGroup = L.markerClusterGroup({
       showCoverageOnHover: false,
       maxClusterRadius: (zoom) => {
@@ -91,17 +81,10 @@ export class LeafletAdapter extends MapAdapter {
       spiderfyOnMaxZoom: true,
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
-        const tierStyle = getMarkerTierStyle(count, this.theme);
+        const clusterInfo = getClusterColor(this.theme);
         const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
         return L.divIcon({
-          html: `
-            <div class="pin-scale-wrapper">
-              <div class="custom-cluster-civic ${themeClass} ${tierStyle.className}" 
-                   style="width: ${tierStyle.size}px; height: ${tierStyle.size}px; background: ${tierStyle.fill}; border: 2px solid ${tierStyle.ring}; box-shadow: ${tierStyle.boxShadow}; color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};">
-                <span class="tabular-nums font-black leading-none" style="font-size: ${tierStyle.fontSize}; color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};">${tierStyle.badgeText}</span>
-              </div>
-            </div>
-          `,
+          html: `<div class="custom-cluster-civic ${themeClass}" style="background: ${clusterInfo.fill}; border: 2px solid ${clusterInfo.ring}; color: ${clusterInfo.textColor}; text-shadow: ${clusterInfo.textShadow};"><span>${count}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: L.point(40, 40)
         });
@@ -168,11 +151,6 @@ export class LeafletAdapter extends MapAdapter {
 
   applyTheme(theme = 'dark') {
     this.theme = theme;
-    const container = this.map?.getContainer ? this.map.getContainer() : document.getElementById('map');
-    if (container) {
-      container.dataset.mapTheme = theme;
-    }
-
     if (this.tileLayer) {
       this.map.removeLayer(this.tileLayer);
     }
@@ -184,10 +162,6 @@ export class LeafletAdapter extends MapAdapter {
       subdomains: ['a', 'b', 'c'],
       maxZoom: 19
     }).addTo(this.map);
-
-    if (this.pinsData && this.pinsData.length > 0) {
-      this.renderPins(this.pinsData, this.onPinClickCallback, this.createPopupHtmlCallback);
-    }
   }
 
   toggleTheme() {
@@ -358,37 +332,34 @@ export class LeafletAdapter extends MapAdapter {
   renderPins(pins, onPinClick, createPopupHtml) {
     if (!this.clusterGroup) return;
 
-    this.pinsData = pins || [];
-    this.onPinClickCallback = onPinClick;
-    this.createPopupHtmlCallback = createPopupHtml;
-
     this.clusterGroup.clearLayers();
     this.markersMap.clear();
 
-    const validPins = (pins || []).filter((p) => p.latitude && p.longitude);
-    const zoom = this.map ? this.map.getZoom() : 14;
-    const items = validPins.map((p) => ({ lat: p.latitude, lng: p.longitude, pin: p }));
-    const crowdedSet = calculateCrowdedMarkers(items, zoom, 44);
+    pins.forEach((pin) => {
+      if (!pin.latitude || !pin.longitude) return;
 
-    validPins.forEach((pin, idx) => {
-      const count = pin.reportCount || 1;
-      const tierStyle = getMarkerTierStyle(count, this.theme);
-      const isSelected = this.selectedPinId === pin.id;
-      const selectedClass = isSelected ? 'is-selected' : '';
-      const isCrowded = crowdedSet.has(idx);
-      const tapClass = isCrowded ? 'tap-36' : 'tap-44';
+      const reportCount = pin.reportCount || 1;
+      const upvotes = pin.upvotes || 0;
+      const photoCount = Array.isArray(pin.images) ? pin.images.length : (pin.imageUrl ? 1 : 0);
+      const isSevere = reportCount >= 5 || upvotes >= 5 || photoCount >= 5;
+      const isMedium = (reportCount >= 2 || upvotes >= 2 || photoCount >= 2) && !isSevere;
+      
+      const orbTierClass = isSevere ? 'pin-tier-3' : isMedium ? 'pin-tier-2' : 'pin-tier-1';
+      const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
+      const badgeCount = Math.max(reportCount, photoCount);
+      const daysOpen = getDaysOpen(pin);
+      const colorInfo = getPinColorByDays(daysOpen, this.theme);
+      const badgeText = badgeCount > 1 ? badgeCount : '!';
+      const fontSize = orbSize >= 28 ? '12px' : (orbSize >= 24 ? '11px' : '10px');
       const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
 
-      const currentFill = isSelected ? tierStyle.selectedFill : tierStyle.fill;
-      const currentBorder = isSelected ? `3px solid ${tierStyle.ring}` : `2px solid ${tierStyle.ring}`;
-      const currentTransform = isSelected ? 'transform: scale(1.15);' : '';
-
+      // Translucent Civic Pin with 2px 90% ring and theme-aware colors
       const iconHtml = `
-        <div class="pin-scale-wrapper ${tapClass}">
-          <div class="civic-pin ${themeClass} ${tierStyle.className} ${selectedClass}" 
-               style="width: ${tierStyle.size}px; height: ${tierStyle.size}px; background: ${currentFill}; border: ${currentBorder}; box-shadow: ${tierStyle.boxShadow}; ${currentTransform} color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};" 
-               title="${pin.landmark || 'Hazard'} (${count} report${count > 1 ? 's' : ''})">
-            <span class="tabular-nums font-black leading-none" style="font-size: ${tierStyle.fontSize}; color: ${tierStyle.textColor}; text-shadow: ${tierStyle.textShadow};">${tierStyle.badgeText}</span>
+        <div class="pin-scale-wrapper">
+          <div class="civic-pin ${themeClass} ${colorInfo.className}" 
+               style="width: ${orbSize}px; height: ${orbSize}px; background: ${colorInfo.fill}; border: 2px solid ${colorInfo.ring}; box-shadow: none; color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};" 
+               title="${pin.landmark || 'Hazard'} (${daysOpen}d)">
+            <span class="tabular-nums font-black leading-none" style="font-size: ${fontSize}; color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};">${badgeText}</span>
           </div>
         </div>
       `;
@@ -420,57 +391,12 @@ export class LeafletAdapter extends MapAdapter {
         if (this.isGestureActive || Date.now() - this.lastGestureEndTime < 300) {
           return;
         }
-        this.selectPin(pin.id);
         if (onPinClick) onPinClick(pin);
       });
 
       this.clusterGroup.addLayer(marker);
       this.markersMap.set(pin.id, marker);
     });
-  }
-
-  deselectPin() {
-    if (this.selectedPinId) {
-      const prevMarker = this.markersMap.get(this.selectedPinId);
-      if (prevMarker && prevMarker._icon) {
-        prevMarker.setZIndexOffset(0);
-        const prevEl = prevMarker._icon.querySelector('.civic-pin');
-        if (prevEl) {
-          prevEl.classList.remove('is-selected');
-          const pin = this.pinsData?.find((p) => p.id === this.selectedPinId);
-          if (pin) {
-            const tierStyle = getMarkerTierStyle(pin.reportCount || 1, this.theme);
-            prevEl.style.background = tierStyle.fill;
-            prevEl.style.border = `2px solid ${tierStyle.ring}`;
-            prevEl.style.boxShadow = tierStyle.boxShadow;
-            prevEl.style.transform = '';
-          }
-        }
-      }
-      this.selectedPinId = null;
-    }
-  }
-
-  selectPin(pinId) {
-    if (this.selectedPinId && this.selectedPinId !== pinId) {
-      this.deselectPin();
-    }
-    this.selectedPinId = pinId;
-    const marker = this.markersMap.get(pinId);
-    if (marker && marker._icon) {
-      marker.setZIndexOffset(9999);
-      const el = marker._icon.querySelector('.civic-pin');
-      if (el) {
-        el.classList.add('is-selected');
-        const pin = this.pinsData?.find((p) => p.id === pinId);
-        if (pin) {
-          const tierStyle = getMarkerTierStyle(pin.reportCount || 1, this.theme);
-          el.style.background = tierStyle.selectedFill;
-          el.style.border = `3px solid ${tierStyle.ring}`;
-          el.style.transform = 'scale(1.15)';
-        }
-      }
-    }
   }
 
   setUserLocationMarker(lat, lng) {
