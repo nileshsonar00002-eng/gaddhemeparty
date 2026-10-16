@@ -161,10 +161,99 @@ class KhaddaApp {
       tilt3d.refresh();
     });
 
+    // 10.8. Setup Site Info Drawer (containing all other site content)
+    this.setupSiteInfoDrawer();
+
+    // Trigger map resize shortly after layout mount for crisp tiles
+    setTimeout(() => {
+      if (this.mapAdapter && this.mapAdapter.resize) {
+        this.mapAdapter.resize();
+      }
+    }, 150);
+
     // 11. Window Resize Listener for full-width layout responsiveness
     window.addEventListener('resize', () => {
       if (this.mapAdapter && this.mapAdapter.resize) {
         this.mapAdapter.resize();
+      }
+    });
+  }
+
+  setupSiteInfoDrawer() {
+    const drawer = document.getElementById('site-info-drawer');
+    const backdrop = document.getElementById('info-drawer-backdrop');
+    const closeBtn = document.getElementById('btn-close-info-drawer');
+    const scrollBody = document.getElementById('info-drawer-scroll-body');
+    const tabButtons = document.querySelectorAll('.info-tab-btn');
+
+    const updateActiveTabUI = (tabId) => {
+      tabButtons.forEach((btn) => {
+        const isMatch = btn.getAttribute('data-info-tab') === tabId;
+        if (isMatch) {
+          btn.classList.remove('text-[var(--muted)]', 'hover:text-[var(--text)]', 'hover:bg-[var(--surface-2)]');
+          btn.classList.add('bg-[var(--primary)]', 'text-[var(--primary-ink)]', 'shadow-xs');
+        } else {
+          btn.classList.remove('bg-[var(--primary)]', 'text-[var(--primary-ink)]', 'shadow-xs');
+          btn.classList.add('text-[var(--muted)]', 'hover:text-[var(--text)]', 'hover:bg-[var(--surface-2)]');
+        }
+      });
+    };
+
+    window.__khaddaOpenInfo = (targetTab = 'leaderboard') => {
+      if (!drawer) return;
+      drawer.classList.remove('hidden');
+      void drawer.offsetWidth;
+      drawer.classList.add('is-open');
+      document.body.classList.add('overflow-hidden');
+
+      updateActiveTabUI(targetTab);
+
+      if (targetTab && scrollBody) {
+        setTimeout(() => {
+          const targetSection = document.getElementById(targetTab);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 120);
+      }
+    };
+
+    window.__khaddaCloseInfo = () => {
+      if (!drawer) return;
+      drawer.classList.remove('is-open');
+      document.body.classList.remove('overflow-hidden');
+      setTimeout(() => {
+        if (!drawer.classList.contains('is-open')) {
+          drawer.classList.add('hidden');
+        }
+      }, 250);
+    };
+
+    closeBtn?.addEventListener('click', () => {
+      window.__khaddaCloseInfo();
+      router.navigate('');
+    });
+
+    backdrop?.addEventListener('click', () => {
+      window.__khaddaCloseInfo();
+      router.navigate('');
+    });
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-info-tab');
+        updateActiveTabUI(tab);
+        const targetSection = document.getElementById(tab);
+        if (targetSection && scrollBody) {
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer && drawer.classList.contains('is-open')) {
+        window.__khaddaCloseInfo();
+        router.navigate('');
       }
     });
   }
@@ -244,10 +333,12 @@ class KhaddaApp {
           openPinDetailModal(pin);
         }
       } else if (route.type === 'panel') {
-        if (route.name) {
-          this.panelManager.open(route.name);
+        if (route.name && route.name !== 'map') {
+          window.__khaddaOpenInfo?.(route.name);
+          this.panelManager?.open?.(route.name);
         } else {
-          this.panelManager.close();
+          window.__khaddaCloseInfo?.();
+          this.panelManager?.close?.();
         }
       }
     });
@@ -318,9 +409,10 @@ class KhaddaApp {
       this.locateUserAndCenter();
     });
 
-    // In-card Info Button -> Opens About Panel
+    // In-card Info Button -> Opens About Section in Info Drawer
     const openAboutBtn = document.getElementById('btn-open-about');
     openAboutBtn?.addEventListener('click', () => {
+      window.__khaddaOpenInfo?.('about');
       router.navigate('about');
     });
 
@@ -433,6 +525,7 @@ class KhaddaApp {
     window.__khaddaFocusPinOnMap = (pin, rank = null) => {
       if (!pin || !pin.latitude || !pin.longitude) return;
 
+      window.__khaddaCloseInfo?.();
       if (this.panelManager) {
         this.panelManager.close();
       }
@@ -462,6 +555,7 @@ class KhaddaApp {
         const pinRank = rank || pin.rank || window.__khaddaGetPinRank(pinId);
         if (pinRank) pin.rank = pinRank;
 
+        window.__khaddaCloseInfo?.();
         if (this.panelManager) {
           this.panelManager.close();
         }

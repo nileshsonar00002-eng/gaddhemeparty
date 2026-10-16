@@ -36,7 +36,7 @@ export function renderStatsStrip(container, statsData = {}) {
   const today = statsData.todayReports || 0;
 
   container.innerHTML = `
-    <div class="w-full sm:w-auto p-2.5 sm:py-2 sm:px-4 bg-[var(--band)] rounded-none border border-[var(--border)] text-[var(--band-ink)] shadow-xs max-w-full">
+    <div class="w-full sm:w-auto py-2 px-3.5 sm:px-4 bg-[var(--band)]/90 backdrop-blur-md rounded-2xl border border-[var(--band-ink)]/25 text-[var(--band-ink)] shadow-md max-w-full">
       <div class="flex items-center justify-center sm:justify-start gap-4 sm:gap-6">
         
         <!-- Column 1: Total Verified Reports -->

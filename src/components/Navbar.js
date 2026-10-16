@@ -111,6 +111,17 @@ export function createNavbar(options = {}) {
           </button>
         </div>
 
+        <button
+          type="button"
+          id="btn-nav-info-desktop"
+          class="btn-nav-info inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--band-ink)]/30 bg-[var(--band-ink)]/15 hover:bg-[var(--band-ink)]/25 text-[var(--band-ink)] transition-all duration-150 cursor-pointer shadow-xs active:scale-95"
+          title="${t('navInfo') || 'Info'}"
+          aria-label="Info"
+        >
+          ${getLucideIcon('info', 'w-3.5 h-3.5 text-inherit')}
+          <span>${t('navInfo') || 'Info'}</span>
+        </button>
+
         <a
           href="${whatsappShareUrl}"
           target="_blank"
@@ -126,6 +137,17 @@ export function createNavbar(options = {}) {
 
       <!-- Mobile Right Controls (< 1024px) -->
       <div class="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
+        <button
+          type="button"
+          id="btn-nav-info-mobile"
+          class="btn-nav-info inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-full border border-[var(--band-ink)]/30 bg-[var(--band-ink)]/15 hover:bg-[var(--band-ink)]/25 text-[var(--band-ink)] transition cursor-pointer shadow-xs active:scale-95"
+          title="${t('navInfo') || 'Info'}"
+          aria-label="Info"
+        >
+          ${getLucideIcon('info', 'w-3.5 h-3.5 text-inherit')}
+          <span>${t('navInfo') || 'Info'}</span>
+        </button>
+
         <button
           id="btn-mobile-menu-toggle"
           type="button"
@@ -321,10 +343,20 @@ export function createNavbar(options = {}) {
       const isOpeningPanel = panelId && panelId !== 'map';
       closeDrawer(isOpeningPanel);
       if (panelId === 'map') {
+        window.__khaddaCloseInfo?.();
         router.navigate('');
       } else {
+        window.__khaddaOpenInfo?.(panelId);
         router.navigate(panelId);
       }
+    });
+  });
+
+  // Dedicated Nav Info buttons (Desktop & Mobile)
+  document.querySelectorAll('.btn-nav-info').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      closeDrawer(true);
+      window.__khaddaOpenInfo?.('leaderboard');
     });
   });
 

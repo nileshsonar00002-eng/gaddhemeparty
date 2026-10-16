@@ -629,9 +629,68 @@
   transform: translateY(0.5px) scale(0.98);
 }
 
-/* Main body padding to offset fixed header smoothly */
+/* Main Layout: Edge-to-Edge Fullscreen Viewport Experience */
 main {
-  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 8px);
+  padding-top: 0 !important;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0%;
+  position: relative;
+  overflow: hidden;
+}
+
+#map-section {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 0%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#map-card-container {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  flex: 1 1 0%;
+  position: relative;
+}
+
+#map {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Site Info Complete Content Drawer */
+#site-info-drawer.is-open {
+  display: block !important;
+  pointer-events: auto !important;
+}
+
+#site-info-drawer.is-open #info-drawer-backdrop {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+#site-info-drawer.is-open #info-drawer-panel {
+  transform: translateX(0) !important;
+}
+
+/* Hide scrollbar on quick tab buttons */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Fullscreen Map Mode */

@@ -54,93 +54,61 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   </head>
-  <body class="w-full bg-[var(--bg)] font-sans antialiased text-[var(--text)] overflow-x-hidden transition-colors duration-200">
+  <body class="w-full h-full bg-[var(--bg)] font-sans antialiased text-[var(--text)] overflow-hidden transition-colors duration-200">
     <!-- Main Application Shell -->
-    <div id="app" class="relative w-full min-h-screen flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-200">
+    <div id="app" class="relative w-full h-[100dvh] flex flex-col bg-[var(--bg)] text-[var(--text)] transition-colors duration-200 overflow-hidden">
       
       <!-- 1. Sticky Header -->
-      <header id="navbar-container" class="sticky top-0 left-0 right-0 z-[1000] w-full"></header>
+      <header id="navbar-container" class="sticky top-0 left-0 right-0 z-[1000] w-full shrink-0"></header>
 
       <!-- Offline Status Banner -->
-      <div id="offline-banner" class="hidden sticky top-16 left-4 right-4 z-[998] mx-auto max-w-4xl my-2 bg-amber-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-center text-xs sm:text-sm shadow-md border border-amber-600/30 flex items-center justify-center gap-2">
+      <div id="offline-banner" class="hidden fixed top-16 left-4 right-4 z-[998] mx-auto max-w-4xl my-2 bg-amber-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-center text-xs sm:text-sm shadow-md border border-amber-600/30 flex items-center justify-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-2.829-2.829m0 0l2.829-2.829M3 3l18 18"/></svg>
         <span data-i18n="offlineBanner">इंटरनेट बंद है। रिपोर्ट ऑफलाइन सेव रहेगी और वापस ऑनलाइन आते ही अपलोड हो जाएगी।</span>
       </div>
 
-      <!-- Main Scrollable Content Container -->
-      <main class="w-full flex flex-col pb-0 pt-0 max-w-full overflow-x-hidden">
+      <!-- Main Fullscreen Map Experience -->
+      <main class="relative w-full flex-1 overflow-hidden z-0">
+        <section id="map-section" class="w-full h-full relative overflow-hidden">
+          <div id="map-card-container" class="map-device-frame relative w-full h-full bg-[var(--surface)] overflow-hidden transition-all duration-200 border-0 rounded-none shadow-none">
+            <!-- Map Inner Vignette Screen Overlay (Inset Depth) -->
+            <div class="map-inner-vignette opacity-20 pointer-events-none"></div>
+            <!-- Fullscreen Map Canvas -->
+            <div id="map" class="w-full h-full bg-[var(--map-bg)]"></div>
 
-        <!-- 2. Hero Section: Lime band (--bg) with headline in --heading -->
-        <section id="hero-section" class="relative w-full max-w-full overflow-hidden bg-[var(--bg)] text-[var(--text)] pt-[calc(var(--header-h)+36px)] sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 pb-16 border-b border-[var(--border)]">
-          <!-- Ambient Soft Radial Light Gradients (No heavy blur filters) -->
-          <div class="hero-ambient-shape-1"></div>
-          <div class="hero-ambient-shape-2"></div>
-
-          <!-- Right-Side Background Photographic Pothole Image with Left-Edge Soft Fade Gradient -->
-          <div class="hero-bg-pothole-container pointer-events-none select-none">
-            <img src="/hero-bg-pothole.jpg" alt="" class="hero-bg-pothole-img" loading="eager" fetchpriority="high" />
-            <div class="hero-bg-pothole-fade-left"></div>
-            <div class="hero-bg-pothole-fade-top"></div>
-            <div class="hero-bg-pothole-fade-bottom"></div>
-          </div>
-
-          <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-              
-              <!-- Left Column: Balanced H1, Concrete Description, Stat Chips, Report Button & Free/No Login Chip -->
-              <div class="lg:col-span-8 flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 sm:space-y-5">
-                <!-- Balanced H1 without quotation marks -->
-                <h1 id="hero-title" class="w-full font-heading font-bold text-[var(--heading)] tracking-tight text-[clamp(1.75rem,7vw,2.25rem)] leading-[1.15] break-words mt-1 sm:mt-2" data-i18n-html="heroTitleHtml">
-                  Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>
-                </h1>
-
-                <!-- Concrete, Human Description -->
-                <p class="hero-subtitle-glass inline-block max-w-xl text-[14.5px] sm:text-base text-white/95 leading-relaxed font-medium rounded-xl bg-[#050B14]/60 backdrop-blur-sm px-3.5 py-2 break-words" data-i18n="heroDescription">
-                  सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें।
-100%&nbsp;खुली&nbsp;व&nbsp;सुरक्षित&nbsp;नागरिक&nbsp;पहल।
-                </p>
-
-                <!-- Translucent Stat Chips Container -->
-                <div id="stats-strip-container" class="pt-2 flex flex-wrap justify-center lg:justify-start gap-2.5"></div>
-
-                <!-- Hero Section Quick Report Action Button & Free/No Login Badge -->
-                <div class="pt-2 flex flex-col items-center lg:items-start gap-2.5 w-full">
-                  <button
-                    id="btn-hero-report"
-                    type="button"
-                    class="btn-primary py-2.5 px-6 sm:py-3 sm:px-7 rounded-xl text-xs sm:text-sm font-bold shadow-lg flex items-center justify-center gap-2 cursor-pointer transition"
-                  >
-                    <!-- Location Pin Symbol -->
-                    <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 21.75c4.5-4.5 7.5-8.25 7.5-11.25a7.5 7.5 0 1 0-15 0c0 3 3 6.75 7.5 11.25z"/>
-                      <circle cx="12" cy="10.5" r="2.5" fill="currentColor"/>
-                    </svg>
-                    <span>Report</span>
-                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-                    </svg>
-                  </button>
-
-                  <!-- Short Concrete Badge Chip (Free / No login) - Hidden in mobile view -->
-                  <div id="hero-free-badge" class="chip-neutral hero-free-badge mt-0.5 hidden sm:inline-flex">
-                    <span data-i18n="heroBadge">मुफ़्त • बिना लॉगिन</span>
-                  </div>
+            <!-- Floating Hero Overlay (Hero Text, Total Potholes Cart, 3D Temple Bell) -->
+            <div id="front-hero-overlay" class="absolute top-3 sm:top-4 left-2.5 right-2.5 sm:left-4 sm:right-auto z-[400] flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 pointer-events-none select-none max-w-2xl">
+              <!-- Hero Title & Tagline Glass Pill Card -->
+              <div class="pointer-events-auto bg-[var(--surface)]/90 backdrop-blur-md border border-[var(--border)] rounded-2xl px-3.5 py-2 sm:px-4 sm:py-2.5 shadow-lg flex items-center justify-between gap-3 min-w-0">
+                <div class="min-w-0">
+                  <h1 id="hero-title" class="font-heading font-extrabold text-sm sm:text-base text-[var(--heading)] leading-tight tracking-tight flex items-center gap-1.5" data-i18n-html="heroTitleHtml">
+                    Spot It. Report It. <span class="hero-highlight-word font-bold">Fix It.</span>
+                  </h1>
+                  <p class="text-[11px] sm:text-xs text-[var(--muted)] leading-tight truncate max-w-[220px] xs:max-w-[260px] sm:max-w-xs mt-0.5" data-i18n="heroDescription">
+                    सड़कों के गड्ढों को सीधे लाइव मैप पर दर्ज करें।
+                  </p>
                 </div>
+                
+                <!-- Hero Report Action Button (for scripts looking for #btn-hero-report) -->
+                <button
+                  id="btn-hero-report"
+                  type="button"
+                  class="hidden sm:inline-flex btn-primary py-1.5 px-3 rounded-xl text-xs font-bold items-center gap-1 cursor-pointer shrink-0 shadow-sm"
+                >
+                  <svg class="w-3.5 h-3.5 text-inherit shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                  <span>Report</span>
+                </button>
               </div>
 
-              <!-- Right Column: Interactive 3D Animated Temple Bell (Ghanta) Widget -->
-              <div id="temple-bell-mount" class="lg:col-span-4 flex flex-col justify-center items-center py-2"></div>
-            </div>
-          </div>
-        </section>
+              <!-- Cart & Temple Bell Group -->
+              <div class="flex items-center gap-2 pointer-events-auto shrink-0">
+                <!-- Total Potholes Ka Cart (Active & Total verified counter pill like nammakasa.in) -->
+                <div id="stats-strip-container" class="pointer-events-auto shrink-0 shadow-lg"></div>
 
-        <!-- 3. Contained Map Card Overlapping Hero Bottom Edge by 48px -->
-        <section id="map-section" class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 sm:-mt-14 lg:-mt-16 z-30 mb-12 sm:mb-16">
-          <div id="map-card-container" class="map-device-frame relative w-full h-[74dvh] sm:h-[78vh] lg:h-[82vh] max-h-[900px] bg-[var(--surface)] overflow-hidden transition-all duration-200">
-            <!-- Map Inner Vignette Screen Overlay (Inset Depth) -->
-            <div class="map-inner-vignette"></div>
-            <!-- Map Canvas -->
-            <div id="map" class="w-full h-full bg-[var(--map-bg)]"></div>
+                <!-- Interactive 3D Temple Bell Widget (Ghanta) -->
+                <div id="temple-bell-mount" class="pointer-events-auto shrink-0 flex items-center justify-center"></div>
+              </div>
+            </div>
 
             <!-- Fullscreen Exit Button (Visible ONLY when Fullscreen is active) -->
             <button
@@ -272,8 +240,54 @@
         </div>
       </div>
     </section>
+  </main>
 
-        <!-- 4. Live Leaderboard Section (Band 1: --surface with contrast) -->
+  <!-- Complete Site Content Drawer (Opened via Info Button near Navbar) -->
+  <div id="site-info-drawer" class="fixed inset-0 z-[1150] hidden pointer-events-none transition-all duration-300">
+    <!-- Backdrop -->
+    <div id="info-drawer-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-250 pointer-events-none cursor-pointer" aria-hidden="true"></div>
+    
+    <!-- Slide-Over Drawer Container -->
+    <div id="info-drawer-panel" role="dialog" aria-modal="true" aria-label="RoadTok Site Information" class="fixed top-0 right-0 bottom-0 w-full sm:max-w-2xl lg:max-w-3xl bg-[var(--surface)] text-[var(--text)] border-l border-[var(--border)] shadow-2xl flex flex-col translate-x-full transition-transform duration-300 ease-out z-[1160] pointer-events-auto h-full max-h-[100dvh]">
+      
+      <!-- Header with Title & Close Button -->
+      <div class="px-4 sm:px-6 py-3.5 border-b border-[var(--border)] bg-[var(--surface-2)]/90 backdrop-blur-md flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="/logo.png" alt="Logo" class="w-8 h-8 rounded-xl object-contain shadow-xs shrink-0" />
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <h2 class="brand-roadtok text-lg text-[var(--heading)] leading-none truncate">RoadTok</h2>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--primary)] text-[var(--primary-ink)]">Civic Tech</span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-[var(--muted)] font-medium mt-0.5 truncate">"<span data-i18n="tagline">अब सड़क भी बोलेगी।</span>"</p>
+          </div>
+        </div>
+        <button id="btn-close-info-drawer" type="button" class="btn-secondary w-9 h-9 p-0 flex items-center justify-center rounded-xl cursor-pointer hover:bg-[var(--surface)] shrink-0" aria-label="Close Info">
+          <svg class="w-5 h-5 text-inherit" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Quick Tab Navigation Pills -->
+      <div class="px-4 py-2 bg-[var(--surface)] border-b border-[var(--border)] flex items-center gap-2 overflow-x-auto select-none shrink-0 no-scrollbar">
+        <button type="button" data-info-tab="leaderboard" class="info-tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition shrink-0 bg-[var(--primary)] text-[var(--primary-ink)] shadow-xs cursor-pointer">
+          🏆 <span data-i18n="navLeaderboard">टाइमलाइन</span>
+        </button>
+        <button type="button" data-info-tab="mission" class="info-tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition shrink-0 text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] cursor-pointer">
+          🎯 <span data-i18n="navMission">उद्देश्य</span>
+        </button>
+        <button type="button" data-info-tab="how" class="info-tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition shrink-0 text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] cursor-pointer">
+          💡 <span data-i18n="navHowItWorks">कैसे काम करता है</span>
+        </button>
+        <button type="button" data-info-tab="about" class="info-tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition shrink-0 text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] cursor-pointer">
+          ℹ️ <span data-i18n="navAbout">हमारे बारे में</span>
+        </button>
+        <button type="button" data-info-tab="terms" class="info-tab-btn px-3 py-1.5 text-xs font-bold rounded-xl transition shrink-0 text-[var(--muted)] hover:text-[var(--text)] hover:bg-[var(--surface-2)] cursor-pointer">
+          ⚖️ <span data-i18n="navTerms">नियम व प्राइवेसी</span>
+        </button>
+      </div>
+
+      <!-- Scrollable Body containing all sections -->
+      <div id="info-drawer-scroll-body" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-10 overscroll-contain">
         <section id="leaderboard" class="w-full bg-[var(--surface)] py-16 sm:py-20 border-y border-[var(--border)] content-auto reveal-on-scroll">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="leaderboard-mount"></div>
@@ -519,41 +533,44 @@
             </div>
           </div>
         </section>
-      </main>
 
-      <!-- 8.4 Functional Visitors Counter (Centered above bottom car/bike animation, dark text theme, no box) -->
-      <div id="visitors-counter-mount" class="w-full relative z-20"></div>
+        <!-- 8.4 Functional Visitors Counter (Centered above bottom car/bike animation) -->
+        <div id="visitors-counter-mount" class="w-full relative z-20"></div>
 
-      <!-- 8.5 Fun Animated Pothole Drive & Party Strip (Above Footer) -->
-      <section id="pothole-cartoon-strip" class="w-full relative z-20">
-        <div id="pothole-animation-mount"></div>
-      </section>
+        <!-- 8.5 Fun Animated Pothole Drive & Party Strip (Above Footer) -->
+        <section id="pothole-cartoon-strip" class="w-full relative z-20">
+          <div id="pothole-animation-mount"></div>
+        </section>
 
-      <!-- 9. Footer: Forest Band (--band) with --band-ink -->
-      <footer class="w-full border-t border-[var(--border)] bg-[var(--band)] text-[var(--band-ink)] py-10 px-4 transition-colors duration-200">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-          <div class="flex items-center gap-3">
-            <img src="/logo.png" alt="Logo" class="w-9 h-9 rounded-xl object-contain" />
-            <div>
-              <p class="brand-roadtok text-lg text-[var(--band-ink)] leading-none mb-1">RoadTok</p>
-              <p class="text-xs text-[var(--band-ink)]/80 font-medium">"<span data-i18n="tagline">अब सड़क भी बोलेगी।</span>"</p>
+        <!-- 9. Footer: Forest Band (--band) with --band-ink -->
+        <footer class="w-full border-t border-[var(--border)] bg-[var(--band)] text-[var(--band-ink)] py-10 px-4 transition-colors duration-200 rounded-3xl">
+          <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div class="flex items-center gap-3">
+              <img src="/logo.png" alt="Logo" class="w-9 h-9 rounded-xl object-contain" />
+              <div>
+                <p class="brand-roadtok text-lg text-[var(--band-ink)] leading-none mb-1">RoadTok</p>
+                <p class="text-xs text-[var(--band-ink)]/80 font-medium">"<span data-i18n="tagline">अब सड़क भी बोलेगी।</span>"</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 text-xs font-medium text-[var(--band-ink)]/80 flex-wrap justify-center">
+              <a href="#map-section" class="hover:text-[var(--band-ink)] transition" data-i18n="footerMap">नक्शा</a>
+              <a href="#leaderboard" class="hover:text-[var(--band-ink)] transition" data-i18n="footerLeaderboard">टाइमलाइन</a>
+              <a href="#mission" class="hover:text-[var(--band-ink)] transition" data-i18n="footerMission">उद्देश्य</a>
+              <a href="#how" class="hover:text-[var(--band-ink)] transition" data-i18n="footerFaq">FAQ</a>
+              <a href="#about" class="hover:text-[var(--band-ink)] transition" data-i18n="footerAbout">हमारे बारे में</a>
+              <a href="#terms" class="hover:text-[var(--band-ink)] transition" data-i18n="footerTerms">नियम व प्राइवेसी</a>
+            </div>
+
+            <div class="text-xs text-[var(--band-ink)]/60 font-normal flex items-center gap-1 justify-center">
+              © 2026 <span class="brand-roadtok text-sm text-[var(--band-ink)]">RoadTok</span> • 100% Free Civic Tech
             </div>
           </div>
+        </footer>
 
-          <div class="flex items-center gap-4 text-xs font-medium text-[var(--band-ink)]/80 flex-wrap justify-center">
-            <a href="#map-section" class="hover:text-[var(--band-ink)] transition" data-i18n="footerMap">नक्शा</a>
-            <a href="#/leaderboard" class="hover:text-[var(--band-ink)] transition" data-i18n="footerLeaderboard">टाइमलाइन</a>
-            <a href="#/mission" class="hover:text-[var(--band-ink)] transition" data-i18n="footerMission">उद्देश्य</a>
-            <a href="#/how" class="hover:text-[var(--band-ink)] transition" data-i18n="footerFaq">FAQ</a>
-            <a href="#/about" class="hover:text-[var(--band-ink)] transition" data-i18n="footerAbout">हमारे बारे में</a>
-            <a href="#/terms" class="hover:text-[var(--band-ink)] transition" data-i18n="footerTerms">नियम व प्राइवेसी</a>
-          </div>
-
-          <div class="text-xs text-[var(--band-ink)]/60 font-normal flex items-center gap-1 justify-center">
-            © 2026 <span class="brand-roadtok text-sm text-[var(--band-ink)]">RoadTok</span> • 100% Free Civic Tech
-          </div>
-        </div>
-      </footer>
+      </div> <!-- /#info-drawer-scroll-body -->
+    </div> <!-- /#info-drawer-panel -->
+  </div> <!-- /#site-info-drawer -->
 
       <!-- Sticky Bottom Mobile CTA -->
       <div id="sticky-mobile-cta" class="fixed bottom-4 left-4 right-4 z-[990] hidden md:hidden transition-all duration-200 pointer-events-auto">
