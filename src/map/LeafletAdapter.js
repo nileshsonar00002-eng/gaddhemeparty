@@ -2,6 +2,7 @@ import L from 'leaflet';
 import 'leaflet.markercluster';
 import { MapAdapter } from './MapAdapter';
 import { t } from '../utils/i18n';
+import { getDaysOpen, getPinColorByDays, getClusterColor } from './GoogleMapsAdapter';
 
 export class LeafletAdapter extends MapAdapter {
   constructor() {
@@ -80,8 +81,10 @@ export class LeafletAdapter extends MapAdapter {
       spiderfyOnMaxZoom: true,
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
+        const clusterInfo = getClusterColor(this.theme);
+        const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
         return L.divIcon({
-          html: `<div class="custom-cluster-civic"><span>${count}</span></div>`,
+          html: `<div class="custom-cluster-civic ${themeClass}" style="background: ${clusterInfo.fill}; border: 2px solid ${clusterInfo.ring}; color: ${clusterInfo.textColor}; text-shadow: ${clusterInfo.textShadow};"><span>${count}</span></div>`,
           className: 'custom-cluster-icon',
           iconSize: L.point(40, 40)
         });
@@ -344,12 +347,19 @@ export class LeafletAdapter extends MapAdapter {
       const orbTierClass = isSevere ? 'pin-tier-3' : isMedium ? 'pin-tier-2' : 'pin-tier-1';
       const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
       const badgeCount = Math.max(reportCount, photoCount);
+      const daysOpen = getDaysOpen(pin);
+      const colorInfo = getPinColorByDays(daysOpen, this.theme);
+      const badgeText = badgeCount > 1 ? badgeCount : '!';
+      const fontSize = orbSize >= 28 ? '12px' : (orbSize >= 24 ? '11px' : '10px');
+      const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
 
-      // Glowing Orb HTML ("Earth at Night / Glowing City Light Node") with Scale Wrapper
+      // Translucent Civic Pin with 2px 90% ring and theme-aware colors
       const iconHtml = `
         <div class="pin-scale-wrapper">
-          <div class="civic-pin ${orbTierClass}" style="width: ${orbSize}px; height: ${orbSize}px;" title="${pin.landmark || 'Hazard'}">
-            ${badgeCount > 1 ? `<span class="tabular-nums">${badgeCount}</span>` : ''}
+          <div class="civic-pin ${themeClass} ${colorInfo.className}" 
+               style="width: ${orbSize}px; height: ${orbSize}px; background: ${colorInfo.fill}; border: 2px solid ${colorInfo.ring}; box-shadow: none; color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};" 
+               title="${pin.landmark || 'Hazard'} (${daysOpen}d)">
+            <span class="tabular-nums font-black leading-none" style="font-size: ${fontSize}; color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};">${badgeText}</span>
           </div>
         </div>
       `;

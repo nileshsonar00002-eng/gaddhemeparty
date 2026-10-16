@@ -1,4 +1,4 @@
-import { MapAdapter } from './MapAdapter';
+import { MapAdapter } from './MapAdapter.js';
 
 // Clean Dark Map Styling: POIs hidden, Transit hidden, Land Parcels hidden, High-contrast roads & cities
 export const DARK_MAP_STYLE = [
@@ -180,6 +180,132 @@ class HTMLMarkerOverlay {
       this.onClick();
     }
   }
+
+  setZIndex(zIndex) {
+    this.zIndex = zIndex;
+    if (this.div) {
+      this.div.style.zIndex = String(zIndex);
+    }
+  }
+}
+
+/**
+ * Calculates days open for a report pin safely handling all Timestamp & Date formats
+ */
+export function getDaysOpen(pin) {
+  if (typeof pin?.daysOpen === 'number' && !isNaN(pin.daysOpen) && pin.daysOpen >= 0) {
+    return pin.daysOpen;
+  }
+  const rawDate = pin?.createdAt || pin?.lastReportedAt;
+  if (!rawDate) return 0;
+
+  let timestamp = null;
+  if (typeof rawDate.toMillis === 'function') {
+    timestamp = rawDate.toMillis();
+  } else if (typeof rawDate.toDate === 'function') {
+    timestamp = rawDate.toDate().getTime();
+  } else if (typeof rawDate === 'number' && !isNaN(rawDate)) {
+    timestamp = rawDate;
+  } else if (typeof rawDate === 'string') {
+    const parsed = new Date(rawDate).getTime();
+    if (!isNaN(parsed)) timestamp = parsed;
+  } else if (rawDate instanceof Date) {
+    timestamp = rawDate.getTime();
+  } else if (typeof rawDate.seconds === 'number') {
+    timestamp = rawDate.seconds * 1000;
+  }
+
+  if (!timestamp || isNaN(timestamp)) return 0;
+  const diffMs = Date.now() - timestamp;
+  if (diffMs <= 0) return 0;
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Returns theme-aware translucent fill, 90% ring, selectedFill (.75 alpha),
+ * text color, text halo, and CSS class by days open:
+ * 
+ * Dark theme (fill alpha .6, brighter colours, white text with dark halo):
+ * - 0-7d: amber #FFB84D (rgba(255, 184, 77, 0.6))
+ * - 8-30d: orange #FF7A4D (rgba(255, 122, 77, 0.6))
+ * - 30+d: red #FF4D5A (rgba(255, 77, 90, 0.6))
+ * 
+ * Light theme (fill alpha .5, text #3E060A with white halo):
+ * - 0-7d: rgba(245, 166, 35, 0.5)
+ * - 8-30d: rgba(232, 84, 42, 0.5)
+ * - 30+d: rgba(142, 17, 25, 0.5)
+ */
+export function getPinColorByDays(days, theme = 'light') {
+  const isDark = theme === 'dark';
+  let className;
+  let fill;
+  let ring;
+  let selectedFill;
+
+  if (days > 30) {
+    className = 'pin-days-30-plus';
+    if (isDark) {
+      fill = 'rgba(255, 77, 90, 0.6)';
+      ring = 'rgba(255, 77, 90, 0.9)';
+      selectedFill = 'rgba(255, 77, 90, 0.75)';
+    } else {
+      fill = 'rgba(142, 17, 25, 0.5)';
+      ring = 'rgba(142, 17, 25, 0.9)';
+      selectedFill = 'rgba(142, 17, 25, 0.75)';
+    }
+  } else if (days >= 8) {
+    className = 'pin-days-8-30';
+    if (isDark) {
+      fill = 'rgba(255, 122, 77, 0.6)';
+      ring = 'rgba(255, 122, 77, 0.9)';
+      selectedFill = 'rgba(255, 122, 77, 0.75)';
+    } else {
+      fill = 'rgba(232, 84, 42, 0.5)';
+      ring = 'rgba(232, 84, 42, 0.9)';
+      selectedFill = 'rgba(232, 84, 42, 0.75)';
+    }
+  } else {
+    className = 'pin-days-0-7';
+    if (isDark) {
+      fill = 'rgba(255, 184, 77, 0.6)';
+      ring = 'rgba(255, 184, 77, 0.9)';
+      selectedFill = 'rgba(255, 184, 77, 0.75)';
+    } else {
+      fill = 'rgba(245, 166, 35, 0.5)';
+      ring = 'rgba(245, 166, 35, 0.9)';
+      selectedFill = 'rgba(245, 166, 35, 0.75)';
+    }
+  }
+
+  const textColor = isDark ? '#FFFFFF' : '#3E060A';
+  const textShadow = isDark
+    ? '0 0 2px #000000, 0 1px 2px #000000, 0 0 3px #000000'
+    : '0 0 2px #FFFFFF, 0 1px 1px #FFFFFF';
+
+  return {
+    fill,
+    ring,
+    selectedFill,
+    className,
+    textColor,
+    textShadow
+  };
+}
+
+/**
+ * Returns cluster bubble colors:
+ * - Light theme: charcoal rgba(22, 26, 34, 0.5) with 90% ring rgba(22, 26, 34, 0.9)
+ * - Dark theme: charcoal rgba(22, 26, 34, 0.6) with ring rgba(209, 213, 219, 0.6)
+ * - White count text on both
+ */
+export function getClusterColor(theme = 'light') {
+  const isDark = theme === 'dark';
+  return {
+    fill: isDark ? 'rgba(22, 26, 34, 0.6)' : 'rgba(22, 26, 34, 0.5)',
+    ring: isDark ? 'rgba(209, 213, 219, 0.6)' : 'rgba(22, 26, 34, 0.9)',
+    textColor: '#FFFFFF',
+    textShadow: '0 0 2px #000000, 0 1px 2px #000000'
+  };
 }
 
 export class GoogleMapsAdapter extends MapAdapter {
@@ -189,6 +315,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.markersMap = new Map();
     this.infoWindow = null;
     this.userMarker = null;
+    this.selectedPinId = null;
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
     this.defaultCenter = isMobile ? { lat: 21.8, lng: 77.5 } : { lat: 22.5937, lng: 78.9629 };
     this.defaultZoom = isMobile ? 4.5 : 5;
@@ -284,6 +411,12 @@ export class GoogleMapsAdapter extends MapAdapter {
       this.updateZoomScales();
     });
 
+    this.map.addListener('click', () => {
+      if (!this.isGestureActive && Date.now() - this.lastGestureEndTime > 300) {
+        this.deselectPin();
+      }
+    });
+
     this.infoWindow = new google.maps.InfoWindow({
       maxWidth: 320
     });
@@ -311,6 +444,10 @@ export class GoogleMapsAdapter extends MapAdapter {
 
   applyTheme(theme = 'dark') {
     this.theme = theme;
+    const container = document.getElementById('map');
+    if (container) {
+      container.dataset.mapTheme = theme;
+    }
     if (this.map) {
       const options = {
         backgroundColor: theme === 'dark' ? '#080C14' : '#F8FAFC'
@@ -333,6 +470,11 @@ export class GoogleMapsAdapter extends MapAdapter {
       }
 
       this.map.setOptions(options);
+
+      // Re-render pins so they immediately update to theme-aware palette
+      if (this.pinsData && this.pinsData.length > 0) {
+        this.clusterAndRenderPins();
+      }
     }
   }
 
@@ -498,6 +640,51 @@ export class GoogleMapsAdapter extends MapAdapter {
     });
   }
 
+  deselectPin() {
+    if (this.selectedPinId) {
+      const prevMarker = this.markersMap.get(this.selectedPinId);
+      if (prevMarker && typeof prevMarker.setZIndex === 'function') {
+        prevMarker.setZIndex(10);
+        const prevEl = prevMarker.div?.querySelector('.civic-pin');
+        if (prevEl) {
+          prevEl.classList.remove('is-selected');
+          const pin = this.pinsData?.find((p) => p.id === this.selectedPinId);
+          if (pin) {
+            const daysOpen = getDaysOpen(pin);
+            const colorInfo = getPinColorByDays(daysOpen, this.theme);
+            prevEl.style.background = colorInfo.fill;
+            prevEl.style.border = `2px solid ${colorInfo.ring}`;
+            prevEl.style.transform = '';
+          }
+        }
+      }
+      this.selectedPinId = null;
+    }
+  }
+
+  selectPin(pinId) {
+    if (this.selectedPinId && this.selectedPinId !== pinId) {
+      this.deselectPin();
+    }
+    this.selectedPinId = pinId;
+    const marker = this.markersMap.get(pinId);
+    if (marker && typeof marker.setZIndex === 'function') {
+      marker.setZIndex(9999);
+      const el = marker.div?.querySelector('.civic-pin');
+      if (el) {
+        el.classList.add('is-selected');
+        const pin = this.pinsData?.find((p) => p.id === pinId);
+        if (pin) {
+          const daysOpen = getDaysOpen(pin);
+          const colorInfo = getPinColorByDays(daysOpen, this.theme);
+          el.style.background = colorInfo.selectedFill;
+          el.style.border = `3px solid ${colorInfo.ring}`;
+          el.style.transform = 'scale(1.15)';
+        }
+      }
+    }
+  }
+
   createSinglePinMarker(pin) {
     const reportCount = pin.reportCount || 1;
     const upvotes = pin.upvotes || 0;
@@ -505,20 +692,36 @@ export class GoogleMapsAdapter extends MapAdapter {
     const isSevere = reportCount >= 5 || upvotes >= 5 || photoCount >= 5;
     const isMedium = (reportCount >= 2 || upvotes >= 2 || photoCount >= 2) && !isSevere;
 
-    const orbTierClass = isSevere ? 'pin-tier-3' : isMedium ? 'pin-tier-2' : 'pin-tier-1';
+    // Preserving existing size logic
     const orbSize = isSevere ? 28 : (isMedium ? 24 : 18);
     const badgeCount = Math.max(reportCount, photoCount);
+    const daysOpen = getDaysOpen(pin);
+    const colorInfo = getPinColorByDays(daysOpen, this.theme);
+
+    const isSelected = this.selectedPinId === pin.id;
+    const selectedClass = isSelected ? 'is-selected' : '';
+    const initialZIndex = isSelected ? 9999 : 10;
+    const currentFill = isSelected ? colorInfo.selectedFill : colorInfo.fill;
+    const currentBorder = isSelected ? `3px solid ${colorInfo.ring}` : `2px solid ${colorInfo.ring}`;
+    const currentTransform = isSelected ? 'transform: scale(1.15);' : '';
+
+    const badgeText = badgeCount > 1 ? badgeCount : '!';
+    const fontSize = orbSize >= 28 ? '12px' : (orbSize >= 24 ? '11px' : '10px');
+    const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
 
     const iconHtml = `
       <div class="pin-scale-wrapper">
-        <div class="civic-pin ${orbTierClass}" style="width: ${orbSize}px; height: ${orbSize}px;" title="${pin.landmark || 'Hazard'}">
-          ${badgeCount > 1 ? `<span class="tabular-nums">${badgeCount}</span>` : ''}
+        <div class="civic-pin ${themeClass} ${colorInfo.className} ${selectedClass}" 
+             style="width: ${orbSize}px; height: ${orbSize}px; background: ${currentFill}; border: ${currentBorder}; ${currentTransform} color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};" 
+             title="${pin.landmark || 'Hazard'} (${daysOpen}d)">
+          <span class="tabular-nums font-black leading-none" style="font-size: ${fontSize}; color: ${colorInfo.textColor}; text-shadow: ${colorInfo.textShadow};">${badgeText}</span>
         </div>
       </div>
     `;
 
     const clickHandler = () => {
       if (this.isGestureActive || Date.now() - this.lastGestureEndTime < 300) return;
+      this.selectPin(pin.id);
       if (this.onPinClickCallback) {
         this.onPinClickCallback(pin);
       }
@@ -528,7 +731,8 @@ export class GoogleMapsAdapter extends MapAdapter {
       this.map,
       { lat: pin.latitude, lng: pin.longitude },
       iconHtml,
-      clickHandler
+      clickHandler,
+      initialZIndex
     );
 
     this.markersMap.set(pin.id, marker);
@@ -536,10 +740,14 @@ export class GoogleMapsAdapter extends MapAdapter {
 
   createClusterMarker(cl, id) {
     const count = cl.pins.reduce((sum, p) => sum + (p.reportCount || 1), 0);
+    const clusterInfo = getClusterColor(this.theme);
+    const themeClass = this.theme === 'dark' ? 'theme-dark' : 'theme-light';
+
     const iconHtml = `
       <div class="pin-scale-wrapper">
-        <div class="custom-cluster-civic" style="cursor: pointer;">
-          <span>${count}</span>
+        <div class="custom-cluster-civic ${themeClass}" 
+             style="cursor: pointer; background: ${clusterInfo.fill}; border: 2px solid ${clusterInfo.ring}; color: ${clusterInfo.textColor}; text-shadow: ${clusterInfo.textShadow};">
+          <span class="tabular-nums font-black leading-none" style="font-size: 13px; color: ${clusterInfo.textColor}; text-shadow: ${clusterInfo.textShadow};">${count}</span>
         </div>
       </div>
     `;
@@ -553,7 +761,8 @@ export class GoogleMapsAdapter extends MapAdapter {
       this.map,
       { lat: cl.centerLat, lng: cl.centerLng },
       iconHtml,
-      clickHandler
+      clickHandler,
+      20
     );
 
     this.markersMap.set(id, marker);
@@ -592,6 +801,13 @@ export class GoogleMapsAdapter extends MapAdapter {
   highlightPin(lat, lng, rank = null) {
     if (!this.map) return;
     this.clearHighlightPin();
+
+    const matchingPin = this.pinsData?.find(p => 
+      Math.abs(p.latitude - lat) < 0.0001 && Math.abs(p.longitude - lng) < 0.0001
+    );
+    if (matchingPin) {
+      this.selectPin(matchingPin.id);
+    }
 
     const rankNumber = Number(rank);
     const hasRank = !isNaN(rankNumber) && rankNumber > 0;
@@ -838,6 +1054,7 @@ export class GoogleMapsAdapter extends MapAdapter {
   }
 
   openPopup(pinId) {
+    this.selectPin(pinId);
     const marker = this.markersMap.get(pinId);
     if (marker) {
       if (typeof marker.triggerClick === 'function') {
@@ -849,6 +1066,7 @@ export class GoogleMapsAdapter extends MapAdapter {
   }
 
   closePopup() {
+    this.deselectPin();
     if (this.infoWindow) {
       this.infoWindow.close();
     }

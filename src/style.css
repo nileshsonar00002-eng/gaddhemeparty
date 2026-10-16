@@ -953,15 +953,38 @@ body.panel-scroll-locked {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   transform: translate(-50%, -50%) scale(var(--pin-scale, 1));
   transform-origin: 50% 50%;
   pointer-events: auto;
+  cursor: pointer;
   transition: opacity 100ms ease;
   will-change: transform;
 }
 
-/* Calm Severity Civic Pins */
-.civic-pin, .glowing-orb-pin {
+/* Tap Target: >=44px touch area (transparent padding) without changing visible pin size */
+.pin-scale-wrapper .civic-pin::after,
+.pin-scale-wrapper .custom-cluster-civic::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Base Civic Pin */
+.pin-scale-wrapper .civic-pin,
+.pin-scale-wrapper .glowing-orb-pin {
   position: relative;
   display: flex;
   align-items: center;
@@ -970,38 +993,126 @@ body.panel-scroll-locked {
   border-radius: 9999px;
   font-family: 'Average Sans', 'Inter', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 11px;
+  line-height: 1;
   user-select: none;
+  box-sizing: border-box;
+  box-shadow: none;
+  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
 }
 
-.civic-pin:hover, .glowing-orb-pin:hover {
+.pin-scale-wrapper .civic-pin:hover,
+.pin-scale-wrapper .glowing-orb-pin:hover {
   transform: scale(1.15);
-  z-index: 999 !important;
+  z-index: 999;
 }
 
-/* Tier 1: 1-2 reports (Brown Warning) */
-.pin-tier-1, .orb-amber {
-  background: #7C2D12;
-  color: #FFFFFF;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 calc(3px * var(--glow-scale, 1)) rgba(124, 45, 18, 0.35), 0 2px 5px rgba(0, 0, 0, 0.25);
+/* Selected Pin Global State: ring 3px, fill alpha .75, scale 1.15, z-index 9999 */
+.pin-scale-wrapper .civic-pin.is-selected {
+  transform: scale(1.15);
+  z-index: 9999;
 }
 
-/* Tier 2: 3-4 reports (Deep Red-Brown Warning) */
-.pin-tier-2, .orb-orange {
-  background: #991B1B;
-  color: #FFFFFF;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 calc(3.5px * var(--glow-scale, 1)) rgba(153, 27, 27, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
+/* ========================================================
+   Light Theme Palettes
+   0-7d: rgba(245,166,35,.5) & 2px ring at 90%
+   8-30d: rgba(232,84,42,.5) & 2px ring at 90%
+   30+d: rgba(142,17,25,.5) & 2px ring at 90%
+   Text: #3E060A with thin white text-shadow
+   ======================================================== */
+.pin-scale-wrapper .civic-pin.theme-light,
+.pin-scale-wrapper .civic-pin:not(.theme-dark) {
+  color: #3E060A;
+  text-shadow: 0 0 2px #FFFFFF, 0 1px 1px #FFFFFF;
 }
 
-/* Tier 3: 5+ reports (Danger Red) */
-.pin-tier-3, .orb-red {
-  background: #DC2626;
+.pin-scale-wrapper .civic-pin.theme-light.pin-days-0-7,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).pin-days-0-7,
+.pin-scale-wrapper .civic-pin.pin-tier-1 {
+  background: rgba(245, 166, 35, 0.5);
+  border: 2px solid rgba(245, 166, 35, 0.9);
+  box-shadow: none;
+}
+
+.pin-scale-wrapper .civic-pin.theme-light.pin-days-8-30,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).pin-days-8-30,
+.pin-scale-wrapper .civic-pin.pin-tier-2 {
+  background: rgba(232, 84, 42, 0.5);
+  border: 2px solid rgba(232, 84, 42, 0.9);
+  box-shadow: none;
+}
+
+.pin-scale-wrapper .civic-pin.theme-light.pin-days-30-plus,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).pin-days-30-plus,
+.pin-scale-wrapper .civic-pin.pin-tier-3 {
+  background: rgba(142, 17, 25, 0.5);
+  border: 2px solid rgba(142, 17, 25, 0.9);
+  box-shadow: none;
+}
+
+/* Light Theme Selected Pin: ring 3px, fill alpha .75 */
+.pin-scale-wrapper .civic-pin.theme-light.is-selected.pin-days-0-7,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).is-selected.pin-days-0-7 {
+  background: rgba(245, 166, 35, 0.75);
+  border: 3px solid rgba(245, 166, 35, 0.9);
+}
+
+.pin-scale-wrapper .civic-pin.theme-light.is-selected.pin-days-8-30,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).is-selected.pin-days-8-30 {
+  background: rgba(232, 84, 42, 0.75);
+  border: 3px solid rgba(232, 84, 42, 0.9);
+}
+
+.pin-scale-wrapper .civic-pin.theme-light.is-selected.pin-days-30-plus,
+.pin-scale-wrapper .civic-pin:not(.theme-dark).is-selected.pin-days-30-plus {
+  background: rgba(142, 17, 25, 0.75);
+  border: 3px solid rgba(142, 17, 25, 0.9);
+}
+
+/* ========================================================
+   Dark Theme Palettes
+   Fill alpha .6, brighter colours:
+   Amber #FFB84D (0-7d), Orange #FF7A4D (8-30d), Red #FF4D5A (30+d)
+   Text: white with a dark halo
+   ======================================================== */
+.pin-scale-wrapper .civic-pin.theme-dark {
   color: #FFFFFF;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 calc(4px * var(--glow-scale, 1)) rgba(220, 38, 38, 0.4), 0 2px 7px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 2px #000000, 0 1px 2px #000000, 0 0 3px #000000;
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.pin-days-0-7 {
+  background: rgba(255, 184, 77, 0.6);
+  border: 2px solid rgba(255, 184, 77, 0.9);
+  box-shadow: none;
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.pin-days-8-30 {
+  background: rgba(255, 122, 77, 0.6);
+  border: 2px solid rgba(255, 122, 77, 0.9);
+  box-shadow: none;
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.pin-days-30-plus {
+  background: rgba(255, 77, 90, 0.6);
+  border: 2px solid rgba(255, 77, 90, 0.9);
+  box-shadow: none;
+}
+
+/* Dark Theme Selected Pin: ring 3px, fill alpha .75 */
+.pin-scale-wrapper .civic-pin.theme-dark.is-selected.pin-days-0-7 {
+  background: rgba(255, 184, 77, 0.75);
+  border: 3px solid rgba(255, 184, 77, 0.9);
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.is-selected.pin-days-8-30 {
+  background: rgba(255, 122, 77, 0.75);
+  border: 3px solid rgba(255, 122, 77, 0.9);
+}
+
+.pin-scale-wrapper .civic-pin.theme-dark.is-selected.pin-days-30-plus {
+  background: rgba(255, 77, 90, 0.75);
+  border: 3px solid rgba(255, 77, 90, 0.9);
 }
 
 /* Clean Cluster Orbs */
@@ -1029,27 +1140,48 @@ body.panel-scroll-locked {
   animation: rankBeaconBounce 1.2s ease-in-out infinite;
 }
 
-.custom-cluster-civic, .custom-cluster-orb {
+/* ========================================================
+   Clusters:
+   Light theme: charcoal rgba(22,26,34,.5) with 90% ring
+   Dark theme: charcoal rgba(22,26,34,.6) with ring rgba(209,213,219,.6)
+   White count text
+   ======================================================== */
+.pin-scale-wrapper .custom-cluster-civic,
+.pin-scale-wrapper .custom-cluster-orb {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
   border-radius: 9999px;
-  background: #000000;
   color: #FFFFFF;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 0 0 calc(4px * var(--glow-scale, 1)) rgba(0, 0, 0, 0.4), 0 3px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 2px #000000, 0 1px 2px #000000;
   font-family: 'Average Sans', 'Inter', system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  font-size: 12px;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
   cursor: pointer;
   user-select: none;
+  box-sizing: border-box;
+  box-shadow: none;
+  transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
 }
 
-.custom-cluster-civic:hover, .custom-cluster-orb:hover {
+.pin-scale-wrapper .custom-cluster-civic:hover,
+.pin-scale-wrapper .custom-cluster-orb:hover {
   transform: scale(1.12);
+}
+
+.pin-scale-wrapper .custom-cluster-civic.theme-light,
+.pin-scale-wrapper .custom-cluster-civic:not(.theme-dark) {
+  background: rgba(22, 26, 34, 0.5);
+  border: 2px solid rgba(22, 26, 34, 0.9);
+}
+
+.pin-scale-wrapper .custom-cluster-civic.theme-dark {
+  background: rgba(22, 26, 34, 0.6);
+  border: 2px solid rgba(209, 213, 219, 0.6);
 }
 
 /* Popup Overrides */
