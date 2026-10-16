@@ -509,11 +509,11 @@ export function renderReportForm(container, options = {}) {
       return;
     }
 
-    // Strict Validation: Max 20km from user's origin GPS location
+    // Strict Validation: Max 5km from user's origin GPS location
     const realGps = getRealDeviceGps() || options.baseGps;
     if (realGps && typeof realGps.lat === 'number' && typeof realGps.lng === 'number') {
       const distKm = haversineDistanceKm(realGps.lat, realGps.lng, currentCoordinates.lat, currentCoordinates.lng);
-      if (distKm > 20) {
+      if (distKm > 5) {
         alert(t('maxRadiusExceededAlert'));
         startMapPinConfirm();
         return;

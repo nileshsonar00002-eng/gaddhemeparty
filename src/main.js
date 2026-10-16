@@ -906,8 +906,8 @@ class KhaddaApp {
         : 0;
 
       if (accDisplay) {
-        if (distFromOrigin > 20) {
-          accDisplay.textContent = `>20km (${Math.round(distFromOrigin)}km - सीमा से बाहर)`;
+        if (distFromOrigin > 5) {
+          accDisplay.textContent = `>5km (${Math.round(distFromOrigin)}km - सीमा से बाहर)`;
           accDisplay.className = 'tabular-nums text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/50';
           if (doneBtn) {
             doneBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -924,14 +924,14 @@ class KhaddaApp {
 
     updateBarDisplay(activeCoords);
 
-    // 6. Place interactive draggable pin marker & 20km boundary circle on main map
+    // 6. Place interactive draggable pin marker & 5km boundary circle on main map
     if (this.mapAdapter) {
       this.mapAdapter.setView(activeCoords.lat, activeCoords.lng, 18, true);
       if (realGps && typeof realGps.lat === 'number') {
         this.mapAdapter.setUserLocationMarker?.(realGps.lat, realGps.lng);
-        this.mapAdapter.setAccuracyCircle?.(realGps.lat, realGps.lng, 20000);
+        this.mapAdapter.setAccuracyCircle?.(realGps.lat, realGps.lng, 5000);
       } else {
-        this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, 20000);
+        this.mapAdapter.setAccuracyCircle?.(activeCoords.lat, activeCoords.lng, 5000);
       }
 
       let userHasMovedPin = false;
@@ -945,7 +945,7 @@ class KhaddaApp {
             this.userCoords = freshGps;
             setRealDeviceGps(freshGps, freshGps.source || 'gps');
             this.mapAdapter?.setUserLocationMarker?.(freshGps.lat, freshGps.lng);
-            this.mapAdapter?.setAccuracyCircle?.(freshGps.lat, freshGps.lng, 20000);
+            this.mapAdapter?.setAccuracyCircle?.(freshGps.lat, freshGps.lng, 5000);
 
             // If user has not dragged or moved the pin yet, snap pin and view to live GPS
             if (!userHasMovedPin) {
@@ -964,7 +964,7 @@ class KhaddaApp {
           ? haversineDistanceKm(realGps.lat, realGps.lng, newPos.lat, newPos.lng) 
           : 0;
 
-        if (isEnd && distFromOrigin > 20) {
+        if (isEnd && distFromOrigin > 5) {
           showToast(t('maxRadiusExceededAlert'), 'warning', 4000);
           if (realGps && typeof realGps.lat === 'number') {
             activeCoords = { lat: realGps.lat, lng: realGps.lng };
@@ -1000,7 +1000,7 @@ class KhaddaApp {
         ? haversineDistanceKm(realGps.lat, realGps.lng, pinPos.lat, pinPos.lng) 
         : 0;
 
-      if (distFromOrigin > 20) {
+      if (distFromOrigin > 5) {
         showToast(t('maxRadiusExceededAlert'), 'warning', 4000);
         if (realGps && typeof realGps.lat === 'number') {
           activeCoords = { lat: realGps.lat, lng: realGps.lng };

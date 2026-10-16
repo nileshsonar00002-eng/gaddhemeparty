@@ -444,7 +444,7 @@ export class LeafletAdapter extends MapAdapter {
     }
   }
 
-  setAccuracyCircle(lat, lng, radius = 20000) {
+  setAccuracyCircle(lat, lng, radius = 5000) {
     if (!this.map) return;
     this.clearAccuracyCircle();
     this.accuracyCircle = L.circle([lat, lng], {

@@ -883,7 +883,7 @@ export class GoogleMapsAdapter extends MapAdapter {
     }
   }
 
-  setAccuracyCircle(lat, lng, radius = 20000) {
+  setAccuracyCircle(lat, lng, radius = 5000) {
     if (!this.map || !window.google || !window.google.maps) return;
     this.clearAccuracyCircle();
     this.accuracyCircle = new google.maps.Circle({
