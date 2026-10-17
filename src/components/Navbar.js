@@ -108,7 +108,7 @@ export function createNavbar(options = {}) {
               ${getLucideIcon('map', 'w-5 h-5 shrink-0')} <span>${t('navMap')}</span>
             </button>
             <button type="button" data-nav-panel="leaderboard" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
-              ${getLucideIcon('trophy', 'w-5 h-5 shrink-0')} <span>${t('navLeaderboard')}</span>
+              ${getLucideIcon('timeline', 'w-5 h-5 shrink-0')} <span>${t('navLeaderboard')}</span>
             </button>
             <button type="button" data-nav-panel="mission" class="mobile-nav-panel-btn h-12 min-h-[48px] flex items-center gap-3.5 px-3.5 rounded-xl text-base font-medium text-left transition cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--primary)] text-[var(--primary-ink)] font-semibold' : 'text-[var(--text)] hover:bg-[var(--surface-2)]'}">
               ${getLucideIcon('target', 'w-5 h-5 shrink-0')} <span>${t('navMission')}</span>

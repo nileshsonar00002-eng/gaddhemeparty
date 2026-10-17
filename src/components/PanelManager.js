@@ -357,7 +357,7 @@ export class PanelManager {
   populatePanelData(panelId) {
     switch (panelId) {
       case 'leaderboard':
-        this.headerIcon.innerHTML = getLucideIcon('trophy', 'w-5 h-5 text-[#84CC16]');
+        this.headerIcon.innerHTML = getLucideIcon('timeline', 'w-5 h-5 text-[#84CC16]');
         this.headerTitle.innerText = t('leaderboardTitle');
         this.updateLeaderboardTimeAgo();
         this.renderLeaderboardBody();
