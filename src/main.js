@@ -94,6 +94,7 @@ class KhaddaApp {
     // 0.6. Initialize Panels, Routing & Site Info Drawer early so menu clicks work immediately
     this.initPanelsAndRouter();
     this.setupSiteInfoDrawer();
+    this.setupEventListeners();
 
     // 1. Initialize Anonymous Auth
     await initAnonymousAuth();
@@ -148,10 +149,7 @@ class KhaddaApp {
       renderStatsStrip(statsContainer, this.statsData);
     }
 
-    // 5. Setup Global UI Event Handlers
-    this.setupEventListeners();
-
-    // 6. Connect Realtime Firestore Listeners
+    // 5. Connect Realtime Firestore Listeners
     this.setupFirestoreSubscriptions();
 
     // 7. Setup Offline Sync Manager
@@ -242,16 +240,20 @@ class KhaddaApp {
       }
     };
 
-    window.__khaddaCloseInfo = () => {
+    window.__khaddaCloseInfo = (immediate = false) => {
       if (!drawer) return;
       drawer.classList.remove('is-open');
       document.body.classList.remove('overflow-hidden');
       document.body.classList.remove('panel-scroll-locked');
-      setTimeout(() => {
-        if (!drawer.classList.contains('is-open')) {
-          drawer.classList.add('hidden');
-        }
-      }, 250);
+      if (immediate) {
+        drawer.classList.add('hidden');
+      } else {
+        setTimeout(() => {
+          if (!drawer.classList.contains('is-open')) {
+            drawer.classList.add('hidden');
+          }
+        }, 250);
+      }
     };
 
     closeBtn?.addEventListener('click', () => {
@@ -350,6 +352,15 @@ class KhaddaApp {
       }
     });
 
+    // Expose dedicated Timeline opener helper
+    window.__khaddaOpenTimeline = () => {
+      window.__khaddaCloseInfo?.(true);
+      this.panelManager?.open?.('leaderboard');
+      if (window.location.hash !== '#/leaderboard') {
+        router.navigate('leaderboard');
+      }
+    };
+
     // Wire Router with History API
     router.init((route) => {
       if (route.type === 'pin' && route.id) {
@@ -371,7 +382,13 @@ class KhaddaApp {
         }
       } else if (route.type === 'panel') {
         if (route.name && route.name !== 'map') {
-          window.__khaddaOpenInfo?.(route.name);
+          if (route.name === 'leaderboard') {
+            window.__khaddaCloseInfo?.(true);
+            this.panelManager?.open?.('leaderboard');
+          } else {
+            this.panelManager?.close?.();
+            window.__khaddaOpenInfo?.(route.name);
+          }
         } else {
           window.__khaddaCloseInfo?.();
           this.panelManager?.close?.();
@@ -451,7 +468,7 @@ class KhaddaApp {
     // Bottom Bar Timeline Button
     const bottomTimelineBtn = document.getElementById('btn-bottom-timeline');
     bottomTimelineBtn?.addEventListener('click', () => {
-      window.__khaddaOpenInfo?.('leaderboard');
+      window.__khaddaOpenTimeline?.();
     });
 
     // Map Padding calculation helper respecting safe areas & dismissed counter
@@ -1619,4 +1636,5 @@ class KhaddaApp {
 
 // Bootstrap Application
 const app = new KhaddaApp();
+window.app = app;
 app.init().catch((e) => console.error('App init failed:', e));

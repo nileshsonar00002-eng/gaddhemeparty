@@ -280,6 +280,13 @@ export function createNavbar(options = {}) {
       if (panelId === 'map') {
         window.__khaddaCloseInfo?.();
         router.navigate('');
+      } else if (panelId === 'leaderboard') {
+        if (window.__khaddaOpenTimeline) {
+          window.__khaddaOpenTimeline();
+        } else {
+          window.__khaddaCloseInfo?.();
+          router.navigate('leaderboard');
+        }
       } else {
         window.__khaddaOpenInfo?.(panelId);
         router.navigate(panelId);
@@ -291,7 +298,7 @@ export function createNavbar(options = {}) {
   document.querySelectorAll('.btn-nav-info').forEach((btn) => {
     btn.addEventListener('click', () => {
       closeDrawer(true);
-      window.__khaddaOpenInfo?.('leaderboard');
+      window.__khaddaOpenInfo?.('mission');
     });
   });
 

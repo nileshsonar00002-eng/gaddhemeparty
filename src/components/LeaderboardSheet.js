@@ -9,6 +9,7 @@ export class LeaderboardSection {
     this.activeTab = 'week'; // 'week' | 'month' | 'all' | 'cities'
     this.leaderboardData = null;
     this.lastUpdatedMinutes = 2;
+    this.render();
   }
 
   setData(data) {
@@ -195,7 +196,12 @@ export class LeaderboardSection {
 
     // Attach Click listener to open full leaderboard panel
     document.getElementById('btn-open-full-leaderboard')?.addEventListener('click', () => {
-      window.location.hash = '#/leaderboard';
+      if (window.__khaddaOpenTimeline) {
+        window.__khaddaOpenTimeline();
+      } else {
+        window.__khaddaCloseInfo?.();
+        window.location.hash = '#/leaderboard';
+      }
     });
   }
 }
