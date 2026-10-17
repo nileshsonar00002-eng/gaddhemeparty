@@ -246,9 +246,13 @@ export function createNavbar(options = {}) {
     if (!skipScrollUnlock) {
       document.body.classList.remove('panel-scroll-locked');
     }
-    setTimeout(() => {
+    if (skipScrollUnlock) {
       mobileDrawer?.classList.add('hidden');
-    }, 250);
+    } else {
+      setTimeout(() => {
+        mobileDrawer?.classList.add('hidden');
+      }, 250);
+    }
   };
 
   toggleBtn?.addEventListener('click', openDrawer);

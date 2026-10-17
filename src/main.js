@@ -91,6 +91,10 @@ class KhaddaApp {
     // 0.5. Initialize Hero Cinematic Visuals (Starfield & 3D Night Globe)
     this.initHeroVisuals();
 
+    // 0.6. Initialize Panels, Routing & Site Info Drawer early so menu clicks work immediately
+    this.initPanelsAndRouter();
+    this.setupSiteInfoDrawer();
+
     // 1. Initialize Anonymous Auth
     await initAnonymousAuth();
 
@@ -137,11 +141,12 @@ class KhaddaApp {
     // Setup Map Cinematic Fly-in on first viewport intersection
     this.setupMapFlyInObserver();
 
-    // 3. Initialize Slide-Over Panel Manager & Routing
-    this.initPanelsAndRouter();
-
-    // 4. Initialize Top Navbar & Real Stats Strip
-    this.renderHeaderAndStats();
+    // 4. Update Stats & Counter in Navbar
+    this.updateCounterDOM();
+    const statsContainer = document.getElementById('stats-strip-container');
+    if (statsContainer) {
+      renderStatsStrip(statsContainer, this.statsData);
+    }
 
     // 5. Setup Global UI Event Handlers
     this.setupEventListeners();
@@ -171,9 +176,6 @@ class KhaddaApp {
       this.renderHeaderAndStats();
       tilt3d.refresh();
     });
-
-    // 10.8. Setup Site Info Drawer (containing all other site content)
-    this.setupSiteInfoDrawer();
 
     // Trigger map resize shortly after layout mount for crisp tiles
     setTimeout(() => {
@@ -212,6 +214,10 @@ class KhaddaApp {
 
     window.__khaddaOpenInfo = (targetTab = 'leaderboard') => {
       if (!drawer) return;
+      if (targetTab === 'how-it-works') targetTab = 'how';
+      if (targetTab === 'about-us') targetTab = 'about';
+      if (targetTab === 'terms-of-use') targetTab = 'terms';
+
       drawer.classList.remove('hidden');
       void drawer.offsetWidth;
       drawer.classList.add('is-open');
@@ -223,7 +229,14 @@ class KhaddaApp {
         setTimeout(() => {
           const targetSection = document.getElementById(targetTab);
           if (targetSection) {
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (targetTab === 'leaderboard') {
+              scrollBody.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              const bodyRect = scrollBody.getBoundingClientRect();
+              const targetRect = targetSection.getBoundingClientRect();
+              const targetScrollTop = scrollBody.scrollTop + (targetRect.top - bodyRect.top);
+              scrollBody.scrollTo({ top: Math.max(0, targetScrollTop - 8), behavior: 'smooth' });
+            }
           }
         }, 120);
       }
@@ -233,6 +246,7 @@ class KhaddaApp {
       if (!drawer) return;
       drawer.classList.remove('is-open');
       document.body.classList.remove('overflow-hidden');
+      document.body.classList.remove('panel-scroll-locked');
       setTimeout(() => {
         if (!drawer.classList.contains('is-open')) {
           drawer.classList.add('hidden');
@@ -252,11 +266,21 @@ class KhaddaApp {
 
     tabButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        const tab = btn.getAttribute('data-info-tab');
+        let tab = btn.getAttribute('data-info-tab');
+        if (tab === 'how-it-works') tab = 'how';
+        if (tab === 'about-us') tab = 'about';
+        if (tab === 'terms-of-use') tab = 'terms';
         updateActiveTabUI(tab);
         const targetSection = document.getElementById(tab);
         if (targetSection && scrollBody) {
-          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (tab === 'leaderboard') {
+            scrollBody.scrollTo({ top: 0, behavior: 'smooth' });
+          } else {
+            const bodyRect = scrollBody.getBoundingClientRect();
+            const targetRect = targetSection.getBoundingClientRect();
+            const targetScrollTop = scrollBody.scrollTop + (targetRect.top - bodyRect.top);
+            scrollBody.scrollTo({ top: Math.max(0, targetScrollTop - 8), behavior: 'smooth' });
+          }
         }
       });
     });
@@ -334,19 +358,20 @@ class KhaddaApp {
           const pinRank = window.__khaddaGetPinRank?.(pin.id) || null;
           if (pinRank) pin.rank = pinRank;
 
-          this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
-          if (this.mapAdapter.highlightPin) {
-            this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
-          }
-          if (this.mapAdapter.playArrivalRipple) {
-            this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+          if (this.mapAdapter) {
+            this.mapAdapter.setView(pin.latitude, pin.longitude, 17);
+            if (this.mapAdapter.highlightPin) {
+              this.mapAdapter.highlightPin(pin.latitude, pin.longitude, pinRank);
+            }
+            if (this.mapAdapter.playArrivalRipple) {
+              this.mapAdapter.playArrivalRipple(pin.latitude, pin.longitude);
+            }
           }
           openPinDetailModal(pin);
         }
       } else if (route.type === 'panel') {
         if (route.name && route.name !== 'map') {
           window.__khaddaOpenInfo?.(route.name);
-          this.panelManager?.open?.(route.name);
         } else {
           window.__khaddaCloseInfo?.();
           this.panelManager?.close?.();

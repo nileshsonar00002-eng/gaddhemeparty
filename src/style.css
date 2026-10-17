@@ -612,15 +612,18 @@ main {
 #site-info-drawer.is-open {
   display: block !important;
   pointer-events: auto !important;
+  z-index: 100000 !important;
 }
 
 #site-info-drawer.is-open #info-drawer-backdrop {
   opacity: 1 !important;
   pointer-events: auto !important;
+  z-index: 100000 !important;
 }
 
 #site-info-drawer.is-open #info-drawer-panel {
   transform: translateX(0) !important;
+  z-index: 100001 !important;
 }
 
 /* Hide scrollbar on quick tab buttons */
