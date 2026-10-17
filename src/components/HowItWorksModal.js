@@ -20,8 +20,16 @@ export function openHowItWorksModal() {
     <div id="hw-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-[1200] flex items-center justify-center p-4 animate-fade-in">
       <div class="relative w-full max-w-lg bg-[var(--surface)] border border-[var(--border)] rounded-3xl shadow-2xl p-6 sm:p-7 space-y-4 text-left max-h-[88dvh] overflow-y-auto text-[var(--text)]">
         <!-- Close Button -->
-        <button id="btn-close-hw" class="btn-secondary absolute top-4 right-4 w-9 h-9 p-0 flex items-center justify-center rounded-xl cursor-pointer">
-          <svg class="w-5 h-5 text-[var(--muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button
+          id="btn-close-hw"
+          type="button"
+          class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl bg-[#101D2E] text-slate-200 hover:text-white hover:bg-slate-800 border border-[#243449] hover:border-[#84CC16] transition cursor-pointer active:scale-95 shadow-sm absolute top-4 right-4"
+          aria-label="Close"
+          title="Close"
+        >
+          <svg class="w-6 h-6 text-inherit" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"/>
+          </svg>
         </button>
 
         <!-- Header -->

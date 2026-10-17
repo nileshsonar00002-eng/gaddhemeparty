@@ -97,11 +97,13 @@ export class PanelManager {
             <button
               id="btn-panel-close"
               type="button"
-              class="w-8 h-8 rounded-xl bg-white/10 hover:bg-[#84CC16]/20 text-[#F5F7FA] hover:text-[#84CC16] border border-white/15 flex items-center justify-center transition cursor-pointer"
+              class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-xl bg-[#101D2E] text-slate-200 hover:text-white hover:bg-slate-800 border border-[#243449] hover:border-[#84CC16] transition cursor-pointer active:scale-95 shadow-sm"
               title="Close panel"
               aria-label="Close panel"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+              <svg class="w-6 h-6 text-inherit" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"/>
+              </svg>
             </button>
           </div>
         </div>
