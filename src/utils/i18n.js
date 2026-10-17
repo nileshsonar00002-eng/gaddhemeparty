@@ -23,6 +23,9 @@ export const translations = {
     exploreMapCta: 'नक्शा देखें',
     totalCounter: 'कुल गड्ढे',
     todayCounter: 'आज के गड्ढे',
+    potholesText: 'गड्ढे',
+    todayText: 'आज',
+    dismissCounter: 'हटाएं',
     topCity: 'प्रमुख शहर',
     locateMe: 'मेरी लोकेशन',
     locating: 'आपकी लोकेशन खोजी जा रही है...',
@@ -242,6 +245,9 @@ export const translations = {
     // Counter / Stats
     totalCounter: 'Total Potholes',
     todayCounter: 'Today\'s Reports',
+    potholesText: 'Potholes',
+    todayText: 'Today',
+    dismissCounter: 'Dismiss',
     topCity: 'Top City',
     
     // Map & Controls

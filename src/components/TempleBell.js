@@ -150,7 +150,7 @@ export class TempleBellWidget {
     const isHindi = getLanguage() === 'hindi';
 
     container.innerHTML = `
-      <div class="temple-bell-wrapper relative flex flex-col items-center justify-center select-none py-2 cursor-pointer group" title="${isHindi ? 'घंटी बजाएं (Click to Ring)' : 'Ring Bell'}">
+      <div class="temple-bell-wrapper relative flex flex-col items-center justify-center select-none cursor-pointer group" title="${isHindi ? 'घंटी बजाएं (Click to Ring)' : 'Ring Bell'}">
         
         <!-- Floating +1 Sparkle Burst Container -->
         <div id="bell-sparkles-container" class="absolute inset-0 pointer-events-none z-40 overflow-visible flex items-center justify-center"></div>
@@ -158,7 +158,7 @@ export class TempleBellWidget {
         <!-- Inline SVG Ring Button -->
         <button class="ring-btn" id="ringBtn" aria-label="${isHindi ? 'सड़क सुधार की घंटी बजाएं' : 'Ring for safer Indian roads'}">
           <span class="ripple"></span><span class="ripple r2"></span>
-          <svg class="ring-bell" viewBox="0 0 400 400" width="44" height="44" aria-hidden="true">
+          <svg class="ring-bell" viewBox="0 0 400 400" width="40" height="40" aria-hidden="true">
             <g fill="none" stroke="#8CFF3F" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="200" cy="98" r="11"/>
               <path d="M104 290C104 290 136 264 136 198C136 150 163 118 200 118C237 118 264 150 264 198C264 264 296 290 296 290Z"/>
@@ -167,27 +167,17 @@ export class TempleBellWidget {
           </svg>
         </button>
 
-        <!-- Interactive Chime Counter & Prompt Badge -->
-        <div class="mt-3 flex flex-col items-center gap-1.5 z-20">
+        <!-- Interactive Chime Counter Badge -->
+        <div class="mt-1 flex flex-col items-center z-20">
           <button
             type="button"
             id="btn-ring-counter"
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--surface)] hover:bg-[var(--surface-2)] active:scale-95 border border-[var(--border)] hover:border-[#8CFF3F]/50 text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-[#8CFF3F]/60 group-hover:shadow-[rgba(140,255,63,0.2)]"
+            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0B1626]/90 backdrop-blur-md border border-[#243449] hover:border-[#8CFF3F]/50 text-[var(--heading)] font-heading font-bold text-xs shadow-md transition-all cursor-pointer group-hover:border-[#8CFF3F]/60"
           >
-            <svg class="w-4 h-4 text-[#8CFF3F] animate-pulse shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
             <span id="bell-counter-text" class="tabular-nums font-mono text-[#8CFF3F] font-extrabold">
               ${this.ringCount.toLocaleString('en-IN')}
             </span>
-            <span class="text-[11px] text-[var(--muted)] font-normal border-l border-[var(--border)] pl-2">
-              ${isHindi ? 'बजाएं' : 'Ring'}
-            </span>
           </button>
-          
-          <span class="bell-caption-text text-xs text-white/90 font-medium tracking-tight" style="text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.6);">
-            ${isHindi ? 'सड़क सुधार की घंटी बजाएं!' : 'Ring for safer Indian roads!'}
-          </span>
         </div>
       </div>
     `;

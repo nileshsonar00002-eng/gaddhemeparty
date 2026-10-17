@@ -201,6 +201,31 @@ export class LeafletAdapter extends MapAdapter {
     }
   }
 
+  fitBoundsToPins(pins, padding = null) {
+    if (!this.map || !pins || pins.length === 0) return;
+    const valid = pins.filter((p) => typeof p.latitude === 'number' && typeof p.longitude === 'number' && !isNaN(p.latitude) && !isNaN(p.longitude));
+    if (valid.length === 0) return;
+
+    const pad = padding || (window.__khaddaGetMapPadding ? window.__khaddaGetMapPadding() : { top: 110, bottom: 80, left: 16, right: 16 });
+
+    if (valid.length === 1) {
+      this.setView(valid[0].latitude, valid[0].longitude, 16);
+      const offsetY = (pad.top - pad.bottom) / 2;
+      if (offsetY !== 0) {
+        setTimeout(() => this.panBy(0, -offsetY), 150);
+      }
+    } else {
+      const latLngs = valid.map((p) => [p.latitude, p.longitude]);
+      const bounds = L.latLngBounds(latLngs);
+      this.map.fitBounds(bounds, {
+        paddingTopLeft: [pad.left, pad.top],
+        paddingBottomRight: [pad.right, pad.bottom],
+        maxZoom: 16,
+        animate: true
+      });
+    }
+  }
+
   resize() {
     if (this.map) {
       this.map.invalidateSize();

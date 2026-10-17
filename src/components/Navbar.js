@@ -25,138 +25,42 @@ export function createNavbar(options = {}) {
   const shareText = `🚧 तुमच्या शहरातील खड्डे आता लपून राहणार नाहीत! 📸\n\nखड्डा दिसला की लगेच www.roadtok.in वर रिपोर्ट करा आणि रस्ते सुधारण्यासाठी आपला हातभार लावा! 💪\n\nखड्डा दिसला? RoadTok करा! 🛣️🔥\n${shareUrl}`;
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
-    container.innerHTML = `
-    <div class="w-full h-full px-3.5 sm:px-6 lg:px-7 flex items-center justify-between bg-[var(--band)]/90 backdrop-blur-md border border-[var(--band-ink)]/20 rounded-full shadow-lg relative z-50 transition-all duration-200 flex-nowrap text-[var(--band-ink)]">
-      
-      <!-- Left: Brand Logo + Single-line App Name (Tagline hidden on mobile) -->
-      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 mr-1.5 overflow-hidden">
-        <button type="button" id="nav-brand-btn" class="shrink-0 cursor-pointer focus:outline-none flex items-center justify-center" title="RoadTok">
-          <img src="/logo.png" alt="Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full transition transform duration-150 hover:scale-105" />
-        </button>
+  container.innerHTML = `
+    <!-- Top Floating Header Pill -->
+    <div id="top-header-pill" class="pointer-events-auto w-full px-3.5 sm:px-4 py-2 flex items-center justify-between bg-[#0B1626]/90 backdrop-blur-md border border-[#243449] rounded-full shadow-lg relative z-50 text-[var(--text)] select-none">
+      <!-- Left: Logo + App Name -->
+      <button type="button" id="nav-brand-btn" class="flex items-center gap-2.5 cursor-pointer focus:outline-none min-w-0" title="RoadTok">
+        <img src="/logo.png" alt="Logo" class="w-8 h-8 rounded-full transition transform duration-150 hover:scale-105 shadow-xs shrink-0" />
+        <span class="brand-roadtok text-lg sm:text-xl text-white font-bold leading-none tracking-tight">
+          RoadTok
+        </span>
+      </button>
 
-        <div class="flex flex-col justify-center min-w-0 overflow-hidden">
-          <span class="brand-roadtok text-lg sm:text-xl text-[var(--band-ink)] leading-tight whitespace-nowrap truncate max-w-[140px] xs:max-w-[200px] sm:max-w-none">
-            RoadTok
-          </span>
-          <p class="hidden sm:block font-medium text-[11px] sm:text-xs text-[var(--band-ink)]/80 tracking-normal leading-none mt-0.5 whitespace-nowrap truncate">
-            "${t('tagline')}"
-          </p>
-        </div>
-      </div>
+      <!-- Right: Hamburger Button (Target >= 44px) -->
+      <button
+        id="btn-mobile-menu-toggle"
+        type="button"
+        class="w-10 h-10 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center rounded-full border border-[var(--border)] bg-[#101D2E]/80 text-white hover:bg-slate-800 transition cursor-pointer active:scale-95 shrink-0"
+        aria-label="Open menu"
+        title="Menu"
+      >
+        ${getLucideIcon('menu', 'w-5 h-5 text-lime-400')}
+      </button>
+    </div>
 
-      <!-- Center Nav Links (Desktop >= 1024px) -->
-      <nav class="hidden lg:flex items-center gap-1 bg-[var(--band)]/60 backdrop-blur-xs p-1 rounded-full border border-[var(--band-ink)]/25 select-none shrink-0 lg:absolute lg:left-1/2 lg:-translate-x-1/2 z-10">
-        <button
-          type="button"
-          data-nav-panel="map"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'map' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
-        >
-          ${getLucideIcon('map', 'w-3.5 h-3.5')}
-          <span>${t('navMap')}</span>
-        </button>
-
-        <button
-          type="button"
-          data-nav-panel="leaderboard"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'leaderboard' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
-        >
-          ${getLucideIcon('trophy', 'w-3.5 h-3.5')}
-          <span>${t('navLeaderboard')}</span>
-        </button>
-
-        <button
-          type="button"
-          data-nav-panel="mission"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'mission' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
-        >
-          ${getLucideIcon('target', 'w-3.5 h-3.5')}
-          <span>${t('navMission')}</span>
-        </button>
-
-        <button
-          type="button"
-          data-nav-panel="how"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'how' || activeNav === 'how-it-works' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
-        >
-          ${getLucideIcon('zap', 'w-3.5 h-3.5')}
-          <span>${t('navHowItWorks')}</span>
-        </button>
-
-        <button
-          type="button"
-          data-nav-panel="about"
-          class="nav-panel-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-pointer ${activeNav === 'about' ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15'}"
-        >
-          ${getLucideIcon('info', 'w-3.5 h-3.5')}
-          <span>${t('navAbout')}</span>
-        </button>
-      </nav>
-
-      <!-- Desktop Right Controls (>= 1024px) -->
-      <div class="hidden lg:flex items-center gap-2 shrink-0">
-        <div class="flex items-center bg-[var(--band)]/70 p-0.5 rounded-full border border-[var(--band-ink)]/25">
-          <button
-            id="btn-lang-hi-desktop"
-            type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
-          >
-            हिंदी
-          </button>
-          <button
-            id="btn-lang-en-desktop"
-            type="button"
-            class="px-2.5 py-1 text-xs font-medium rounded-full transition-all duration-150 cursor-pointer ${!isHindi ? 'bg-[var(--band-ink)] text-[var(--band)] font-bold shadow-xs' : 'text-[var(--band-ink)]/80 hover:text-[var(--band-ink)]'}"
-          >
-            EN
-          </button>
-        </div>
-
-        <button
-          type="button"
-          id="btn-nav-info-desktop"
-          class="btn-nav-info inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border border-[var(--band-ink)]/30 bg-[var(--band-ink)]/15 hover:bg-[var(--band-ink)]/25 text-[var(--band-ink)] transition-all duration-150 cursor-pointer shadow-xs active:scale-95"
-          title="${t('navInfo') || 'Info'}"
-          aria-label="Info"
-        >
-          ${getLucideIcon('info', 'w-3.5 h-3.5 text-inherit')}
-          <span>${t('navInfo') || 'Info'}</span>
-        </button>
-
-        <a
-          href="${whatsappShareUrl}"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full border border-[var(--band-ink)]/25 bg-[var(--band)]/70 hover:bg-[var(--band-ink)]/15 text-[var(--band-ink)] transition-all duration-150 cursor-pointer font-medium hover:-translate-y-0.5 active:translate-y-0"
-          title="Share on WhatsApp"
-          aria-label="Share on WhatsApp"
-        >
-          ${getLucideIcon('share', 'w-3.5 h-3.5 text-[#25D366]')}
-          <span>Share</span>
-        </a>
-      </div>
-
-      <!-- Mobile Right Controls (< 1024px) -->
-      <div class="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0">
-        <button
-          type="button"
-          id="btn-nav-info-mobile"
-          class="btn-nav-info inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-full border border-[var(--band-ink)]/30 bg-[var(--band-ink)]/15 hover:bg-[var(--band-ink)]/25 text-[var(--band-ink)] transition cursor-pointer shadow-xs active:scale-95"
-          title="${t('navInfo') || 'Info'}"
-          aria-label="Info"
-        >
-          ${getLucideIcon('info', 'w-3.5 h-3.5 text-inherit')}
-          <span>${t('navInfo') || 'Info'}</span>
-        </button>
-
-        <button
-          id="btn-mobile-menu-toggle"
-          type="button"
-          class="w-9 h-9 min-w-[36px] min-h-[36px] p-0 flex items-center justify-center rounded-full border border-[var(--band-ink)]/35 bg-transparent text-[var(--band-ink)] hover:bg-[var(--band-ink)]/15 shrink-0 cursor-pointer"
-          aria-label="Open navigation menu"
-        >
-          ${getLucideIcon('menu', 'w-4 h-4 text-[var(--band-ink)]')}
-        </button>
-      </div>
+    <!-- Centered Counter Pill ("16 Potholes | 8 Today", solid navy, readable) -->
+    <div id="top-counter-pill" class="pointer-events-auto mx-auto mt-2 px-3.5 py-1.5 rounded-full bg-[#0B1626] border border-[#243449] shadow-md flex items-center gap-2 text-xs select-none max-w-fit transition-all duration-200">
+      <span class="w-2 h-2 rounded-full bg-lime-400 animate-pulse shrink-0"></span>
+      <span class="font-bold text-white tracking-tight">
+        <span id="counter-total-count">0</span> <span data-i18n="potholesText">${t('potholesText') || 'Potholes'}</span>
+      </span>
+      <span class="text-slate-500 font-bold">|</span>
+      <span class="font-medium text-slate-300 tracking-tight">
+        <span id="counter-today-count" class="text-lime-400 font-bold">0</span> <span data-i18n="todayText">${t('todayText') || 'Today'}</span>
+      </span>
+      <button id="btn-dismiss-counter" type="button" class="w-5 h-5 -mr-1 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer active:scale-90" aria-label="${t('dismissCounter') || 'Dismiss'}" title="${t('dismissCounter') || 'Dismiss'}">
+        ${getLucideIcon('x', 'w-3.5 h-3.5 text-inherit')}
+      </button>
     </div>
   `;
 
@@ -259,6 +163,33 @@ export function createNavbar(options = {}) {
       </div>
     </div>
   `;
+
+  // Check dismissed state for counter pill in localStorage with try/catch
+  const counterPill = document.getElementById('top-counter-pill');
+  try {
+    if (localStorage.getItem('khadda_counter_dismissed') === 'true') {
+      if (counterPill) counterPill.classList.add('hidden');
+      document.documentElement.style.setProperty('--counter-h', '0px');
+    }
+  } catch (err) {
+    console.warn('[Storage] Error checking counter dismissal:', err);
+  }
+
+  document.getElementById('btn-dismiss-counter')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (counterPill) {
+      counterPill.classList.add('hidden');
+      document.documentElement.style.setProperty('--counter-h', '0px');
+      try {
+        localStorage.setItem('khadda_counter_dismissed', 'true');
+      } catch (err) {
+        console.warn('[Storage] Error saving counter dismissal:', err);
+      }
+      if (window.__khaddaResizeMapPadding) {
+        window.__khaddaResizeMapPadding();
+      }
+    }
+  });
 
   // Attach event handlers
   document.getElementById('nav-brand-btn')?.addEventListener('click', () => {

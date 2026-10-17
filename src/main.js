@@ -56,6 +56,7 @@ class KhaddaApp {
     this.starfield = null;
     this.nightGlobe = null;
     this.hasFlownIn = false;
+    this.hasInitialBoundsFit = false;
     this.knownPinIds = new Set();
     this.isMapShiftedForReport = false;
     this.statsData = {
@@ -83,6 +84,9 @@ class KhaddaApp {
 
     // 0.3. Render Interactive 3D Temple Bell Widget
     this.templeBell?.render();
+
+    // 0.4. Render Top Header Pill & Real Stats Strip immediately
+    this.renderHeaderAndStats();
 
     // 0.5. Initialize Hero Cinematic Visuals (Starfield & 3D Night Globe)
     this.initHeroVisuals();
@@ -122,6 +126,13 @@ class KhaddaApp {
     }
 
     this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+
+    // Remove instant navy skeleton as soon as map initializes
+    const skeleton = document.getElementById('map-skeleton');
+    if (skeleton) {
+      skeleton.style.opacity = '0';
+      setTimeout(() => skeleton?.remove(), 350);
+    }
 
     // Setup Map Cinematic Fly-in on first viewport intersection
     this.setupMapFlyInObserver();
@@ -276,7 +287,7 @@ class KhaddaApp {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !this.hasFlownIn) {
             this.hasFlownIn = true;
-            if (this.mapAdapter && this.mapAdapter.cinematicFlyIn) {
+            if (!this.hasInitialBoundsFit && this.mapAdapter && this.mapAdapter.cinematicFlyIn) {
               const liveTarget = (this.userCoords && this.userCoords.lat && this.userCoords.lng)
                 ? this.userCoords
                 : null;
@@ -386,10 +397,19 @@ class KhaddaApp {
       activeNav: this.activeNav
     });
 
+    this.updateCounterDOM();
+
     const statsContainer = document.getElementById('stats-strip-container');
     if (statsContainer) {
       renderStatsStrip(statsContainer, this.statsData);
     }
+  }
+
+  updateCounterDOM() {
+    const totalEl = document.getElementById('counter-total-count');
+    const todayEl = document.getElementById('counter-today-count');
+    if (totalEl) totalEl.textContent = (this.statsData?.totalReports || 0).toLocaleString('en-IN');
+    if (todayEl) todayEl.textContent = (this.statsData?.todayReports || 0).toLocaleString('en-IN');
   }
 
   toggleMapTheme() {
@@ -397,11 +417,42 @@ class KhaddaApp {
   }
 
   setupEventListeners() {
-    // Open Bottom Sheet Report Form
+    // Open Bottom Sheet Report Form (from bottom bar)
     const openReportBtn = document.getElementById('btn-open-report');
     openReportBtn?.addEventListener('click', () => {
       this.handleOpenReportClick();
     });
+
+    // Bottom Bar Timeline Button
+    const bottomTimelineBtn = document.getElementById('btn-bottom-timeline');
+    bottomTimelineBtn?.addEventListener('click', () => {
+      window.__khaddaOpenInfo?.('leaderboard');
+    });
+
+    // Map Padding calculation helper respecting safe areas & dismissed counter
+    window.__khaddaGetMapPadding = () => {
+      const headerEl = document.getElementById('navbar-container');
+      const counterEl = document.getElementById('top-counter-pill');
+      const bottomBarEl = document.getElementById('bottom-bar-nav');
+
+      const headerH = headerEl ? headerEl.offsetHeight : 52;
+      const isCounterVisible = counterEl && !counterEl.classList.contains('hidden') && counterEl.offsetHeight > 0;
+      const counterH = isCounterVisible ? counterEl.offsetHeight + 8 : 0;
+      const bottomBarH = bottomBarEl ? bottomBarEl.offsetHeight : 64;
+
+      return {
+        top: headerH + counterH + 16,
+        bottom: bottomBarH + 8,
+        left: 16,
+        right: 16
+      };
+    };
+
+    window.__khaddaResizeMapPadding = () => {
+      if (this.mapAdapter && this.currentPins && this.currentPins.length > 0) {
+        this.mapAdapter.fitBoundsToPins(this.currentPins, window.__khaddaGetMapPadding());
+      }
+    };
 
     // Locate Me Button
     const locateMeBtn = document.getElementById('btn-locate-me');
@@ -416,13 +467,13 @@ class KhaddaApp {
       router.navigate('about');
     });
 
-    // Sticky Mobile Floating Report Button
+    // Sticky Mobile Floating Report Button (fallback if present)
     const stickyReportBtn = document.getElementById('btn-sticky-report');
     stickyReportBtn?.addEventListener('click', () => {
       this.handleOpenReportClick();
     });
 
-    // Hero Section Quick Report Button
+    // Hero Section Quick Report Button (fallback if present)
     const heroReportBtn = document.getElementById('btn-hero-report');
     heroReportBtn?.addEventListener('click', () => {
       this.handleOpenReportClick();
@@ -753,6 +804,20 @@ class KhaddaApp {
       this.currentPins = pins;
       this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
 
+      // Initial fit to data bounds with UI padding (header+counter, bottom bar) so no pin is hidden
+      if (!this.hasInitialBoundsFit && pins.length > 0) {
+        this.hasInitialBoundsFit = true;
+        const pad = window.__khaddaGetMapPadding ? window.__khaddaGetMapPadding() : null;
+        this.mapAdapter?.fitBoundsToPins?.(pins, pad);
+      }
+
+      // Hide and remove instant navy skeleton
+      const skel = document.getElementById('map-skeleton');
+      if (skel) {
+        skel.style.opacity = '0';
+        setTimeout(() => skel.remove(), 350);
+      }
+
       // Compute real stats from live pins
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -796,6 +861,8 @@ class KhaddaApp {
         topCity
       };
 
+      this.updateCounterDOM();
+
       const statsContainer = document.getElementById('stats-strip-container');
       if (statsContainer) {
         renderStatsStrip(statsContainer, this.statsData);
@@ -826,6 +893,7 @@ class KhaddaApp {
     subscribeToGlobalStats((stats) => {
       if (stats && stats.totalReports) {
         this.statsData.totalReports = stats.totalReports;
+        this.updateCounterDOM();
         const statsContainer = document.getElementById('stats-strip-container');
         if (statsContainer) {
           renderStatsStrip(statsContainer, this.statsData);
@@ -882,8 +950,8 @@ class KhaddaApp {
           if (this.mapAdapter && this.mapAdapter.setUserLocationMarker) {
             this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
           }
-          // Center the map on live user location if user has not manually dragged or zoomed the map
-          if (this.mapAdapter && !this.userInteractedWithMap) {
+          // Center the map on live user location if user has not manually dragged or zoomed the map and pins have not set bounds
+          if (this.mapAdapter && !this.userInteractedWithMap && !this.hasInitialBoundsFit) {
             const isMobile = window.innerWidth <= 768;
             const targetZoom = isMobile ? 6 : 7;
             if (this.mapAdapter.setView) {

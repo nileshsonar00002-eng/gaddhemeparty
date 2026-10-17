@@ -519,6 +519,32 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.setView(this.defaultCenter.lat, this.defaultCenter.lng, this.defaultZoom);
   }
 
+  fitBoundsToPins(pins, padding = null) {
+    if (!this.map || !window.google || !window.google.maps || !pins || pins.length === 0) return;
+    const valid = pins.filter((p) => typeof p.latitude === 'number' && typeof p.longitude === 'number' && !isNaN(p.latitude) && !isNaN(p.longitude));
+    if (valid.length === 0) return;
+
+    const pad = padding || (window.__khaddaGetMapPadding ? window.__khaddaGetMapPadding() : { top: 110, bottom: 80, left: 16, right: 16 });
+
+    if (valid.length === 1) {
+      this.map.setCenter({ lat: valid[0].latitude, lng: valid[0].longitude });
+      this.map.setZoom(16);
+      const offsetY = (pad.top - pad.bottom) / 2;
+      if (offsetY !== 0) {
+        this.panBy(0, -offsetY);
+      }
+    } else {
+      const bounds = new google.maps.LatLngBounds();
+      valid.forEach((p) => bounds.extend({ lat: p.latitude, lng: p.longitude }));
+      this.map.fitBounds(bounds, {
+        top: pad.top,
+        bottom: pad.bottom,
+        left: pad.left,
+        right: pad.right
+      });
+    }
+  }
+
   resize() {
     if (this.map && window.google && window.google.maps) {
       google.maps.event.trigger(this.map, 'resize');
