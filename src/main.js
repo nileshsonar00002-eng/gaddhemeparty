@@ -197,18 +197,66 @@ class KhaddaApp {
     const scrollBody = document.getElementById('info-drawer-scroll-body');
     const tabButtons = document.querySelectorAll('.info-tab-btn');
 
-    const updateActiveTabUI = (tabId) => {
+    let currentHighlightedTab = null;
+    let isProgrammaticScroll = false;
+    let programmaticScrollTimer = null;
+
+    const updateActiveTabUI = (tabId, scrollTabIntoView = true) => {
+      if (currentHighlightedTab === tabId) return;
+      currentHighlightedTab = tabId;
+
       tabButtons.forEach((btn) => {
         const isMatch = btn.getAttribute('data-info-tab') === tabId;
         if (isMatch) {
           btn.classList.remove('text-[var(--muted)]', 'hover:text-[var(--text)]', 'hover:bg-[var(--surface-2)]');
           btn.classList.add('bg-[var(--primary)]', 'text-[var(--primary-ink)]', 'shadow-xs');
+          if (scrollTabIntoView) {
+            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+          }
         } else {
           btn.classList.remove('bg-[var(--primary)]', 'text-[var(--primary-ink)]', 'shadow-xs');
           btn.classList.add('text-[var(--muted)]', 'hover:text-[var(--text)]', 'hover:bg-[var(--surface-2)]');
         }
       });
     };
+
+    const sections = ['leaderboard', 'mission', 'how', 'about', 'terms'];
+
+    const onScroll = () => {
+      if (isProgrammaticScroll || !scrollBody) return;
+
+      // Check if user has scrolled near bottom of container
+      const scrollBottom = scrollBody.scrollHeight - scrollBody.scrollTop - scrollBody.clientHeight;
+      if (scrollBottom < 60) {
+        updateActiveTabUI('terms', true);
+        return;
+      }
+
+      const bodyRect = scrollBody.getBoundingClientRect();
+      const triggerY = bodyRect.top + Math.min(180, bodyRect.height * 0.35);
+
+      let activeSectionId = 'leaderboard';
+      for (const secId of sections) {
+        const el = document.getElementById(secId);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= triggerY) {
+          activeSectionId = secId;
+        }
+      }
+
+      updateActiveTabUI(activeSectionId, true);
+    };
+
+    let scrollRafId = null;
+    scrollBody?.addEventListener('scroll', () => {
+      if (scrollRafId) cancelAnimationFrame(scrollRafId);
+      scrollRafId = requestAnimationFrame(onScroll);
+    }, { passive: true });
+
+    scrollBody?.addEventListener('wheel', () => { isProgrammaticScroll = false; }, { passive: true });
+    scrollBody?.addEventListener('touchstart', () => { isProgrammaticScroll = false; }, { passive: true });
+    scrollBody?.addEventListener('pointerdown', () => { isProgrammaticScroll = false; }, { passive: true });
 
     window.__khaddaOpenInfo = (targetTab = 'leaderboard') => {
       if (!drawer) return;
@@ -221,7 +269,13 @@ class KhaddaApp {
       drawer.classList.add('is-open');
       document.body.classList.add('overflow-hidden');
 
-      updateActiveTabUI(targetTab);
+      isProgrammaticScroll = true;
+      clearTimeout(programmaticScrollTimer);
+      programmaticScrollTimer = setTimeout(() => {
+        isProgrammaticScroll = false;
+      }, 400);
+
+      updateActiveTabUI(targetTab, true);
 
       if (targetTab && scrollBody) {
         setTimeout(() => {
@@ -242,6 +296,8 @@ class KhaddaApp {
 
     window.__khaddaCloseInfo = (immediate = false) => {
       if (!drawer) return;
+      clearTimeout(programmaticScrollTimer);
+      isProgrammaticScroll = false;
       drawer.classList.remove('is-open');
       document.body.classList.remove('overflow-hidden');
       document.body.classList.remove('panel-scroll-locked');
@@ -272,7 +328,14 @@ class KhaddaApp {
         if (tab === 'how-it-works') tab = 'how';
         if (tab === 'about-us') tab = 'about';
         if (tab === 'terms-of-use') tab = 'terms';
-        updateActiveTabUI(tab);
+
+        isProgrammaticScroll = true;
+        clearTimeout(programmaticScrollTimer);
+        programmaticScrollTimer = setTimeout(() => {
+          isProgrammaticScroll = false;
+        }, 400);
+
+        updateActiveTabUI(tab, true);
         const targetSection = document.getElementById(tab);
         if (targetSection && scrollBody) {
           if (tab === 'leaderboard') {
