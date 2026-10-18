@@ -36,16 +36,37 @@ export function createNavbar(options = {}) {
         </span>
       </button>
 
-      <!-- Right: Hamburger Button (Target >= 44px) -->
-      <button
-        id="btn-mobile-menu-toggle"
-        type="button"
-        class="w-10 h-10 min-w-[44px] min-h-[44px] p-0 flex items-center justify-center rounded-full border border-[var(--border)] bg-[#101D2E]/80 text-white hover:bg-slate-800 transition cursor-pointer active:scale-95 shrink-0"
-        aria-label="Open menu"
-        title="Menu"
-      >
-        ${getLucideIcon('menu', 'w-5 h-5 text-lime-400')}
-      </button>
+      <!-- Right: Action Buttons Group (WhatsApp Share & Hamburger Menu) -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- WhatsApp Share Button -->
+        <a
+          id="btn-header-whatsapp-share"
+          href="${whatsappShareUrl}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="h-9 px-3 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition cursor-pointer shrink-0 border border-[#25D366]/40 select-none"
+          title="WhatsApp पर शेयर करें / Share on WhatsApp"
+          aria-label="Share on WhatsApp"
+        >
+          <!-- WhatsApp Icon -->
+          <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.664-.698c.969.586 1.761.881 2.802.881 3.181 0 5.768-2.587 5.768-5.766.001-3.187-2.575-5.768-5.774-5.768zm3.376 8.21c-.144.405-.837.774-1.17.824-.312.045-.697.073-2.196-.543-1.802-.741-2.936-2.588-3.025-2.707-.09-.12-0.729-.97-0.729-1.85 0-.88.46-1.314.624-1.492.164-.179.359-.224.479-.224.12 0 .24.001.345.006.11.005.259-.042.404.309.15.36.51.1.245.555 1.355.045.09.075.195.015.315-.06.12-.09.195-.18.3-.09.105-.19.235-.27.315-.09.09-.184.187-.079.367.105.18.467.771 1.003 1.248.69.614 1.272.804 1.452.894.18.09.285.075.39-.045.105-.12.45-.525.57-.705.12-.18.24-.15.405-.09.165.06 1.05.495 1.23.585.18.09.3.135.345.21.045.075.045.435-.099.84z"/>
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.66 1.434 5.176L2 22l4.981-1.309A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.2a8.156 8.156 0 01-4.225-1.176l-.303-.18-2.964.777.791-2.89-.197-.314A8.167 8.167 0 013.8 12c0-4.521 3.679-8.2 8.2-8.2 4.521 0 8.2 3.679 8.2 8.2 0 4.521-3.679 8.2-8.2 8.2z"/>
+          </svg>
+          <span class="text-xs font-bold tracking-tight text-white leading-none">Share</span>
+        </a>
+
+        <!-- Right: Hamburger Button (Target >= 44px) -->
+        <button
+          id="btn-mobile-menu-toggle"
+          type="button"
+          class="w-10 h-10 min-w-[40px] min-h-[40px] p-0 flex items-center justify-center rounded-full border border-[var(--border)] bg-[#101D2E]/80 text-white hover:bg-slate-800 transition cursor-pointer active:scale-95 shrink-0"
+          aria-label="Open menu"
+          title="Menu"
+        >
+          ${getLucideIcon('menu', 'w-5 h-5 text-lime-400')}
+        </button>
+      </div>
     </div>
 
     <!-- Centered Counter Pill ("16 Potholes | 8 Today", solid navy, readable) -->
