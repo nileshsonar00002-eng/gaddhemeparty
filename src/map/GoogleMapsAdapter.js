@@ -317,8 +317,8 @@ export class GoogleMapsAdapter extends MapAdapter {
     this.userMarker = null;
     this.selectedPinId = null;
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-    this.defaultCenter = isMobile ? { lat: 21.8, lng: 77.5 } : { lat: 22.5937, lng: 78.9629 };
-    this.defaultZoom = isMobile ? 4.5 : 5;
+    this.defaultCenter = isMobile ? { lat: 18.5204, lng: 73.8567 } : { lat: 20.5937, lng: 78.9629 };
+    this.defaultZoom = isMobile ? 7 : 5;
     this.theme = 'light';
     this.lastGestureEndTime = 0;
     this.isGestureActive = false;
@@ -364,8 +364,17 @@ export class GoogleMapsAdapter extends MapAdapter {
     const container = document.getElementById(containerId);
     if (!container) return this;
 
+    let initialCenter = this.defaultCenter;
+    if (options.center) {
+      if (Array.isArray(options.center)) {
+        initialCenter = { lat: options.center[0], lng: options.center[1] };
+      } else if (typeof options.center.lat === 'number' && typeof options.center.lng === 'number') {
+        initialCenter = { lat: options.center.lat, lng: options.center.lng };
+      }
+    }
+
     const mapOptions = {
-      center: options.center ? { lat: options.center[0], lng: options.center[1] } : this.defaultCenter,
+      center: initialCenter,
       zoom: options.zoom || this.defaultZoom,
       disableDefaultUI: true,
       zoomControl: false,
@@ -554,9 +563,16 @@ export class GoogleMapsAdapter extends MapAdapter {
   cinematicFlyIn(callback, targetCoords = null) {
     if (!this.map) return;
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-    const destLat = targetCoords?.lat ?? (isMobile ? 21.8 : 22.5937);
-    const destLng = targetCoords?.lng ?? (isMobile ? 77.5 : 78.9629);
-    const destZoom = targetCoords ? (isMobile ? 6 : 7) : (isMobile ? 4.5 : 5);
+    const destLat = targetCoords?.lat ?? (isMobile ? 18.5204 : 20.5937);
+    const destLng = targetCoords?.lng ?? (isMobile ? 73.8567 : 78.9629);
+    const destZoom = targetCoords ? (isMobile ? 7 : 7.5) : (isMobile ? 7 : 5);
+
+    if (isMobile) {
+      this.map.panTo({ lat: destLat, lng: destLng });
+      this.map.setZoom(destZoom);
+      if (callback) callback();
+      return;
+    }
 
     // Set initial altitude (world view)
     this.map.setCenter({ lat: 20.5937, lng: 78.9629 });

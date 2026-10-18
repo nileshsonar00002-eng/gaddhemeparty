@@ -38,7 +38,7 @@ import { initPotholeCartoonAnimation } from './components/PotholeCartoonAnimatio
 import { initVisitorsCounter } from './components/VisitorsCounter';
 import { TempleBellWidget } from './components/TempleBell';
 import { router } from './utils/router';
-import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps } from './utils/geo';
+import { getLiveUserLocation, getCachedUserLocation, setCachedUserLocation, getRealDeviceGps, setRealDeviceGps, fetchIpGeolocation } from './utils/geo';
 import { tilt3d } from './utils/tilt3d';
 
 // Real Live Data Store
@@ -99,9 +99,24 @@ class KhaddaApp {
     // 1. Initialize Anonymous Auth
     await initAnonymousAuth();
 
-    // 2. Initialize Map View centered on India (Google Maps or Leaflet)
+    // 2. Initialize Map View centered on user's live state location (or default Maharashtra center)
     const provider = import.meta.env.VITE_MAP_PROVIDER;
     const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+    const isMobile = window.innerWidth <= 768;
+    const initialCoords = (this.userCoords && this.userCoords.lat && this.userCoords.lng)
+      ? this.userCoords
+      : null;
+    const initialCenter = initialCoords
+      ? { lat: initialCoords.lat, lng: initialCoords.lng }
+      : (isMobile ? { lat: 18.5204, lng: 73.8567 } : { lat: 20.5937, lng: 78.9629 });
+    const initialZoom = isMobile ? 7 : (initialCoords ? 7.5 : 5);
+
+    const mapInitOptions = {
+      theme: this.mapTheme,
+      center: initialCenter,
+      zoom: initialZoom
+    };
 
     if (provider === 'google' && googleKey) {
       window.gm_authFailure = () => {
@@ -111,23 +126,33 @@ class KhaddaApp {
           const mapEl = document.getElementById('map');
           if (mapEl) mapEl.innerHTML = '';
           this.mapAdapter = new LeafletAdapter();
-          this.mapAdapter.init('map', { theme: this.mapTheme });
+          this.mapAdapter.init('map', mapInitOptions);
           this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+          if (initialCoords && this.mapAdapter.setUserLocationMarker) {
+            this.mapAdapter.setUserLocationMarker(initialCoords.lat, initialCoords.lng);
+          }
         }
       };
 
       try {
         console.log('[Map] Initializing Google Maps JS API with region=IN...');
         this.mapAdapter = new GoogleMapsAdapter();
-        await this.mapAdapter.init('map', { theme: this.mapTheme });
+        await this.mapAdapter.init('map', mapInitOptions);
       } catch (e) {
         console.warn('[Map] Google Maps fallback to Leaflet:', e);
         this.mapAdapter = new LeafletAdapter();
-        this.mapAdapter.init('map', { theme: this.mapTheme });
+        this.mapAdapter.init('map', mapInitOptions);
       }
     } else {
       this.mapAdapter = new LeafletAdapter();
-      this.mapAdapter.init('map', { theme: this.mapTheme });
+      this.mapAdapter.init('map', mapInitOptions);
+    }
+
+    if (initialCoords) {
+      this.hasInitialBoundsFit = true;
+      if (this.mapAdapter && this.mapAdapter.setUserLocationMarker) {
+        this.mapAdapter.setUserLocationMarker(initialCoords.lat, initialCoords.lng);
+      }
     }
 
     this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
@@ -376,7 +401,8 @@ class KhaddaApp {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !this.hasFlownIn) {
             this.hasFlownIn = true;
-            if (!this.hasInitialBoundsFit && this.mapAdapter && this.mapAdapter.cinematicFlyIn) {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile && !this.hasInitialBoundsFit && this.mapAdapter && this.mapAdapter.cinematicFlyIn) {
               const liveTarget = (this.userCoords && this.userCoords.lat && this.userCoords.lng)
                 ? this.userCoords
                 : null;
@@ -554,8 +580,14 @@ class KhaddaApp {
     };
 
     window.__khaddaResizeMapPadding = () => {
-      if (this.mapAdapter && this.currentPins && this.currentPins.length > 0) {
-        this.mapAdapter.fitBoundsToPins(this.currentPins, window.__khaddaGetMapPadding());
+      if (this.mapAdapter) {
+        if (this.userCoords && this.userCoords.lat && this.userCoords.lng && !this.userInteractedWithMap) {
+          const isMobile = window.innerWidth <= 768;
+          const targetZoom = isMobile ? 7 : 7.5;
+          this.mapAdapter.setView(this.userCoords.lat, this.userCoords.lng, targetZoom);
+        } else if (this.currentPins && this.currentPins.length > 0 && !this.userCoords) {
+          this.mapAdapter.fitBoundsToPins(this.currentPins, window.__khaddaGetMapPadding());
+        }
       }
     };
 
@@ -909,8 +941,8 @@ class KhaddaApp {
       this.currentPins = pins;
       this.mapAdapter.renderPins(this.currentPins, (p) => openPinDetailModal(p));
 
-      // Initial fit to data bounds with UI padding (header+counter, bottom bar) so no pin is hidden
-      if (!this.hasInitialBoundsFit && pins.length > 0) {
+      // Initial fit to data bounds ONLY if user location is completely unavailable
+      if (!this.hasInitialBoundsFit && !this.userCoords && pins.length > 0) {
         this.hasInitialBoundsFit = true;
         const pad = window.__khaddaGetMapPadding ? window.__khaddaGetMapPadding() : null;
         this.mapAdapter?.fitBoundsToPins?.(pins, pad);
@@ -1046,23 +1078,50 @@ class KhaddaApp {
   }
 
   detectInitialLocation() {
+    const isMobile = window.innerWidth <= 768;
+    const targetZoom = isMobile ? 7 : 7.5;
+
+    const applyLiveCoords = (coords, isHighAcc = false) => {
+      if (!coords || typeof coords.lat !== 'number' || typeof coords.lng !== 'number') return;
+      this.userCoords = coords;
+      if (isHighAcc) {
+        this.realDeviceGps = coords;
+        setRealDeviceGps(coords, coords.source || 'gps');
+      }
+      this.hasInitialBoundsFit = true;
+
+      if (this.mapAdapter && this.mapAdapter.setUserLocationMarker) {
+        this.mapAdapter.setUserLocationMarker(coords.lat, coords.lng);
+      }
+
+      // Center the map on live user location at state zoom if user has not manually dragged or zoomed the map
+      if (this.mapAdapter && !this.userInteractedWithMap) {
+        if (this.mapAdapter.setView) {
+          this.mapAdapter.setView(coords.lat, coords.lng, targetZoom, true);
+        }
+      }
+    };
+
+    // If cached coords exist, immediately position marker & center
+    const cached = getCachedUserLocation();
+    if (cached && cached.lat && cached.lng) {
+      applyLiveCoords(cached, false);
+    } else {
+      // Try fast IP-based geolocation in parallel so the user's state is located immediately (~200ms)
+      fetchIpGeolocation()
+        .then((ipCoords) => {
+          if (ipCoords && !this.realDeviceGps) {
+            applyLiveCoords(ipCoords, false);
+          }
+        })
+        .catch(() => {});
+    }
+
+    // Always fetch fresh device GPS in background
     getLiveUserLocation({ enableHighAccuracy: true, timeout: 8000, fallbackToCache: true })
       .then((coords) => {
         if (coords && coords.lat && coords.lng) {
-          this.userCoords = coords;
-          this.realDeviceGps = coords;
-          setRealDeviceGps(coords, coords.source || 'gps');
-          if (this.mapAdapter && this.mapAdapter.setUserLocationMarker) {
-            this.mapAdapter.setUserLocationMarker(this.userCoords.lat, this.userCoords.lng);
-          }
-          // Center the map on live user location if user has not manually dragged or zoomed the map and pins have not set bounds
-          if (this.mapAdapter && !this.userInteractedWithMap && !this.hasInitialBoundsFit) {
-            const isMobile = window.innerWidth <= 768;
-            const targetZoom = isMobile ? 6 : 7;
-            if (this.mapAdapter.setView) {
-              this.mapAdapter.setView(this.userCoords.lat, this.userCoords.lng, targetZoom);
-            }
-          }
+          applyLiveCoords(coords, true);
         }
       })
       .catch((err) => {

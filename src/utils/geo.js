@@ -99,7 +99,7 @@ export function setDefaultFallbackCoords(coords) {
 /**
  * Fast IP-based geolocation fallback for desktop browsers with no hardware GPS
  */
-async function fetchIpGeolocation() {
+export async function fetchIpGeolocation() {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 3500);

@@ -13,8 +13,8 @@ export class LeafletAdapter extends MapAdapter {
     this.markersMap = new Map();
     this.userMarker = null;
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-    this.defaultCenter = isMobile ? [21.8, 77.5] : [22.5937, 78.9629];
-    this.defaultZoom = isMobile ? 4.5 : 5;
+    this.defaultCenter = isMobile ? [18.5204, 73.8567] : [20.5937, 78.9629];
+    this.defaultZoom = isMobile ? 7 : 5;
     this.theme = 'light';
     this.lastGestureEndTime = 0;
     this.isGestureActive = false;
@@ -34,8 +34,17 @@ export class LeafletAdapter extends MapAdapter {
     this.theme = options.theme || 'light';
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+    let initialCenter = this.defaultCenter;
+    if (options.center) {
+      if (Array.isArray(options.center)) {
+        initialCenter = options.center;
+      } else if (typeof options.center.lat === 'number' && typeof options.center.lng === 'number') {
+        initialCenter = [options.center.lat, options.center.lng];
+      }
+    }
+
     this.map = L.map(containerId, {
-      center: options.center || this.defaultCenter,
+      center: initialCenter,
       zoom: options.zoom || this.defaultZoom,
       zoomControl: false,
       attributionControl: true,
@@ -235,9 +244,15 @@ export class LeafletAdapter extends MapAdapter {
   cinematicFlyIn(callback, targetCoords = null) {
     if (!this.map) return;
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-    const destLat = targetCoords?.lat ?? (isMobile ? 21.8 : 22.5937);
-    const destLng = targetCoords?.lng ?? (isMobile ? 77.5 : 78.9629);
-    const destZoom = targetCoords ? (isMobile ? 6 : 7) : (isMobile ? 4.5 : 5);
+    const destLat = targetCoords?.lat ?? (isMobile ? 18.5204 : 20.5937);
+    const destLng = targetCoords?.lng ?? (isMobile ? 73.8567 : 78.9629);
+    const destZoom = targetCoords ? (isMobile ? 7 : 7.5) : (isMobile ? 7 : 5);
+
+    if (isMobile) {
+      this.map.setView([destLat, destLng], destZoom);
+      if (callback) callback();
+      return;
+    }
 
     // Start at high-altitude world view
     this.map.setView([20.5937, 78.9629], 3.5, { animate: false });
