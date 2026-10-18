@@ -22,7 +22,7 @@ export function createNavbar(options = {}) {
   const shareUrl = (typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost'))
     ? window.location.origin
     : 'https://www.roadtok.in';
-  const shareText = `अब सड़क भी बोलेगी! 🛣️🗣️\nक्या आप भी खराब सड़कों और गड्ढों से परेशान हैं? तो अब चुप मत बैठिए!\n1️⃣ गड्ढे की फोटो खींचें 📸\n2️⃣ www.roadtok.in पर अपलोड करें 📍\n3️⃣ बिना किसी लॉगिन/साइन-अप के सीधे अपनी आवाज़ प्रशासन तक पहुंचाएं!\nगड्ढा दिखा? RoadTok करो! 👇\n${shareUrl}`;
+  const shareText = `अब सड़क भी बोलेगी! 🛣️🗣️\nक्या आप भी खराब सड़कों और गड्ढों से परेशान हैं? तो अब चुप मत बैठिए!\n\n1️⃣ गड्ढे की फोटो खींचें 📸\n2️⃣ www.roadtok.in पर अपलोड करें 📍\n3️⃣ बिना किसी लॉगिन/साइन-अप के ,\n\nगड्ढा दिखा? RoadTok करो! 👇\n${shareUrl}`;
   const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
 
   container.innerHTML = `
