@@ -53,7 +53,7 @@ export function createNavbar(options = {}) {
             <path vector-effect="non-scaling-stroke" d="M12 2C6.48 2 2 6.48 2 12c0 1.82.49 3.53 1.35 5L2 22l5.17-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/>
             <path vector-effect="non-scaling-stroke" d="M9.5 8.5c-.3 0-.6.1-.8.4-.3.4-.9 1.1-.9 2.2 0 1.6 1.2 3.1 1.4 3.3.2.2 2.3 3.6 5.7 4.9 2.8 1.1 3.4.7 4 .6.6-.1 1.9-.8 2.2-1.5.3-.8.3-1.4.2-1.5-.1-.1-.3-.2-.6-.4l-1.9-.9c-.3-.1-.6 0-.8.2l-.8 1c-.2.2-.4.2-.7.1-.4-.2-1.6-.7-2.6-1.7-.8-.8-1.3-1.8-1.5-2.2-.1-.3 0-.5.2-.7l.6-.7c.2-.2.2-.4.1-.7l-.9-2.1c-.2-.5-.4-.5-.7-.5z"/>
           </svg>
-          <span class="text-xs font-bold tracking-tight text-lime-400 leading-none">Share</span>
+          <span class="text-xs font-normal tracking-tight text-lime-400 leading-none">Share</span>
         </a>
 
         <!-- Right: Hamburger Button (Target >= 44px) -->
