@@ -1,4 +1,4 @@
-// Bilingual Dictionary: Hindi (Default) and English
+// Bilingual Dictionary: English (Default) and Hindi
 // /* draft - review with a lawyer */
 
 export const translations = {
@@ -454,7 +454,7 @@ export const translations = {
   }
 };
 
-let currentLanguage = localStorage.getItem('khadda_lang') || 'hindi';
+let currentLanguage = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('khadda_lang') : null) || 'english';
 
 export function getLanguage() {
   return currentLanguage;
@@ -463,15 +463,20 @@ export function getLanguage() {
 export function setLanguage(lang) {
   if (translations[lang]) {
     currentLanguage = lang;
-    localStorage.setItem('khadda_lang', lang);
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('khadda_lang', lang);
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('khadda_lang', lang);
+    }
     renderAllPageI18n();
     window.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang } }));
   }
 }
 
 export function t(key, replacements = {}) {
-  const dict = translations[currentLanguage] || translations.hindi;
-  let text = dict[key] !== undefined ? dict[key] : (translations.hindi[key] !== undefined ? translations.hindi[key] : key);
+  const dict = translations[currentLanguage] || translations.english || translations.hindi;
+  let text = dict[key] !== undefined ? dict[key] : (translations.english[key] !== undefined ? translations.english[key] : (translations.hindi[key] !== undefined ? translations.hindi[key] : key));
   for (const [k, v] of Object.entries(replacements)) {
     text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
   }
