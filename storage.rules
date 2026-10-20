@@ -14,13 +14,12 @@ service firebase.storage {
     }
 
     // Pothole photos folder:
-    // 1. Any citizen or visitor can view photos on the map
-    // 2. Any authenticated user (anonymous citizen or admin) can upload pothole images up to 10 MB
-    // 3. Deletion and updates are strictly reserved for Admins
+    // 1. Anyone can view photos on the map (allow read: if true)
+    // 2. Anyone can upload pothole photos up to 10 MB
+    // 3. Deleting photos is strictly reserved for Admins
     match /potholes/{allPaths=**} {
       allow read: if true;
-      allow create: if request.auth != null
-                    && request.resource.size <= 10 * 1024 * 1024
+      allow create: if request.resource.size <= 10 * 1024 * 1024
                     && request.resource.contentType.matches('image/.*');
       allow update, delete: if isAdmin();
     }

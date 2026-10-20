@@ -121,18 +121,29 @@ export function getCurrentUser() {
 export async function uploadPotholePhoto(uid, blob, isThumb = false) {
   try {
     if (!uid) {
-      const user = await initAnonymousAuth();
-      uid = user?.uid || 'anon_user';
+      try {
+        const authPromise = initAnonymousAuth();
+        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 1500));
+        const user = await Promise.race([authPromise, timeoutPromise]);
+        uid = user?.uid || ('anon_' + Math.random().toString(36).substring(2, 10));
+      } catch (_) {
+        uid = 'anon_' + Math.random().toString(36).substring(2, 10);
+      }
     }
     const timestamp = Date.now();
     const suffix = isThumb ? '_thumb.webp' : '.webp';
     const fileName = `pothole_${timestamp}${suffix}`;
     const fileRef = ref(storage, `potholes/${uid}/${fileName}`);
 
-    await uploadBytes(fileRef, blob, {
+    // Wrap uploadBytes with a 4-second timeout so it never hangs the UI
+    const uploadPromise = uploadBytes(fileRef, blob, {
       contentType: 'image/webp',
       cacheControl: 'public, max-age=31536000'
     });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Storage upload timeout')), 4000)
+    );
+    await Promise.race([uploadPromise, timeoutPromise]);
 
     return await getDownloadURL(fileRef);
   } catch (err) {
@@ -162,7 +173,12 @@ export async function callSubmitReport(reportPayload) {
 
   try {
     const submitFn = httpsCallable(functions, 'submitReport');
-    const result = await submitFn(enrichedPayload);
+    // Fast 2.5s race timeout so un-deployed Cloud Functions don't freeze the UI
+    const fnPromise = submitFn(enrichedPayload);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Cloud Functions timeout')), 2500)
+    );
+    const result = await Promise.race([fnPromise, timeoutPromise]);
     const data = result.data || {};
     recordLocalCountedAction(data.pinId || result.data?.id || ('pin_' + Date.now()));
     return {
@@ -171,7 +187,7 @@ export async function callSubmitReport(reportPayload) {
       cityNameEnglish: data?.cityNameEnglish || cityInfo.nameEnglish
     };
   } catch (fnErr) {
-    console.warn('[Cloud Functions] submitReport error:', fnErr);
+    console.warn('[Cloud Functions] submitReport error / timeout fallback:', fnErr.message || fnErr);
     const serverMessage = fnErr.details?.messageHindi || fnErr.message;
     if (fnErr.details?.code === 'RATE_LIMITED' || fnErr.details?.code === 'ALREADY_REPORTED' || fnErr.details?.code === 'IP_RATE_LIMITED') {
       throw new Error(serverMessage);
