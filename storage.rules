@@ -23,20 +23,22 @@ service firebase.storage {
     }
 
     // Pothole photos folder:
-    // 1. Authenticated users (Anonymous Auth) can upload their own photo (create only)
-    // 2. Max size: 300 KB
-    // 3. Allowed content types: JPEG, WebP, PNG
-    // 4. Clients cannot overwrite or modify files (allow update: if false)
-    // 5. Only authorized admins can delete rejected or spam photos
+    // 1. Anyone can view photos on map (allow read: if true)
+    // 2. Authenticated citizens can upload to their own folder: potholes/{uid}/{fileName}
+    // 3. Authorized admins can upload/edit in potholes/admin/{fileName} or any folder
+    // 4. Safe size limit: max 500 KB (citizen client compresses photos to < 180 KB)
+    // 5. Allowed image types: WebP, JPEG, PNG
+    // 6. Normal citizens cannot overwrite or modify existing photos
+    // 7. Deletion is strictly reserved for authorized admins
     match /potholes/{uid}/{fileName} {
       allow read: if true;
       allow create: if request.auth != null
-                    && request.auth.uid == uid
-                    && request.resource.size <= 300 * 1024
+                    && (request.auth.uid == uid || isAdmin())
+                    && request.resource.size <= 500 * 1024
                     && (request.resource.contentType.matches('image/jpeg') ||
                         request.resource.contentType.matches('image/webp') ||
                         request.resource.contentType.matches('image/png'));
-      allow update: if false;
+      allow update: if isAdmin();
       allow delete: if isAdmin();
     }
     
