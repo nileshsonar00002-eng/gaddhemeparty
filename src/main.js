@@ -1458,6 +1458,14 @@ class KhaddaApp {
   }
 
   async handleReportSubmit(formData) {
+    const resetSubmitBtnState = () => {
+      const submitBtn = document.getElementById('btn-submit-report');
+      const submitSpinner = document.getElementById('submit-btn-spinner');
+      const submitText = document.getElementById('submit-btn-text');
+      if (submitBtn) submitBtn.disabled = false;
+      if (submitSpinner) submitSpinner.classList.add('hidden');
+      if (submitText) submitText.textContent = t('submitBtn');
+    };
     const quota = getActionQuota();
     if (quota.isLimitReached) {
       showToast(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }), 'warning', 6000);
@@ -1470,11 +1478,13 @@ class KhaddaApp {
 
     if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
       showToast(t('gpsRequiredAlert'), 'error');
+      resetSubmitBtnState();
       return;
     }
 
     if (!formData.imageData && !formData.imageUrl) {
       showToast(t('photoRequiredAlert'), 'warning');
+      resetSubmitBtnState();
       return;
     }
 
@@ -1484,6 +1494,7 @@ class KhaddaApp {
       const distKm = haversineDistanceKm(realGps.lat, realGps.lng, latitude, longitude);
       if (distKm > 20) {
         showToast(t('maxRadiusExceededAlert'), 'error', 5000);
+        resetSubmitBtnState();
         return;
       }
     }
@@ -1622,7 +1633,27 @@ class KhaddaApp {
       });
     } catch (err) {
       console.error('[App] Report submission error:', err);
+      // Fallback: If network or Firestore write failed, save offline so report is NEVER lost!
+      try {
+        const offlineImgUrl = formData.imageData?.mainDataUrl || null;
+        const offlineThumbUrl = formData.imageData?.thumbDataUrl || null;
+        await saveReportOffline({
+          latitude,
+          longitude,
+          landmark: formData.landmark || t('defaultLandmark'),
+          imageUrl: offlineImgUrl,
+          thumbnailUrl: offlineThumbUrl,
+          formOpenTime: formData.formOpenTime
+        });
+        showToast(t('offlineAlert') || 'रिपोर्ट सुरक्षित कर ली गई है, इंटरनेट कनेक्ट होते ही सेव हो जाएगी।', 'warning', 6000);
+        this.bottomSheet.close();
+        return;
+      } catch (offlineErr) {
+        console.error('Offline fallback also failed:', offlineErr);
+      }
+
       showToast(err.message || t('submitError'), 'error');
+      resetSubmitBtnState();
     }
   }
 

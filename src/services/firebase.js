@@ -86,8 +86,8 @@ if (appCheckSiteKey && typeof window !== 'undefined') {
 
 // Anonymous Auth Auto-Login
 let currentUser = null;
-let isCloudFunctionsAvailable = true;
-let lastCloudFunctionsAttemptTime = 0;
+let isCloudFunctionsAvailable = false;
+let lastCloudFunctionsAttemptTime = Date.now();
 
 export function initAnonymousAuth() {
   const existing = getCurrentUser();
@@ -183,17 +183,33 @@ export async function callSubmitReport(reportPayload) {
     throw new Error(t('nextReportAvailable', { time: quota.waitFormatted || '24 घंटे' }));
   }
 
-  // Geocode location to accurate city / town
-  const cityInfo = await reverseGeocodeLocation(reportPayload.latitude, reportPayload.longitude);
+  // Geocode location to accurate city / town safely with guaranteed non-undefined fallbacks
+  const cityInfo = await reverseGeocodeLocation(reportPayload.latitude, reportPayload.longitude).catch(() => null);
+  const safeCityHindi = String(cityInfo?.nameHindi || 'महाराष्ट्र').trim();
+  const safeCityEnglish = String(cityInfo?.nameEnglish || 'Maharashtra').trim();
+  const safeState = String(cityInfo?.state || 'Maharashtra').trim();
+  const safeLandmark = String(reportPayload.landmark || 'Sadak par gaddha').trim().slice(0, 80) || 'Sadak par gaddha';
+  const safeLat = typeof reportPayload.latitude === 'number' && !isNaN(reportPayload.latitude) ? reportPayload.latitude : 18.6298;
+  const safeLng = typeof reportPayload.longitude === 'number' && !isNaN(reportPayload.longitude) ? reportPayload.longitude : 73.7997;
+  const safeImageUrl = reportPayload.imageUrl ? String(reportPayload.imageUrl) : null;
+  const safeThumbUrl = reportPayload.thumbnailUrl ? String(reportPayload.thumbnailUrl) : (safeImageUrl || null);
+  const safeImages = (safeImageUrl ? [safeImageUrl] : []).filter(Boolean);
+  const safeThumbs = (safeThumbUrl ? [safeThumbUrl] : (safeImageUrl ? [safeImageUrl] : [])).filter(Boolean);
+
   const enrichedPayload = {
     ...reportPayload,
-    cityNameHindi: cityInfo.nameHindi,
-    cityNameEnglish: cityInfo.nameEnglish,
-    cityState: cityInfo.state
+    latitude: safeLat,
+    longitude: safeLng,
+    landmark: safeLandmark,
+    cityNameHindi: safeCityHindi,
+    cityNameEnglish: safeCityEnglish,
+    cityState: safeState,
+    imageUrl: safeImageUrl,
+    thumbnailUrl: safeThumbUrl
   };
 
   // Check if Cloud Functions are reachable or if we should skip the timeout wait in this session
-  const shouldTryCloudFunctions = isCloudFunctionsAvailable || (Date.now() - lastCloudFunctionsAttemptTime > 300000);
+  const shouldTryCloudFunctions = isCloudFunctionsAvailable && (Date.now() - lastCloudFunctionsAttemptTime > 300000);
 
   if (shouldTryCloudFunctions) {
     try {
@@ -209,8 +225,8 @@ export async function callSubmitReport(reportPayload) {
       recordLocalCountedAction(data.pinId || result.data?.id || ('pin_' + Date.now()));
       return {
         ...data,
-        cityNameHindi: data?.cityNameHindi || cityInfo.nameHindi,
-        cityNameEnglish: data?.cityNameEnglish || cityInfo.nameEnglish
+        cityNameHindi: data?.cityNameHindi || safeCityHindi,
+        cityNameEnglish: data?.cityNameEnglish || safeCityEnglish
       };
     } catch (fnErr) {
       console.warn('[Cloud Functions] submitReport error / timeout fallback:', fnErr.message || fnErr);
@@ -246,7 +262,7 @@ export async function callSubmitReport(reportPayload) {
     for (const docSnap of snap.docs) {
       const d = docSnap.data();
       if (d.latitude && d.longitude) {
-        const dist = haversineDistanceMeters(reportPayload.latitude, reportPayload.longitude, d.latitude, d.longitude);
+        const dist = haversineDistanceMeters(safeLat, safeLng, d.latitude, d.longitude);
         if (dist <= 5) {
           existingPinDoc = { id: docSnap.id, ref: docSnap.ref, data: d };
           break;
@@ -259,28 +275,30 @@ export async function callSubmitReport(reportPayload) {
 
   if (existingPinDoc) {
     // Merge report and image into existing pin
-    const existingImages = Array.isArray(existingPinDoc.data.images)
-      ? [...existingPinDoc.data.images]
-      : (existingPinDoc.data.imageUrl ? [existingPinDoc.data.imageUrl] : []);
+    const existingImages = (Array.isArray(existingPinDoc.data.images)
+      ? existingPinDoc.data.images
+      : (existingPinDoc.data.imageUrl ? [existingPinDoc.data.imageUrl] : [])
+    ).filter(Boolean);
 
-    const existingThumbs = Array.isArray(existingPinDoc.data.thumbnails)
-      ? [...existingPinDoc.data.thumbnails]
-      : (existingPinDoc.data.thumbnailUrl ? [existingPinDoc.data.thumbnailUrl] : []);
+    const existingThumbs = (Array.isArray(existingPinDoc.data.thumbnails)
+      ? existingPinDoc.data.thumbnails
+      : (existingPinDoc.data.thumbnailUrl ? [existingPinDoc.data.thumbnailUrl] : [])
+    ).filter(Boolean);
 
-    if (reportPayload.imageUrl) {
-      existingImages.unshift(reportPayload.imageUrl);
+    if (safeImageUrl) {
+      existingImages.unshift(safeImageUrl);
     }
-    if (reportPayload.thumbnailUrl) {
-      existingThumbs.unshift(reportPayload.thumbnailUrl);
+    if (safeThumbUrl) {
+      existingThumbs.unshift(safeThumbUrl);
     }
 
     await updateDoc(existingPinDoc.ref, {
       reportCount: (existingPinDoc.data.reportCount || 1) + 1,
-      imageUrl: reportPayload.imageUrl || existingPinDoc.data.imageUrl || null,
-      thumbnailUrl: reportPayload.thumbnailUrl || existingPinDoc.data.thumbnailUrl || null,
+      imageUrl: safeImageUrl || existingPinDoc.data.imageUrl || null,
+      thumbnailUrl: safeThumbUrl || existingPinDoc.data.thumbnailUrl || null,
       images: existingImages,
       thumbnails: existingThumbs,
-      photoStatus: reportPayload.imageUrl ? 'pending' : (existingPinDoc.data.photoStatus || 'approved'),
+      photoStatus: safeImageUrl ? 'pending' : (existingPinDoc.data.photoStatus || 'approved'),
       photoApproved: false,
       lastReportedAt: serverTimestamp()
     });
@@ -291,8 +309,8 @@ export async function callSubmitReport(reportPayload) {
       success: true,
       deduplicated: true,
       pinId: existingPinDoc.id,
-      cityNameHindi: existingPinDoc.data.cityNameHindi || cityInfo.nameHindi,
-      cityNameEnglish: existingPinDoc.data.cityNameEnglish || cityInfo.nameEnglish,
+      cityNameHindi: existingPinDoc.data.cityNameHindi || safeCityHindi,
+      cityNameEnglish: existingPinDoc.data.cityNameEnglish || safeCityEnglish,
       images: existingImages,
       thumbnails: existingThumbs,
       message: 'Aapke paas pehle se report kiya hua gaddha mila (5m range). Nayi photo add kar di gayi hai!'
@@ -300,18 +318,18 @@ export async function callSubmitReport(reportPayload) {
   }
 
   // Create new pin with images and thumbnails arrays
-  const hasPhoto = Boolean(reportPayload.imageUrl);
+  const hasPhoto = Boolean(safeImageUrl);
   const newDoc = await addDoc(pinsRef, {
-    latitude: reportPayload.latitude,
-    longitude: reportPayload.longitude,
-    landmark: reportPayload.landmark || 'Sadak par gaddha',
-    cityNameHindi: cityInfo.nameHindi,
-    cityNameEnglish: cityInfo.nameEnglish,
-    cityState: cityInfo.state,
-    imageUrl: reportPayload.imageUrl || null,
-    thumbnailUrl: reportPayload.thumbnailUrl || reportPayload.imageUrl || null,
-    images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
-    thumbnails: reportPayload.thumbnailUrl ? [reportPayload.thumbnailUrl] : (reportPayload.imageUrl ? [reportPayload.imageUrl] : []),
+    latitude: safeLat,
+    longitude: safeLng,
+    landmark: safeLandmark,
+    cityNameHindi: safeCityHindi,
+    cityNameEnglish: safeCityEnglish,
+    cityState: safeState,
+    imageUrl: safeImageUrl,
+    thumbnailUrl: safeThumbUrl,
+    images: safeImages,
+    thumbnails: safeThumbs,
     photoStatus: hasPhoto ? 'pending' : 'none',
     photoApproved: false,
     reportCount: 1,
@@ -329,9 +347,9 @@ export async function callSubmitReport(reportPayload) {
     success: true,
     deduplicated: false,
     pinId: newDoc.id,
-    cityNameHindi: cityInfo.nameHindi,
-    cityNameEnglish: cityInfo.nameEnglish,
-    images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
+    cityNameHindi: safeCityHindi,
+    cityNameEnglish: safeCityEnglish,
+    images: safeImages,
     message: 'Gaddha safalta se report ho gaya!'
   };
 }
