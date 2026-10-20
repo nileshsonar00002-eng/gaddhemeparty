@@ -2,9 +2,7 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // DYNAMIC & FLEXIBLE: Any non-anonymous account created in your Firebase Authentication
-    // console (Email/Password or Google) is automatically recognized as an Admin!
-    // You can add, edit, or change admin emails/passwords in Firebase Auth anytime without touching these rules.
+    // Helper: Check if caller is an authorized Admin (any Email/Password account in Firebase Auth)
     function isAdmin() {
       return request.auth != null && (
         (request.auth.token.firebase.sign_in_provider != 'anonymous' &&
@@ -16,29 +14,21 @@ service firebase.storage {
     }
 
     // Pothole photos folder:
-    // 1. Anyone can view photos on map (allow read: if true)
-    // 2. Authenticated citizens can upload to their own folder: potholes/{uid}/{fileName}
-    // 3. Authorized admins can upload/edit in potholes/admin/{fileName} or any folder
-    // 4. Safe size limit: max 500 KB (citizen client compresses photos to < 180 KB)
-    // 5. Allowed image types: WebP, JPEG, PNG
-    // 6. Normal citizens cannot overwrite or modify existing photos
-    // 7. Deletion is strictly reserved for authorized admins
-    match /potholes/{uid}/{fileName} {
+    // 1. Any citizen or visitor can view photos on the map
+    // 2. Any authenticated user (anonymous citizen or admin) can upload pothole images up to 10 MB
+    // 3. Deletion and updates are strictly reserved for Admins
+    match /potholes/{allPaths=**} {
       allow read: if true;
       allow create: if request.auth != null
-                    && (request.auth.uid == uid || isAdmin())
-                    && request.resource.size <= 500 * 1024
-                    && (request.resource.contentType.matches('image/jpeg') ||
-                        request.resource.contentType.matches('image/webp') ||
-                        request.resource.contentType.matches('image/png'));
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+                    && request.resource.size <= 10 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+      allow update, delete: if isAdmin();
     }
     
+    // Default fallback: Block any other folders from unauthorized writes
     match /{allPaths=**} {
       allow read: if false;
       allow write: if isAdmin();
     }
   }
 }
-
