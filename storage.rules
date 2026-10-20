@@ -2,23 +2,16 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // DYNAMIC & FLEXIBLE: Any non-anonymous account created in your Firebase Authentication
+    // console (Email/Password or Google) is automatically recognized as an Admin!
+    // You can add, edit, or change admin emails/passwords in Firebase Auth anytime without touching these rules.
     function isAdmin() {
       return request.auth != null && (
+        (request.auth.token.firebase.sign_in_provider != 'anonymous' &&
+         'email' in request.auth.token &&
+         request.auth.token.email != null) ||
         ('admin' in request.auth.token && request.auth.token.admin == true) ||
-        ('role' in request.auth.token && request.auth.token.role == 'admin') ||
-        ('email' in request.auth.token && (
-          request.auth.token.email in [
-            'admin@roadtok.com',
-            'npbagul1991@gmail.com',
-            'npbagul@gmail.com',
-            'inforoadtok@gmail.com',
-            'nileshbagulkhan763100@gmail.com',
-            'admin@roadtok.in',
-            'admin@khadda.com'
-          ] ||
-          request.auth.token.email.matches('.*@roadtok[.]com$') ||
-          request.auth.token.email.matches('.*@roadtok[.]in$')
-        ))
+        ('role' in request.auth.token && request.auth.token.role == 'admin')
       );
     }
 
