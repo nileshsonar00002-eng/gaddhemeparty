@@ -86,10 +86,21 @@ if (appCheckSiteKey && typeof window !== 'undefined') {
 
 // Anonymous Auth Auto-Login
 let currentUser = null;
+let isCloudFunctionsAvailable = true;
+let lastCloudFunctionsAttemptTime = 0;
 
 export function initAnonymousAuth() {
+  const existing = getCurrentUser();
+  if (existing) {
+    return Promise.resolve(existing);
+  }
   return new Promise((resolve) => {
-    onAuthStateChanged(auth, async (user) => {
+    if (auth.currentUser) {
+      currentUser = auth.currentUser;
+      return resolve(auth.currentUser);
+    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      unsubscribe();
       if (user) {
         currentUser = user;
         console.log('[Auth] Anonymous session ready:', user.uid);
@@ -121,13 +132,19 @@ export function getCurrentUser() {
 export async function uploadPotholePhoto(uid, blob, isThumb = false) {
   try {
     if (!uid) {
-      try {
-        const authPromise = initAnonymousAuth();
-        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 1500));
-        const user = await Promise.race([authPromise, timeoutPromise]);
-        uid = user?.uid || ('anon_' + Math.random().toString(36).substring(2, 10));
-      } catch (_) {
-        uid = 'anon_' + Math.random().toString(36).substring(2, 10);
+      const current = getCurrentUser();
+      if (current?.uid) {
+        uid = current.uid;
+      } else {
+        try {
+          const user = await Promise.race([
+            initAnonymousAuth(),
+            new Promise((resolve) => setTimeout(() => resolve(null), 1000))
+          ]);
+          uid = user?.uid || ('anon_' + Math.random().toString(36).substring(2, 10));
+        } catch (_) {
+          uid = 'anon_' + Math.random().toString(36).substring(2, 10);
+        }
       }
     }
     const timestamp = Date.now();
@@ -135,17 +152,21 @@ export async function uploadPotholePhoto(uid, blob, isThumb = false) {
     const fileName = `pothole_${timestamp}${suffix}`;
     const fileRef = ref(storage, `potholes/${uid}/${fileName}`);
 
-    // Wrap uploadBytes with a 4-second timeout so it never hangs the UI
+    // Fast 2.5-second timeout so Storage latency never stalls the UI
     const uploadPromise = uploadBytes(fileRef, blob, {
       contentType: 'image/webp',
       cacheControl: 'public, max-age=31536000'
     });
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Storage upload timeout')), 4000)
+      setTimeout(() => reject(new Error('Storage upload timeout')), 2500)
     );
     await Promise.race([uploadPromise, timeoutPromise]);
 
-    return await getDownloadURL(fileRef);
+    const urlPromise = getDownloadURL(fileRef);
+    const urlTimeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Storage URL timeout')), 1500)
+    );
+    return await Promise.race([urlPromise, urlTimeout]);
   } catch (err) {
     console.warn('[Firebase Storage] Upload notice (CORS/Rules/Auth):', err.message || err);
     return null;
@@ -171,134 +192,148 @@ export async function callSubmitReport(reportPayload) {
     cityState: cityInfo.state
   };
 
-  try {
-    const submitFn = httpsCallable(functions, 'submitReport');
-    // Fast 2.5s race timeout so un-deployed Cloud Functions don't freeze the UI
-    const fnPromise = submitFn(enrichedPayload);
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Cloud Functions timeout')), 2500)
-    );
-    const result = await Promise.race([fnPromise, timeoutPromise]);
-    const data = result.data || {};
-    recordLocalCountedAction(data.pinId || result.data?.id || ('pin_' + Date.now()));
-    return {
-      ...data,
-      cityNameHindi: data?.cityNameHindi || cityInfo.nameHindi,
-      cityNameEnglish: data?.cityNameEnglish || cityInfo.nameEnglish
-    };
-  } catch (fnErr) {
-    console.warn('[Cloud Functions] submitReport error / timeout fallback:', fnErr.message || fnErr);
-    const serverMessage = fnErr.details?.messageHindi || fnErr.message;
-    if (fnErr.details?.code === 'RATE_LIMITED' || fnErr.details?.code === 'ALREADY_REPORTED' || fnErr.details?.code === 'IP_RATE_LIMITED') {
-      throw new Error(serverMessage);
-    }
-    
-    // Direct Firestore write fallback for local offline / demo
-    const currentQuota = getActionQuota();
-    if (currentQuota.isLimitReached) {
-      throw new Error(t('nextReportAvailable', { time: currentQuota.waitFormatted || '24 घंटे' }));
-    }
+  // Check if Cloud Functions are reachable or if we should skip the timeout wait in this session
+  const shouldTryCloudFunctions = isCloudFunctionsAvailable || (Date.now() - lastCloudFunctionsAttemptTime > 300000);
 
-    const user = getCurrentUser();
-    const pinsRef = collection(db, 'pins');
-
-    // Check for nearby existing active pin within 20 meters
-    let existingPinDoc = null;
+  if (shouldTryCloudFunctions) {
     try {
-      const q = query(pinsRef, where('status', '==', 'active'), limit(60));
-      const snap = await getDocs(q);
-      for (const docSnap of snap.docs) {
-        const d = docSnap.data();
-        if (d.latitude && d.longitude) {
-          const dist = haversineDistanceMeters(reportPayload.latitude, reportPayload.longitude, d.latitude, d.longitude);
-          if (dist <= 5) {
-            existingPinDoc = { id: docSnap.id, ref: docSnap.ref, data: d };
-            break;
-          }
+      const submitFn = httpsCallable(functions, 'submitReport');
+      // Fast 1.0s race timeout so un-deployed or slow Cloud Functions don't freeze the UI
+      const fnPromise = submitFn(enrichedPayload);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Cloud Functions timeout')), 1000)
+      );
+      const result = await Promise.race([fnPromise, timeoutPromise]);
+      const data = result.data || {};
+      isCloudFunctionsAvailable = true;
+      recordLocalCountedAction(data.pinId || result.data?.id || ('pin_' + Date.now()));
+      return {
+        ...data,
+        cityNameHindi: data?.cityNameHindi || cityInfo.nameHindi,
+        cityNameEnglish: data?.cityNameEnglish || cityInfo.nameEnglish
+      };
+    } catch (fnErr) {
+      console.warn('[Cloud Functions] submitReport error / timeout fallback:', fnErr.message || fnErr);
+      const serverMessage = fnErr.details?.messageHindi || fnErr.message;
+      if (fnErr.details?.code === 'RATE_LIMITED' || fnErr.details?.code === 'ALREADY_REPORTED' || fnErr.details?.code === 'IP_RATE_LIMITED') {
+        throw new Error(serverMessage);
+      }
+      
+      // Mark Cloud Functions as temporarily unavailable so subsequent calls don't wait
+      isCloudFunctionsAvailable = false;
+      lastCloudFunctionsAttemptTime = Date.now();
+    }
+  }
+
+  // Direct Firestore write fallback for local offline / demo
+  const currentQuota = getActionQuota();
+  if (currentQuota.isLimitReached) {
+    throw new Error(t('nextReportAvailable', { time: currentQuota.waitFormatted || '24 घंटे' }));
+  }
+
+  const user = getCurrentUser();
+  const pinsRef = collection(db, 'pins');
+
+  // Check for nearby existing active pin within 5 meters
+  let existingPinDoc = null;
+  try {
+    const q = query(pinsRef, where('status', '==', 'active'), limit(60));
+    const fetchPromise = getDocs(q);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Dedup query timeout')), 1000)
+    );
+    const snap = await Promise.race([fetchPromise, timeoutPromise]);
+    for (const docSnap of snap.docs) {
+      const d = docSnap.data();
+      if (d.latitude && d.longitude) {
+        const dist = haversineDistanceMeters(reportPayload.latitude, reportPayload.longitude, d.latitude, d.longitude);
+        if (dist <= 5) {
+          existingPinDoc = { id: docSnap.id, ref: docSnap.ref, data: d };
+          break;
         }
       }
-    } catch (e) {
-      console.warn('Nearby deduplication scan notice:', e);
+    }
+  } catch (e) {
+    console.warn('Nearby deduplication scan notice:', e);
+  }
+
+  if (existingPinDoc) {
+    // Merge report and image into existing pin
+    const existingImages = Array.isArray(existingPinDoc.data.images)
+      ? [...existingPinDoc.data.images]
+      : (existingPinDoc.data.imageUrl ? [existingPinDoc.data.imageUrl] : []);
+
+    const existingThumbs = Array.isArray(existingPinDoc.data.thumbnails)
+      ? [...existingPinDoc.data.thumbnails]
+      : (existingPinDoc.data.thumbnailUrl ? [existingPinDoc.data.thumbnailUrl] : []);
+
+    if (reportPayload.imageUrl) {
+      existingImages.unshift(reportPayload.imageUrl);
+    }
+    if (reportPayload.thumbnailUrl) {
+      existingThumbs.unshift(reportPayload.thumbnailUrl);
     }
 
-    if (existingPinDoc) {
-      // Merge report and image into existing pin
-      const existingImages = Array.isArray(existingPinDoc.data.images)
-        ? [...existingPinDoc.data.images]
-        : (existingPinDoc.data.imageUrl ? [existingPinDoc.data.imageUrl] : []);
-
-      const existingThumbs = Array.isArray(existingPinDoc.data.thumbnails)
-        ? [...existingPinDoc.data.thumbnails]
-        : (existingPinDoc.data.thumbnailUrl ? [existingPinDoc.data.thumbnailUrl] : []);
-
-      if (reportPayload.imageUrl) {
-        existingImages.unshift(reportPayload.imageUrl);
-      }
-      if (reportPayload.thumbnailUrl) {
-        existingThumbs.unshift(reportPayload.thumbnailUrl);
-      }
-
-      await updateDoc(existingPinDoc.ref, {
-        reportCount: (existingPinDoc.data.reportCount || 1) + 1,
-        imageUrl: reportPayload.imageUrl || existingPinDoc.data.imageUrl || null,
-        thumbnailUrl: reportPayload.thumbnailUrl || existingPinDoc.data.thumbnailUrl || null,
-        images: existingImages,
-        thumbnails: existingThumbs,
-        photoStatus: reportPayload.imageUrl ? 'pending' : (existingPinDoc.data.photoStatus || 'approved'),
-        photoApproved: false,
-        lastReportedAt: serverTimestamp()
-      });
-
-      recordLocalCountedAction(existingPinDoc.id);
-
-      return {
-        success: true,
-        deduplicated: true,
-        pinId: existingPinDoc.id,
-        cityNameHindi: existingPinDoc.data.cityNameHindi || cityInfo.nameHindi,
-        cityNameEnglish: existingPinDoc.data.cityNameEnglish || cityInfo.nameEnglish,
-        images: existingImages,
-        thumbnails: existingThumbs,
-        message: 'Aapke paas pehle se report kiya hua gaddha mila (5m range). Nayi photo add kar di gayi hai!'
-      };
-    }
-
-    // Create new pin with images and thumbnails arrays
-    const hasPhoto = Boolean(reportPayload.imageUrl);
-    const newDoc = await addDoc(pinsRef, {
-      latitude: reportPayload.latitude,
-      longitude: reportPayload.longitude,
-      landmark: reportPayload.landmark || 'Sadak par gaddha',
-      cityNameHindi: cityInfo.nameHindi,
-      cityNameEnglish: cityInfo.nameEnglish,
-      cityState: cityInfo.state,
-      imageUrl: reportPayload.imageUrl || null,
-      thumbnailUrl: reportPayload.thumbnailUrl || reportPayload.imageUrl || null,
-      images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
-      thumbnails: reportPayload.thumbnailUrl ? [reportPayload.thumbnailUrl] : (reportPayload.imageUrl ? [reportPayload.imageUrl] : []),
-      photoStatus: hasPhoto ? 'pending' : 'none',
+    await updateDoc(existingPinDoc.ref, {
+      reportCount: (existingPinDoc.data.reportCount || 1) + 1,
+      imageUrl: reportPayload.imageUrl || existingPinDoc.data.imageUrl || null,
+      thumbnailUrl: reportPayload.thumbnailUrl || existingPinDoc.data.thumbnailUrl || null,
+      images: existingImages,
+      thumbnails: existingThumbs,
+      photoStatus: reportPayload.imageUrl ? 'pending' : (existingPinDoc.data.photoStatus || 'approved'),
       photoApproved: false,
-      reportCount: 1,
-      upvotes: 0,
-      flagCount: 0,
-      status: 'active',
-      createdBy: user?.uid || 'anonymous',
-      createdAt: serverTimestamp(),
       lastReportedAt: serverTimestamp()
     });
 
-    recordLocalCountedAction(newDoc.id);
+    recordLocalCountedAction(existingPinDoc.id);
 
     return {
       success: true,
-      deduplicated: false,
-      pinId: newDoc.id,
-      cityNameHindi: cityInfo.nameHindi,
-      cityNameEnglish: cityInfo.nameEnglish,
-      images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
-      message: 'Gaddha safalta se report ho gaya!'
+      deduplicated: true,
+      pinId: existingPinDoc.id,
+      cityNameHindi: existingPinDoc.data.cityNameHindi || cityInfo.nameHindi,
+      cityNameEnglish: existingPinDoc.data.cityNameEnglish || cityInfo.nameEnglish,
+      images: existingImages,
+      thumbnails: existingThumbs,
+      message: 'Aapke paas pehle se report kiya hua gaddha mila (5m range). Nayi photo add kar di gayi hai!'
     };
   }
+
+  // Create new pin with images and thumbnails arrays
+  const hasPhoto = Boolean(reportPayload.imageUrl);
+  const newDoc = await addDoc(pinsRef, {
+    latitude: reportPayload.latitude,
+    longitude: reportPayload.longitude,
+    landmark: reportPayload.landmark || 'Sadak par gaddha',
+    cityNameHindi: cityInfo.nameHindi,
+    cityNameEnglish: cityInfo.nameEnglish,
+    cityState: cityInfo.state,
+    imageUrl: reportPayload.imageUrl || null,
+    thumbnailUrl: reportPayload.thumbnailUrl || reportPayload.imageUrl || null,
+    images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
+    thumbnails: reportPayload.thumbnailUrl ? [reportPayload.thumbnailUrl] : (reportPayload.imageUrl ? [reportPayload.imageUrl] : []),
+    photoStatus: hasPhoto ? 'pending' : 'none',
+    photoApproved: false,
+    reportCount: 1,
+    upvotes: 0,
+    flagCount: 0,
+    status: 'active',
+    createdBy: user?.uid || 'anonymous',
+    createdAt: serverTimestamp(),
+    lastReportedAt: serverTimestamp()
+  });
+
+  recordLocalCountedAction(newDoc.id);
+
+  return {
+    success: true,
+    deduplicated: false,
+    pinId: newDoc.id,
+    cityNameHindi: cityInfo.nameHindi,
+    cityNameEnglish: cityInfo.nameEnglish,
+    images: reportPayload.imageUrl ? [reportPayload.imageUrl] : [],
+    message: 'Gaddha safalta se report ho gaya!'
+  };
 }
 
 export async function callUpvotePin(pinId, userCoords = null) {

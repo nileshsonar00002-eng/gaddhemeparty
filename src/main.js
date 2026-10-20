@@ -17,6 +17,7 @@ import { resolvePinCity, getNearestIndianCity, haversineDistanceKm } from './uti
 import { getActionQuota, hasUserReportedOrUpvoted, hasUserUpvoted, markPinAsUpvoted } from './utils/upvoteStorage';
 import {
   initAnonymousAuth,
+  getCurrentUser,
   subscribeToActivePins,
   subscribeToGlobalStats,
   subscribeToLeaderboard,
@@ -1513,10 +1514,19 @@ class KhaddaApp {
       let thumbnailUrl = null;
 
       if (formData.imageData && formData.imageData.mainBlob) {
-        showToast(t('photoCompressing'), 'info', 2000);
         try {
-          imageUrl = await uploadPotholePhoto(null, formData.imageData.mainBlob, false);
-          thumbnailUrl = await uploadPotholePhoto(null, formData.imageData.thumbnailBlob, true);
+          const user = getCurrentUser() || (await initAnonymousAuth().catch(() => null));
+          const userUid = user?.uid || null;
+
+          const [mainResult, thumbResult] = await Promise.allSettled([
+            uploadPotholePhoto(userUid, formData.imageData.mainBlob, false),
+            formData.imageData.thumbnailBlob
+              ? uploadPotholePhoto(userUid, formData.imageData.thumbnailBlob, true)
+              : Promise.resolve(null)
+          ]);
+
+          imageUrl = mainResult.status === 'fulfilled' ? mainResult.value : null;
+          thumbnailUrl = thumbResult.status === 'fulfilled' ? thumbResult.value : null;
         } catch (uploadErr) {
           console.warn('Image upload notice:', uploadErr);
         }

@@ -137,11 +137,11 @@ export function getNearestIndianCity(lat, lng) {
 export async function reverseGeocodeLocation(lat, lng) {
   const nearestStatic = getNearestIndianCity(lat, lng);
 
-  // 1. Try Google Maps Geocoder if loaded in window
+  // 1. Try Google Maps Geocoder if loaded in window (with fast 600ms safety timeout)
   if (typeof window !== 'undefined' && window.google && window.google.maps && window.google.maps.Geocoder) {
     try {
       const geocoder = new window.google.maps.Geocoder();
-      const response = await new Promise((resolve, reject) => {
+      const geocodePromise = new Promise((resolve, reject) => {
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
           if (status === 'OK' && results && results.length > 0) {
             resolve(results);
@@ -150,6 +150,12 @@ export async function reverseGeocodeLocation(lat, lng) {
           }
         });
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Geocoder timeout')), 600)
+      );
+
+      const response = await Promise.race([geocodePromise, timeoutPromise]);
 
       if (response && response.length > 0) {
         let locality = '';
