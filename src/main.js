@@ -1491,176 +1491,139 @@ class KhaddaApp {
     this.userCoords = { lat: latitude, lng: longitude };
     setCachedUserLocation(this.userCoords);
 
-    // 1. Instantly close the bottom sheet
-    this.bottomSheet.close();
+    const isOnline = navigator.onLine;
 
-    // 2. Synchronously resolve nearest city and landmark (0ms delay)
-    const nearestCity = getNearestIndianCity(latitude, longitude);
-    const landmark = formData.landmark || t('defaultLandmark');
-    const tempPinId = 'temp_' + Date.now();
-    recordLocalCountedAction(tempPinId);
-
-    // 3. Create optimistic pin on the map immediately
-    const optimisticImg = formData.imageData?.previewUrl || formData.imageData?.mainDataUrl || formData.imageUrl || null;
-    const optimisticThumb = formData.imageData?.thumbDataUrl || optimisticImg;
-
-    const optimisticPin = {
-      id: tempPinId,
-      latitude,
-      longitude,
-      landmark,
-      cityNameHindi: nearestCity.nameHindi,
-      cityNameEnglish: nearestCity.nameEnglish,
-      imageUrl: optimisticImg,
-      thumbnailUrl: optimisticThumb,
-      images: optimisticImg ? [optimisticImg] : [],
-      thumbnails: optimisticThumb ? [optimisticThumb] : [],
-      photoStatus: optimisticImg ? 'pending' : 'none',
-      photoApproved: false,
-      reportCount: 1,
-      upvotes: 0,
-      status: 'active',
-      createdAt: new Date(),
-      isOptimistic: true
-    };
-
-    this.currentPins.unshift(optimisticPin);
-
-    // 4. Update map view immediately
-    if (this.mapAdapter) {
-      this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
-      this.mapAdapter.setView(latitude, longitude, 17);
+    if (!isOnline) {
+      const offlineImgUrl = formData.imageData?.mainDataUrl || null;
+      const offlineThumbUrl = formData.imageData?.thumbDataUrl || null;
+      await saveReportOffline({
+        latitude,
+        longitude,
+        landmark: formData.landmark,
+        imageUrl: offlineImgUrl,
+        thumbnailUrl: offlineThumbUrl,
+        formOpenTime: formData.formOpenTime
+      });
+      showToast(t('offlineAlert'), 'warning', 6000);
+      this.bottomSheet.close();
+      return;
     }
 
-    // 5. Trigger celebratory confetti animation immediately
-    if (window.__khaddaTriggerPartyExplosion) {
-      window.__khaddaTriggerPartyExplosion();
-    }
+    try {
+      let imageUrl = null;
+      let thumbnailUrl = null;
 
-    // 6. Instantly open Thank You / Feedback confirmation modal
-    openThankYouModal({
-      landmark,
-      cityName: nearestCity.nameEnglish || nearestCity.nameHindi || '',
-      isDeduplicated: false,
-      onClose: () => {
-        if (this.panelManager) {
-          this.panelManager.close();
+      if (formData.imageData && formData.imageData.mainBlob) {
+        try {
+          const user = getCurrentUser() || (await initAnonymousAuth().catch(() => null));
+          const userUid = user?.uid || null;
+
+          const [mainResult, thumbResult] = await Promise.allSettled([
+            uploadPotholePhoto(userUid, formData.imageData.mainBlob, false),
+            formData.imageData.thumbnailBlob
+              ? uploadPotholePhoto(userUid, formData.imageData.thumbnailBlob, true)
+              : Promise.resolve(null)
+          ]);
+
+          imageUrl = mainResult.status === 'fulfilled' ? mainResult.value : null;
+          thumbnailUrl = thumbResult.status === 'fulfilled' ? thumbResult.value : null;
+        } catch (uploadErr) {
+          console.warn('Image upload notice:', uploadErr);
         }
-        const mapSec = document.getElementById('map-section');
-        if (mapSec) {
-          mapSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (!imageUrl && formData.imageData.mainDataUrl) {
+          imageUrl = formData.imageData.mainDataUrl;
+        }
+        if (!thumbnailUrl && formData.imageData.thumbDataUrl) {
+          thumbnailUrl = formData.imageData.thumbDataUrl;
         }
       }
-    });
 
-    // 7. Show success toast immediately
-    showToast(t('submitSuccess'), 'success', 5000);
+      const reportPayload = {
+        latitude,
+        longitude,
+        landmark: formData.landmark,
+        imageUrl,
+        thumbnailUrl,
+        website_hp: formData.website_hp,
+        formOpenTime: formData.formOpenTime
+      };
 
-    // 8. Non-blocking Background persistence & deduplication
-    (async () => {
-      try {
-        const isOnline = navigator.onLine;
-        if (!isOnline) {
-          await saveReportOffline({
-            latitude,
-            longitude,
-            landmark,
-            imageUrl: optimisticImg,
-            thumbnailUrl: optimisticThumb,
-            formOpenTime: formData.formOpenTime
-          });
-          return;
-        }
+      const result = await callSubmitReport(reportPayload);
 
-        let imageUrl = null;
-        let thumbnailUrl = null;
+      if (result.deduplicated) {
+        showToast(result.message || t('dedupedNotice'), 'warning', 6000);
+      } else {
+        showToast(result.message || t('submitSuccess'), 'success', 5000);
+      }
 
-        if (formData.imageData && formData.imageData.mainBlob) {
-          try {
-            const user = getCurrentUser() || (await initAnonymousAuth().catch(() => null));
-            const userUid = user?.uid || null;
+      const nearestCity = getNearestIndianCity(latitude, longitude);
+      let targetPin = null;
 
-            const [mainResult, thumbResult] = await Promise.allSettled([
-              uploadPotholePhoto(userUid, formData.imageData.mainBlob, false),
-              formData.imageData.thumbnailBlob
-                ? uploadPotholePhoto(userUid, formData.imageData.thumbnailBlob, true)
-                : Promise.resolve(null)
-            ]);
-
-            imageUrl = mainResult.status === 'fulfilled' ? mainResult.value : null;
-            thumbnailUrl = thumbResult.status === 'fulfilled' ? thumbResult.value : null;
-          } catch (uploadErr) {
-            console.warn('[Background] Image upload notice:', uploadErr);
-          }
-
-          if (!imageUrl && formData.imageData.mainDataUrl) {
-            imageUrl = formData.imageData.mainDataUrl;
-          }
-          if (!thumbnailUrl && formData.imageData.thumbDataUrl) {
-            thumbnailUrl = formData.imageData.thumbDataUrl;
+      if (result.deduplicated && result.pinId) {
+        targetPin = this.currentPins.find((p) => p.id === result.pinId);
+        if (targetPin) {
+          targetPin.reportCount = (targetPin.reportCount || 1) + 1;
+          if (imageUrl && targetPin.images) {
+            targetPin.images.unshift(imageUrl);
+            targetPin.photoStatus = 'pending';
+            targetPin.photoApproved = false;
           }
         }
-
-        const reportPayload = {
+      } else if (result.pinId) {
+        targetPin = {
+          id: result.pinId,
           latitude,
           longitude,
-          landmark,
-          imageUrl: imageUrl || optimisticImg,
-          thumbnailUrl: thumbnailUrl || optimisticThumb,
-          website_hp: formData.website_hp,
-          formOpenTime: formData.formOpenTime
+          landmark: formData.landmark || t('defaultLandmark'),
+          cityNameHindi: result.cityNameHindi || nearestCity.nameHindi,
+          cityNameEnglish: result.cityNameEnglish || nearestCity.nameEnglish,
+          imageUrl,
+          thumbnailUrl,
+          images: imageUrl ? [imageUrl] : [],
+          photoStatus: imageUrl ? 'pending' : 'none',
+          photoApproved: false,
+          reportCount: 1,
+          upvotes: 0,
+          status: 'active',
+          createdAt: new Date()
         };
-
-        const result = await callSubmitReport(reportPayload);
-
-        // Update optimistic pin with actual database response
-        if (result.deduplicated && result.pinId) {
-          // If deduplicated within 5m range, merge and remove temp pin
-          this.currentPins = this.currentPins.filter((p) => p.id !== tempPinId);
-          const targetPin = this.currentPins.find((p) => p.id === result.pinId);
-          if (targetPin) {
-            targetPin.reportCount = (targetPin.reportCount || 1) + 1;
-            if (imageUrl && targetPin.images) {
-              targetPin.images.unshift(imageUrl);
-              targetPin.photoStatus = 'pending';
-              targetPin.photoApproved = false;
-            }
-          }
-          showToast(result.message || t('dedupedNotice'), 'info', 6000);
-        } else if (result.pinId) {
-          // Update temp pin with permanent Firestore pin ID
-          optimisticPin.id = result.pinId;
-          optimisticPin.cityNameHindi = result.cityNameHindi || nearestCity.nameHindi;
-          optimisticPin.cityNameEnglish = result.cityNameEnglish || nearestCity.nameEnglish;
-          if (imageUrl) {
-            optimisticPin.imageUrl = imageUrl;
-            optimisticPin.images = [imageUrl];
-          }
-          if (thumbnailUrl) {
-            optimisticPin.thumbnailUrl = thumbnailUrl;
-            optimisticPin.thumbnails = [thumbnailUrl];
-          }
-          optimisticPin.isOptimistic = false;
-        }
-
-        // Re-render pins on map with the updated server ID
-        if (this.mapAdapter) {
-          this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
-        }
-      } catch (bgErr) {
-        console.warn('[Background] Save notice:', bgErr);
-        if (!navigator.onLine) {
-          await saveReportOffline({
-            latitude,
-            longitude,
-            landmark,
-            imageUrl: optimisticImg,
-            thumbnailUrl: optimisticThumb,
-            formOpenTime: formData.formOpenTime
-          });
-        }
+        this.currentPins.unshift(targetPin);
       }
-    })();
+
+      // Re-render pins on map & center on new report
+      if (this.mapAdapter) {
+        this.mapAdapter.renderPins(this.currentPins, (pin) => openPinDetailModal(pin));
+        this.mapAdapter.setView(latitude, longitude, 17);
+      }
+
+      // Close bottom sheet
+      this.bottomSheet.close();
+
+      // Trigger celebratory animation
+      if (window.__khaddaTriggerPartyExplosion) {
+        window.__khaddaTriggerPartyExplosion();
+      }
+
+      // Open Thank You feedback modal popup
+      openThankYouModal({
+        landmark: formData.landmark || targetPin?.landmark || '',
+        cityName: targetPin?.cityNameEnglish || targetPin?.cityNameHindi || nearestCity?.nameEnglish || '',
+        isDeduplicated: Boolean(result.deduplicated),
+        onClose: () => {
+          if (this.panelManager) {
+            this.panelManager.close();
+          }
+          const mapSec = document.getElementById('map-section');
+          if (mapSec) {
+            mapSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      });
+    } catch (err) {
+      console.error('[App] Report submission error:', err);
+      showToast(err.message || t('submitError'), 'error');
+    }
   }
 
   setupOfflineSync() {
