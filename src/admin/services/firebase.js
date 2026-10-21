@@ -803,3 +803,37 @@ export async function deletePinCommentAdmin(pinId, commentId) {
   return true;
 }
 
+/**
+ * Returns current date string in Indian Standard Time (IST, UTC+05:30), format: YYYY-MM-DD
+ */
+export function getTodayDateKeyIST() {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+  } catch (e) {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+/**
+ * Real-time listener for global stats counter (Visitors, Daily Metrics)
+ */
+export function subscribeToGlobalStats(onStatsUpdated, onError) {
+  try {
+    const statsDoc = doc(db, 'stats', 'global');
+    return onSnapshot(
+      statsDoc,
+      (snap) => {
+        if (snap.exists()) {
+          onStatsUpdated(snap.data());
+        }
+      },
+      (err) => {
+        console.warn('[Admin] Global stats sync notice:', err.message);
+        if (onError) onError(err);
+      }
+    );
+  } catch (e) {
+    if (onError) onError(e);
+    return () => {};
+  }
+}

@@ -4,6 +4,8 @@ import './style.css';
 import {
   initAdminAuth,
   subscribeToModerationQueue,
+  subscribeToGlobalStats,
+  getTodayDateKeyIST,
   approvePin,
   rejectPin,
   bulkApprovePins,
@@ -55,6 +57,8 @@ class AdminApp {
     this.initialLoadDone = false;
     this.previousPendingIds = new Set();
     this.unsubscribeFirestore = null;
+    this.unsubscribeGlobalStats = null;
+    this.globalStats = {};
     this.storageListenerBound = false;
   }
 
@@ -74,6 +78,10 @@ class AdminApp {
         if (this.unsubscribeFirestore) {
           this.unsubscribeFirestore();
           this.unsubscribeFirestore = null;
+        }
+        if (this.unsubscribeGlobalStats) {
+          this.unsubscribeGlobalStats();
+          this.unsubscribeGlobalStats = null;
         }
         renderAuthGate(this.appEl, async () => {
           await this.startDashboard();
@@ -106,6 +114,19 @@ class AdminApp {
         }
       });
     }
+
+    // Setup Realtime Firestore Global Stats Listener
+    this.unsubscribeGlobalStats = subscribeToGlobalStats(
+      (stats) => {
+        this.globalStats = stats || {};
+        if (this.initialLoadDone) {
+          this.renderStatsBarSection();
+        }
+      },
+      (error) => {
+        console.warn('[Admin] Global stats subscription notice:', error);
+      }
+    );
 
     // Setup Realtime Firestore Listener
     this.unsubscribeFirestore = subscribeToModerationQueue(
@@ -352,6 +373,40 @@ class AdminApp {
     });
   }
 
+  renderStatsBarSection() {
+    const statsMount = document.getElementById('admin-stats-mount');
+    if (!statsMount) return;
+
+    let pendingCount = 0;
+    let approvedCount = 0;
+    let rejectedCount = 0;
+    this.allPins.forEach((pin) => {
+      const status = this.getPhotoStatus(pin);
+      if (status === 'pending') pendingCount++;
+      else if (status === 'approved') approvedCount++;
+      else if (status === 'rejected') rejectedCount++;
+    });
+
+    const todayKey = getTodayDateKeyIST();
+    const todayNewUsersCount = this.globalStats?.dailyNewUsers?.[todayKey] || 0;
+    const todayTotalVisitors = this.globalStats?.dailyVisitors?.[todayKey] || 0;
+    const totalVisitorsCount = this.globalStats?.visitorCount || 0;
+
+    renderStatsBar(statsMount, {
+      pendingCount,
+      approvedCount,
+      rejectedCount,
+      totalCount: this.allPins.length,
+      todayNewUsersCount,
+      todayTotalVisitors,
+      totalVisitorsCount,
+      activeTab: this.activeTab
+    }, (selectedTab) => {
+      this.activeTab = selectedTab;
+      this.render();
+    });
+  }
+
   render() {
     const navbarMount = document.getElementById('admin-navbar-mount');
     const statsMount = document.getElementById('admin-stats-mount');
@@ -404,11 +459,19 @@ class AdminApp {
     });
 
     // 3. Render Stats Bar
+    const todayKey = getTodayDateKeyIST();
+    const todayNewUsersCount = this.globalStats?.dailyNewUsers?.[todayKey] || 0;
+    const todayTotalVisitors = this.globalStats?.dailyVisitors?.[todayKey] || 0;
+    const totalVisitorsCount = this.globalStats?.visitorCount || 0;
+
     renderStatsBar(statsMount, {
       pendingCount,
       approvedCount,
       rejectedCount,
       totalCount: this.allPins.length,
+      todayNewUsersCount,
+      todayTotalVisitors,
+      totalVisitorsCount,
       activeTab: this.activeTab
     }, (selectedTab) => {
       this.activeTab = selectedTab;

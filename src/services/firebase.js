@@ -654,26 +654,99 @@ export function subscribeToModerationPins(onPinsUpdated, onError) {
 }
 
 /**
- * Record a unique visitor session atomically in Firestore
+ * Returns current date string in Indian Standard Time (IST, UTC+05:30), format: YYYY-MM-DD
+ */
+export function getTodayDateKeyIST() {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+  } catch (e) {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+/**
+ * Record a unique visitor session and new user atomically in Firestore
  */
 export async function recordVisitorSession() {
   if (typeof window === 'undefined') return;
+
+  const todayKey = getTodayDateKeyIST();
+  const HAS_VISITED_KEY = 'khadda_has_visited_v1';
+  const TODAY_NEW_USER_KEY = `khadda_new_user_recorded_${todayKey}`;
+  const TODAY_VISITOR_KEY = `khadda_visitor_recorded_${todayKey}`;
   const SESSION_KEY = 'khadda_visitor_recorded_v1';
-  if (!sessionStorage.getItem(SESSION_KEY)) {
-    sessionStorage.setItem(SESSION_KEY, 'true');
+
+  let isNewUser = false;
+  try {
+    if (!localStorage.getItem(HAS_VISITED_KEY)) {
+      isNewUser = true;
+      localStorage.setItem(HAS_VISITED_KEY, 'true');
+      localStorage.setItem('khadda_first_visit_date', todayKey);
+    }
+  } catch (e) {
+    isNewUser = !sessionStorage.getItem('khadda_has_visited_session');
+    try { sessionStorage.setItem('khadda_has_visited_session', 'true'); } catch (_) {}
+  }
+
+  let shouldRecordNewUserToday = false;
+  if (isNewUser) {
+    try {
+      if (!localStorage.getItem(TODAY_NEW_USER_KEY)) {
+        shouldRecordNewUserToday = true;
+        localStorage.setItem(TODAY_NEW_USER_KEY, 'true');
+      }
+    } catch (e) {
+      shouldRecordNewUserToday = true;
+    }
+  }
+
+  let shouldRecordVisitorSession = false;
+  try {
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      shouldRecordVisitorSession = true;
+      sessionStorage.setItem(SESSION_KEY, 'true');
+    }
+  } catch (e) {
+    shouldRecordVisitorSession = true;
+  }
+
+  let shouldRecordDailyVisitor = false;
+  try {
+    if (!localStorage.getItem(TODAY_VISITOR_KEY)) {
+      shouldRecordDailyVisitor = true;
+      localStorage.setItem(TODAY_VISITOR_KEY, 'true');
+    }
+  } catch (e) {
+    shouldRecordDailyVisitor = true;
+  }
+
+  if (shouldRecordNewUserToday || shouldRecordVisitorSession || shouldRecordDailyVisitor) {
     try {
       const statsRef = doc(db, 'stats', 'global');
-      await setDoc(statsRef, { visitorCount: increment(1) }, { merge: true });
+      const updateData = {
+        lastVisitorAt: serverTimestamp()
+      };
+      if (shouldRecordVisitorSession) {
+        updateData.visitorCount = increment(1);
+      }
+      if (shouldRecordNewUserToday) {
+        updateData.dailyNewUsers = {
+          [todayKey]: increment(1)
+        };
+      }
+      if (shouldRecordDailyVisitor) {
+        updateData.dailyVisitors = {
+          [todayKey]: increment(1)
+        };
+      }
+
+      await setDoc(statsRef, updateData, { merge: true });
     } catch (err) {
       console.warn('[Firebase] Visitor count increment notice:', err);
     }
   }
 }
 
-/**
- * Record a bell ring atomically in Firestore for multi-user sync
- * Uses Firestore SDK with atomic REST commit transform fallback
- */
 export async function recordBellRing() {
   let recorded = false;
   try {

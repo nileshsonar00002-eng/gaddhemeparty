@@ -24,7 +24,8 @@ import {
   uploadPotholePhoto,
   callSubmitReport,
   callUpvotePin,
-  callFlagPin
+  callFlagPin,
+  recordVisitorSession
 } from './services/firebase';
 import {
   saveReportOffline,
@@ -91,6 +92,9 @@ class KhaddaApp {
 
     // 0.5. Initialize Hero Cinematic Visuals (Starfield & 3D Night Globe)
     this.initHeroVisuals();
+
+    // 0.5. Record visitor session & new user visit atomically
+    recordVisitorSession();
 
     // 0.6. Initialize Panels, Routing & Site Info Drawer early so menu clicks work immediately
     this.initPanelsAndRouter();

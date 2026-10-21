@@ -6,11 +6,14 @@ export function renderStatsBar(container, stats = {}, onTabSelect) {
     approvedCount = 0,
     rejectedCount = 0,
     totalCount = 0,
+    todayNewUsersCount = 0,
+    todayTotalVisitors = 0,
+    totalVisitorsCount = 0,
     activeTab = 'pending'
   } = stats;
 
   container.innerHTML = `
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
       <!-- 1. Pending Queue Card -->
       <div
         data-tab-target="pending"
@@ -68,6 +71,21 @@ export function renderStatsBar(container, stats = {}, onTabSelect) {
         <div class="mt-3 flex items-baseline gap-2">
           <span class="text-2xl sm:text-3xl font-heading font-black text-cyan-400 tabular-nums">${totalCount}</span>
           <span class="text-[11px] text-slate-400">total reports</span>
+        </div>
+      </div>
+
+      <!-- 5. New Users Today Card -->
+      <div
+        class="group p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 transition flex flex-col justify-between col-span-2 sm:col-span-1"
+        title="Today's new visitors (आज के नए विजिटर) - All-time total visits: ${totalVisitorsCount}"
+      >
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 group-hover:text-indigo-400 transition">New Users Today</span>
+          <span class="w-7 h-7 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xs">👥</span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span class="text-2xl sm:text-3xl font-heading font-black text-indigo-400 tabular-nums">${todayNewUsersCount}</span>
+          <span class="text-[11px] text-slate-400">${todayTotalVisitors > todayNewUsersCount ? `${todayTotalVisitors} today` : 'visited today'}</span>
         </div>
       </div>
     </div>
